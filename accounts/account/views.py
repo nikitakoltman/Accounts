@@ -1,31 +1,27 @@
-import json
-
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 
+from . import service
 from .models import Account
-from .service import AccountManage, catching_exceptions
 
 
 def index(request):
-    """ Главная страница сайта """
-
     # Проверка авторизации пользователя
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
 
     accounts = None
+    master_password = service.get_master_password(user_name=request.user)
 
     try:
-        accounts = Account.objects.all().filter(user=request.user)
+        accounts = Account.objects.all().filter(user_name=request.user)
     except Account.DoesNotExist:
         pass
 
-    return render(request, 'account.html', {'accounts': accounts})
+    return render(request, 'account.html', {'accounts': accounts, 'master_password': master_password})
 
 
-@catching_exceptions
+@service.base_view
 def create_account(request):
     """ Создает аккаунт """
 
@@ -34,55 +30,64 @@ def create_account(request):
     login = request.POST.get('login', None)
     password = request.POST.get('password', None)
 
-    answer = AccountManage.create(
-        site, description, login, password, request.user)
+    answer = service.create_account(
+        site=site,
+        description=description,
+        login=login,
+        password=password,
+        user_name=request.user
+    )
 
-    return HttpResponse(answer)
+    return service.json_response(answer)
 
 
-@catching_exceptions
+@service.base_view
 def delete_account(request):
     """ Удаляет аккаунт """
 
-    id = request.POST.get('datadissid', None)
-    answer = AccountManage.delete(id)
-    return HttpResponse(answer)
+    account_id = request.POST.get('account_id', None)
+    answer = service.delete_account(account_id)
+    return service.json_response(answer)
 
 
-@catching_exceptions
+@service.base_view
 def change_info_account(request):
     """ Изменяет информацию об аккаунте """
 
-    id = request.POST.get('id', None)
     site = request.POST.get('site', None)
     description = request.POST.get('description', None)
     login = request.POST.get('login', None)
-    newpassword = request.POST.get('newpassword', None)
+    new_password = request.POST.get('new_password', None)
+    account_id = request.POST.get('account_id', None)
 
-    answer = AccountManage.change_info(
-        id, site, description, login, newpassword)
-    return HttpResponse(answer)
+    answer = service.change_info_account(
+        site=site,
+        description=description,
+        login=login,
+        new_password=new_password,
+        account_id=account_id
+    )
+
+    return service.json_response(answer)
 
 
-@catching_exceptions
-def change_master_password_accounts(request):
+@service.base_view
+def change_or_create_master_password(request):
     """ Изменяет мастер пароль """
 
-    newmp = request.POST.get('newmp', None)
-    sites = json.loads(request.POST.get('sites', None))
-    descriptions = json.loads(request.POST.get('descriptions', None))
-    logins = json.loads(request.POST.get('logins', None))
-    passwords = json.loads(request.POST.get('passwords', None))
+    sites = request.POST.get('sites', None)
+    descriptions = request.POST.get('descriptions', None)
+    logins = request.POST.get('logins', None)
+    passwords = request.POST.get('passwords', None)
+    new_master_password = request.POST.get('new_master_password', None)
 
-    answer = AccountManage.change_master_password(
-        newmp, sites, descriptions, logins, passwords, request.user)
-    return HttpResponse(answer)
+    answer = service.change_or_create_master_password(
+        sites=sites,
+        descriptions=descriptions,
+        logins=logins,
+        passwords=passwords,
+        new_master_password=new_master_password,
+        user_name=request.user
+    )
 
-
-@csrf_exempt
-@catching_exceptions
-def get_master_password_accounts(request):
-    """ Возвращает мастер пароль """
-
-    answer = AccountManage.get_master_password(request.user)
-    return HttpResponse(answer)
+    return service.json_response(answer)

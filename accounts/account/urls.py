@@ -4,9 +4,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index),
-    path('createaccount/', views.create_account),
-    path('deleteaccount/', views.delete_account),
-    path('changeinfoaccount/', views.change_info_account),
-    path('changemasterpassword/', views.change_master_password_accounts),
-    path('getmasterpassword/', views.get_master_password_accounts),
+    path('create_account/', views.create_account),
+    path('delete_account/', views.delete_account),
+    path('change_info_account/', views.change_info_account),
+    path('change_or_create_master_password/', views.change_or_create_master_password),
 ]

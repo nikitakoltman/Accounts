@@ -4,18 +4,18 @@ from django.db import models
 class Account(models.Model):
     """ Аккаунты пользователя """
 
-    site = models.CharField('Сайт', max_length=255)
-    description = models.CharField('Описание', max_length=255)
-    login = models.CharField('Логин', max_length=255)
-    password = models.CharField('Пароль', max_length=255)
-    user = models.CharField('Пользователь', max_length=255)
+    site = models.CharField('Сайт', max_length=255, default=None)
+    description = models.CharField('Описание', max_length=255, default=None)
+    login = models.CharField('Логин', max_length=255, default=None)
+    password = models.CharField('Пароль', max_length=255, default=None)
+    user_name = models.CharField('Имя пользователя', max_length=255, default=None)
     updated = models.DateTimeField(
         'Обновлено', auto_now=True, auto_now_add=False)
     timestamp = models.DateTimeField(
         'Создано', auto_now=False, auto_now_add=True)
 
     def __str__(self):
-        return str(self.id) + ' (' + self.user + ')'
+        return str(self.id) + ' (' + self.user_name + ')'
 
     class Meta:
         verbose_name = 'Аккаунт'
@@ -26,11 +26,11 @@ class Account(models.Model):
 class MasterPassword(models.Model):
     """ Мастер пароль пользователя """
 
-    user = models.CharField('Пользователь', max_length=255)
-    value = models.CharField('Значение', max_length=255)
+    user_name = models.CharField('Имя пользователя', max_length=255, default=None)
+    value = models.CharField('Значение', max_length=255, default=None)
 
     def __str__(self):
-        return self.user
+        return self.user_name
 
     class Meta:
         verbose_name = 'Мастер пароль'

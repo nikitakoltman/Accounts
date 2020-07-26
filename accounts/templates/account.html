@@ -1,139 +1,130 @@
 {% extends 'base.html' %} {% load static %} {% block addons_head %}
 <title>Аккаунты</title>
-<script type="text/javascript" src="{% static 'js/account.js' %}?ver=22"></script>
-<script type="text/javascript" src="{% static 'js/jquery.tablesorter.min.js' %}"></script>
-<link rel="stylesheet" href="{% static 'css/table-theme-blue.css' %}" type="text/css" media="print, projection, screen" />
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
-{% endblock %}
-{% block content %}
+<link rel="stylesheet" href="{% static 'css/minimize/table-theme-blue.min.css' %}">
+
+<script type="text/javascript" src="{% static 'js/minimize/jquery.tablesorter.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/minimize/crypto-js.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/addons.js' %}?ver=1"></script>
+<script type="text/javascript" src="{% static 'js/account.js' %}?ver=1"></script>
+{% endblock %} {% block content %}
+<header class="header-icons">
+ <div class="body-chars account-name">• {{ request.user }}</div>
+ <div class="body-chars logout">‹ <a href="{% url 'logout_url' %}">Выход</a> ›</div>
+</header>
 <div class="container account_container">
-    <button class="btn btn-primary" id="btn-create" data-toggle="modal" data-target="#CreateAccountModal">Добавить аккаунт</button>
-    <button class="btn btn-primary" id="btn-masterpassword" data-toggle="modal" data-target="#MasterPasswordModal">Изменить пароль</button>
-    <table id="Accounts_table" class="tablesorter">
-        <thead>
-            <tr>
-                <th>Сайт</th>
-                <th>Описание</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for account in accounts %}
-            <tr data-id="{{ account.id }}">
-                <td class="td-site" data-id="{{ account.id }}">{{ account.site }}</td>
-                <td class="td-description" data-id="{{ account.id }}">{{ account.description }}</td>
-                <td class="td-login tdencrypt" data-id="{{ account.id }}">{{ account.login }}</td>
-                <td class="td-password tdencrypt" data-id="{{ account.id }}">{{ account.password }}</td>
-                <td class="td-btn">
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#AccountModal" data-id="{{ account.id }}">Open</button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+ <div class="flex">
+  <div class="flex-buttons">
+   <button class="btn btn-primary" id="btn-create" data-toggle="modal" data-target="#CreateAccountModal">Добавить аккаунт</button>
+   <button class="btn btn-primary" id="btn-masterpassword" data-toggle="modal" data-target="#MasterPasswordModal">Изменить пароль</button>
+  </div>
+  <input class="form-control" placeholder="Поиск" type="text" id="in-search">
+ </div>
+ <table id="Accounts_table" class="tablesorter">
+  <thead>
+   <tr>
+    <th>Сайт</th>
+    <th>Описание</th>
+   </tr>
+  </thead>
+  <tbody>
+   {% for account in accounts %}
+   <tr data-id="{{ account.id }}">
+    <td class="td-site" data-id="{{ account.id }}">{{ account.site }}</td>
+    <td class="td-description" data-id="{{ account.id }}">{{ account.description }}</td>
+    <td class="td-login tdencrypt" data-id="{{ account.id }}">{{ account.login }}</td>
+    <td class="td-password tdencrypt" data-id="{{ account.id }}">{{ account.password }}</td>
+    <td class="td-btn">
+     <button class="btn btn-open btn-primary" data-toggle="modal" data-target="#AccountModal" data-id="{{ account.id }}">👁</button>
+    </td>
+   </tr>
+   {% endfor %}
+  </tbody>
+ </table>
 </div>
 <div id="AccountModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-create-account">
-                <button type="button" class="btn btn-danger btn-round" style="width: 100px;" data-site="" data-diss-id="" id="modal-btn-delete">Удалить</button>
-                <button class="btn btn-primary bubbly-button btn-round btn-worklist" id="modal-btn-save">Сохранить</button>
-                <button type="button" class="close btn-close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title"></h4>
-            </div>
-            <div class="modal-body modal-body-show-account">
-                <label for="modal-site">Сайт</label>
-                <input class="form-control" type="text" id="modal-site">
+ <div class="modal-dialog modal-lg">
+  <div class="modal-content">
+   <div class="modal-header modal-header-create-account">
+    <button type="button" class="btn btn-danger btn-round" style="width: 100px;" data-site="" data-diss-id="" id="modal-btn-delete">Удалить</button>
+    <button class="btn btn-primary bubbly-button btn-round btn-worklist" id="modal-btn-save">Сохранить</button>
+    <button type="button" class="close btn-close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h4 class="modal-title"></h4>
+   </div>
+   <div class="modal-body modal-body-show-account">
+    <label for="modal-site">Сайт</label>
+    <input class="form-control" type="text" id="modal-site">
 
-                <label for="modal-description">Описание</label>
-                <input class="form-control" type="text" id="modal-description">
+    <label for="modal-description">Описание</label>
+    <input class="form-control" type="text" id="modal-description">
 
-                <label for="modal-login">Логин</label>
-                <input class="form-control" type="text" id="modal-login">
+    <label for="modal-login">Логин</label>
+    <input class="form-control" type="text" id="modal-login">
 
-                <label for="modal-newpassword">Пароль</label>
-                <input class="form-control" type="password" id="modal-newpassword">
+    <label for="modal-newpassword">Пароль</label>
+    <input class="form-control" type="password" id="modal-newpassword">
 
-                <input style="display: none;" id="modal-password">
-            </div>
-            <div class="modal-footer modal-footer-show-account">
-                <button class="btn btn-primary bubbly-button btn-round btn-worklist" id="modal-btn-login">Логин</button>
-                <button class="btn btn-primary bubbly-button btn-round btn-worklist" id="modal-btn-password">Пароль</button>
-            </div>
-        </div>
-    </div>
+    <input style="display: none;" id="modal-password">
+   </div>
+   <div class="modal-footer modal-footer-show-account">
+    <button class="btn btn-primary bubbly-button btn-round btn-worklist" id="modal-btn-login">Логин</button>
+    <button class="btn btn-primary bubbly-button btn-round btn-worklist" id="modal-btn-password">Пароль</button>
+   </div>
+  </div>
+ </div>
 </div>
 <div id="CreateAccountModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-create-account">
-                <h4 class="modal-title">Добавление аккаунта</h4>
-                <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body modal-body-create-account">
-                <label for="in-site">Сайт</label>
-                <input class="form-control" type="text" id="in-site">
-                <label for="in-description">Описание</label>
-                <input class="form-control" type="text" id="in-description">
-                <label for="in-login">Логин</label>
-                <input class="form-control" type="text" id="in-login">
-                <label for="in-password">Пароль</label>
-                <input class="form-control" type="password" id="in-password">
-                <button class="btn btn-primary bubbly-button btn-round btnsend" id="btnsendaccount">Отправить</button>
-            </div>
-        </div>
-    </div>
+ <div class="modal-dialog modal-lg">
+  <div class="modal-content">
+   <div class="modal-header modal-header-create-account">
+    <h4 class="modal-title">Добавление аккаунта</h4>
+    <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
+   </div>
+   <div class="modal-body modal-body-create-account">
+    <label for="in-site">Сайт</label>
+    <input class="form-control" type="text" id="in-site">
+    <label for="in-description">Описание</label>
+    <input class="form-control" type="text" id="in-description">
+    <label for="in-login">Логин</label>
+    <input class="form-control" type="text" id="in-login">
+    <label for="in-password">Пароль</label>
+    <input class="form-control" type="password" id="in-password">
+    <button class="btn btn-primary bubbly-button btn-round btnsend" id="btnsendaccount">Отправить</button>
+   </div>
+  </div>
+ </div>
 </div>
 <div id="MasterPasswordModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-create-account">
-                <h4 class="modal-title">Мастер пароль</h4>
-                <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body modal-body-master-password">
-                <label for="in-oldpassword">Старый пароль</label>
-                <input class="form-control" type="password" id="in-oldpassword">
-                <label for="in-newpassword">Новый пароль</label>
-                <input class="form-control" type="password" id="in-newpassword">
-                <label for="in-renewpassword">Повторите новый пароль</label>
-                <input class="form-control" type="password" id="in-renewpassword">
-                <button class="btn btn-primary bubbly-button btn-round btnsend" id="btnsendmasterpassword">Отправить</button>
-            </div>
-        </div>
-    </div>
+ <div class="modal-dialog modal-lg">
+  <div class="modal-content">
+   <div class="modal-header modal-header-create-account">
+    <h4 class="modal-title">Мастер пароль</h4>
+    <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
+   </div>
+   <div class="modal-body modal-body-master-password">
+    <label for="in-oldpassword">Старый пароль</label>
+    <input class="form-control" type="password" id="in-oldpassword">
+    <label for="in-newpassword">Новый пароль</label>
+    <input class="form-control" type="password" id="in-newpassword">
+    <label for="in-renewpassword">Повторите новый пароль</label>
+    <input class="form-control" type="password" id="in-renewpassword">
+    <button class="btn btn-primary bubbly-button btn-round btnsend" id="btnsendmasterpassword">Отправить</button>
+   </div>
+  </div>
+ </div>
 </div>
 <div id="EnterKeyModal" class="modal fade" tabindex="-1" role="dialog" result="">
-    <div class="modal-dialog modal-md">
-        <div class="modal-content">
-            <div class="modal-header modal-header-create-account">
-                <h4 class="modal-title">Авторизация</h4>
-                <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body modal-body-enter-password">
-                <label for="in-enterpassword">Введите пароль</label>
-                <input class="form-control" type="password" id="in-enterpassword" inputmode="text" autofocus>
-                <button class="btn btn-primary bubbly-button btn-round btnsend" id="btnenterpassword">ОК</button>
-            </div>
-        </div>
-    </div>
+ <div class="modal-dialog modal-md">
+  <div class="modal-content">
+   <div class="modal-header modal-header-create-account">
+    <h4 class="modal-title">Авторизация</h4>
+    <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
+   </div>
+   <div class="modal-body modal-body-enter-password">
+    <label for="in-enterpassword">Введите пароль</label>
+    <input class="form-control" type="password" id="in-enterpassword" inputmode="text" autofocus>
+    <button class="btn btn-primary btn-round btnsend" id="btnenterpassword">ОК</button>
+   </div>
+  </div>
+ </div>
 </div>
-<script>
-var animateButton = function(e) {
-
-e.preventDefault;
-//reset animation
-e.target.classList.remove('animate');
-
-e.target.classList.add('animate');
-setTimeout(function(){
-  e.target.classList.remove('animate');
-},700);
-};
-
-var bubblyButtons = document.getElementsByClassName("bubbly-button");
-
-for (var i = 0; i < bubblyButtons.length; i++) {
-bubblyButtons[i].addEventListener('click', animateButton, false);
-}
-</script>
 {% endblock %}

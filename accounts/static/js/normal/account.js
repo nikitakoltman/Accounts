@@ -370,7 +370,7 @@ $(function() {
         if ($(this).val() === "") {
             $('tbody tr').css('display', '');
         } else {
-            var td = $('tbody tr .td-site:contains(' + $(this).val() + ')');
+            var td = $('tbody tr .td-site:contains(' + $(this).val().toLowerCase() + ')');
             $('tbody tr').fadeOut(100);
             td.parent().fadeIn(100);
         }

@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
-from .models import MasterPassword, Account
+from .models import Account, MasterPassword
 
 admin.site.register(Account)
 admin.site.register(MasterPassword)

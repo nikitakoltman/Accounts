@@ -4,28 +4,23 @@ import logging as log
 import traceback
 from datetime import datetime
 
+from accounts.settings import DEBUG
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 
-from accounts.settings import DEBUG
-
 from .models import Account, MasterPassword
 
-JSON_DUMPS_PARAMS = {
-    'ensure_ascii': False
-}
 
-
-def create_account(site: str, description: str, login: str, password: str, user_name: str) -> json:
+def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:
     """ Создает новый аккаунт """
-
-    account = Account()
-    account.site = site
-    account.description = description
-    account.login = login
-    account.password = password
-    account.user_name = user_name
-    account.save()
+    account = Account.objects.create(
+        user=user,
+        site=site,
+        description=description,
+        login=login,
+        password=password
+    )
 
     return {
         'status': 'success',
@@ -33,12 +28,10 @@ def create_account(site: str, description: str, login: str, password: str, user_
     }
 
 
-def delete_account(account_id: int) -> json:
+def delete_account(user: User) -> dict:
     """ Удаляет аккаунт """
-
     try:
-        account = Account.objects.get(id=account_id)
-        account.delete()
+        Account.objects.get(user=user).delete()
 
         return {
             'status': 'success'
@@ -50,11 +43,10 @@ def delete_account(account_id: int) -> json:
         }
 
 
-def change_info_account(site: str, description: str, login: str, new_password: str, account_id: int) -> json:
+def change_info_account(site: str, description: str, login: str, new_password: str, user: User) -> dict:
     """ Изменяет информацию аккаунта """
-
     try:
-        account = Account.objects.get(id=account_id)
+        account = Account.objects.get(user=user)
         account.site = site
         account.description = description
         account.login = login
@@ -76,13 +68,13 @@ def change_info_account(site: str, description: str, login: str, new_password: s
         }
 
 
-def change_or_create_master_password(sites: str, descriptions: str, logins: str, passwords: str, new_master_password: str, user_name: str) -> json:
+def change_or_create_master_password(sites: str, descriptions: str, logins: str, passwords: str,
+                                     new_master_password: str, user: User) -> dict:
     """ Изменяет мастер пароль """
-
     master_password, is_created = MasterPassword.objects.get_or_create(
-        user_name=user_name,
+        user=user,
         defaults={
-            'value': new_master_password
+            'password': new_master_password
         }
     )
 
@@ -95,7 +87,7 @@ def change_or_create_master_password(sites: str, descriptions: str, logins: str,
         passwords = json.loads(passwords)
 
         # Перезаписываем все аккаунты на новые значения
-        account = Account.objects.all().filter(user_name=user_name)
+        account = Account.objects.filter(user=user)
         for item in account:
             item.site = sites[str(item.id)]
             item.description = descriptions[str(item.id)]
@@ -103,7 +95,7 @@ def change_or_create_master_password(sites: str, descriptions: str, logins: str,
             item.password = passwords[str(item.id)]
             item.save()
 
-        master_password.value = new_master_password
+        master_password.password = new_master_password
         master_password.save()
 
     return {
@@ -111,12 +103,11 @@ def change_or_create_master_password(sites: str, descriptions: str, logins: str,
     }
 
 
-def get_master_password(user_name: str) -> str:
+def get_master_password(user: User) -> str:
     """ Возвращает мастер пароль """
-
     try:
-        master_password = MasterPassword.objects.get(user_name=user_name)
-        return master_password.value
+        master_password = MasterPassword.objects.get(user=user)
+        return master_password.password
     except MasterPassword.DoesNotExist:
         return 'DoesNotExist'
 
@@ -138,35 +129,37 @@ def base_view(function):
                 log.error(traceback.format_exc())
                 error_response(err)
             else:
-                save_error_to_log_file(traceback.format_exc())
+                write_error_to_log_file(traceback.format_exc())
+
     return wrapper
 
 
-def json_response(json_object, status=200):
+def json_response(data: dict, status=200) -> JsonResponse:
     """ Возвращает JSON с правильными HTTP заголовками и в читаемом
     в браузере виде в случае с кириллицей """
-
     return JsonResponse(
-        json_object,
+        data=data,
         status=status,
-        safe=not isinstance(json_object, list),
-        json_dumps_params=JSON_DUMPS_PARAMS
+        safe=not isinstance(data, list),
+        json_dumps_params={
+            'ensure_ascii': False
+        }
     )
 
 
-def error_response(exception):
+def error_response(exception: Exception) -> json_response:
     """ Форматирует HTTP ответ с описанием ошибки """
-
     result = {
         'status': 'error',
         'result': str(exception),
     }
 
-    return json_response(result, status=400)
+    return json_response(data=result, status=400)
 
 
-def save_error_to_log_file(traceback):
-    # Запись исключения в файл
+def write_error_to_log_file(traceback_format_exc: str) -> None:
+    """ Запись исключения в файл """
     with open('../log.txt', 'a') as f:
         f.write(
-            f'ERROR | {datetime.now().strftime("%d.%m.%Y %H:%M:%S")} | {traceback} \n\n')
+            f'ERROR | {datetime.now().strftime("%d.%m.%Y %H:%M:%S")} | {traceback_format_exc} \n\n'
+        )

@@ -40,7 +40,7 @@ def create_account(request):
 def delete_account(request):
     """ Удаляет аккаунт """
     account_id = request.POST.get('account_id', None)
-    answer = service.delete_account(request.user)
+    answer = service.delete_account(account_id)
     return service.json_response(answer)
 
 
@@ -58,7 +58,7 @@ def change_info_account(request):
         description=description,
         login=login,
         new_password=new_password,
-        user=request.user
+        account_id=account_id
     )
 
     return service.json_response(answer)

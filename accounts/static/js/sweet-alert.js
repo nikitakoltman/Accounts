@@ -8,11 +8,7 @@
       overlayClass = '.sweet-overlay',
       alertTypes   = ['error', 'warning', 'info', 'success'];
 
-
-  /*
-   * Manipulate DOM
-   */
-
+  //Manipulate DOM
   var getModal = function() {
       return document.querySelector(modalClass);
     },
@@ -45,24 +41,24 @@
       elem.style.opacity = '';
       elem.style.display = 'block';
     },
-    show = function(elems) {
-      if (elems && !elems.length) {
-        return _show(elems);
+    show = function(elements) {
+      if (elements && !elements.length) {
+        return _show(elements);
       }
-      for (var i = 0; i < elems.length; ++i) {
-        _show(elems[i]);
+      for (var i = 0; i < elements.length; ++i) {
+        _show(elements[i]);
       }
     },
     _hide = function(elem) {
       elem.style.opacity = '';
       elem.style.display = 'none';
     },
-    hide = function(elems) {
-      if (elems && !elems.length) {
-        return _hide(elems);
+    hide = function(elements) {
+      if (elements && !elements.length) {
+        return _hide(elements);
       }
-      for (var i = 0; i < elems.length; ++i) {
-        _hide(elems[i]);
+      for (var i = 0; i < elements.length; ++i) {
+        _hide(elements[i]);
       }
     },
     isDescendant = function(parent, child) {
@@ -155,10 +151,7 @@
       previousWindowKeyDown,
       lastFocusedButton;
 
-  /*
-   * Add modal + overlay to DOM
-   */
-
+  // Add modal + overlay to DOM
   function initialize() {
     var sweetHTML = '<div class="sweet-overlay" tabIndex="-1"></div><div class="sweet-alert" tabIndex="-1"><div class="icon error"><span class="x-mark"><span class="line left"></span><span class="line right"></span></span></div><div class="icon warning"> <span class="body"></span> <span class="dot"></span> </div> <div class="icon info"></div> <div class="icon success"> <span class="line tip"></span> <span class="line long"></span> <div class="placeholder"></div> <div class="fix"></div> </div> <div class="icon custom"></div> <h2>Title</h2><p>Text</p><button class="cancel" tabIndex="2">Cancel</button><button class="confirm" tabIndex="1">OK</button></div>',
         sweetWrap = document.createElement('div');
@@ -178,14 +171,8 @@
       });*/
   }
 
-
-
-  /*
-   * Global sweetAlert function
-   */
-
+  // Global sweetAlert function
   window.sweetAlert = window.swal = function() {
-
     // Default parameters
     var params = {
       title: '',
@@ -205,16 +192,12 @@
       return false;
     }
 
-
     switch (typeof arguments[0]) {
-
       case 'string':
         params.title = arguments[0];
         params.text  = arguments[1] || '';
         params.type  = arguments[2] || '';
-
         break;
-
       case 'object':
         if (arguments[0].title === undefined) {
           window.console.error('Missing "title" argument!');
@@ -236,28 +219,22 @@
         params.imageUrl           = arguments[0].imageUrl || params.imageUrl;
         params.imageSize          = arguments[0].imageSize || params.imageSize;
         params.doneFunction       = arguments[1] || null;
-
         break;
-
       default:
         window.console.error('Unexpected type of argument! Expected "string" or "object", got ' + typeof arguments[0]);
         return false;
 
     }
 
-    //console.log(params.confirmButtonColor);
-
     setParameters(params);
     fixVerticalPosition();
     openModal();
-
 
     // Modal interactions
     var modal = getModal();
 
     // Mouse interactions
     var onButtonEvent = function(e) {
-
       var target = e.target || e.srcElement,
           targetedConfirm    = (target.className === 'confirm'),
           modalIsVisible     = hasClass(modal, 'visible'),
@@ -309,7 +286,7 @@
       $buttons[i].onmouseover = onButtonEvent;
       $buttons[i].onmouseout  = onButtonEvent;
       $buttons[i].onmousedown = onButtonEvent;
-      //$buttons[i].onmouseup   = onButtonEvent;
+      $buttons[i].onmouseup   = onButtonEvent;
       $buttons[i].onfocus     = onButtonEvent;
     }
 
@@ -328,12 +305,10 @@
       }
     };
 
-
     // Keyboard interactions
     var $okButton = modal.querySelector('button.confirm'),
         $cancelButton = modal.querySelector('button.cancel'),
         $modalButtons = modal.querySelectorAll('button:not([type=hidden])');
-
 
     function handleKeyDown(e) {
       var keyCode = e.keyCode || e.which;
@@ -441,11 +416,7 @@
     };
   };
 
-
-  /*
-   * Set type, text and actions on modal
-   */
-
+  // Set type, text and actions on modal
   function setParameters(params) {
     var modal = getModal();
 
@@ -497,7 +468,6 @@
           addClass($icon.querySelector('.dot'), 'pulseWarningIns');
           break;
       }
-
     }
 
     // Custom image
@@ -559,11 +529,7 @@
     modal.setAttribute('data-has-done-function', hasDoneFunction);
   }
 
-
-  /*
-   * Set hover, active and focus-states for buttons (source: http://www.sitepoint.com/javascript-generate-lighter-darker-color)
-   */
-   
+  // Set hover, active and focus-states for buttons (source: http://www.sitepoint.com/javascript-generate-lighter-darker-color)
   function colorLuminance(hex, lum) {
     // Validate hex string
     hex = String(hex).replace(/[^0-9a-f]/gi, '');
@@ -594,12 +560,7 @@
     $button.style.boxShadow = '0 0 2px rgba(' + rgbColor +', 0.8), inset 0 0 0 1px rgba(0, 0, 0, 0.05)';
   }
 
-
-
-  /*
-   * Animations
-   */
-
+  // Animations
   function openModal() {
     var modal = getModal();
     fadeIn(getOverlay(), 10);
@@ -624,9 +585,7 @@
     addClass(modal, 'hideSweetAlert');
     removeClass(modal, 'visible');
 
-
     // Reset icon animations
-
     var $successIcon = modal.querySelector('.icon.success');
     removeClass($successIcon, 'animate');
     removeClass($successIcon.querySelector('.tip'), 'animateSuccessTip');
@@ -651,23 +610,14 @@
     lastFocusedButton = undefined;
   }
 
-
-  /*
-   * Set "margin-top"-property on modal based on its computed height
-   */
-
+  // Set "margin-top"-property on modal based on its computed height
   function fixVerticalPosition() {
     var modal = getModal();
 
     modal.style.marginTop = getTopMargin(getModal());
   }
 
-
-
-  /*
-   * If library is injected after page has loaded
-   */
-
+  // If library is injected after page has loaded
   (function () {
 	  if (document.readyState === "complete" || document.readyState === "interactive") {
 		  initialize();
@@ -687,5 +637,4 @@
 		  }
 	  }
   })();
-
 })(window, document);

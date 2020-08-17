@@ -1,10 +1,7 @@
 $(function() {
     var animateButton = function(e) {
-
         e.preventDefault;
-        //reset animation
         e.target.classList.remove('animate');
-
         e.target.classList.add('animate');
         setTimeout(function() {
             e.target.classList.remove('animate');
@@ -20,11 +17,7 @@ $(function() {
 
 $.ajaxSetup({ // Функция присвоение CSRF токена для всех ajax функций
     beforeSend: function(xhr, settings) {
-        if (
-            settings.type == "POST" ||
-            settings.type == "PUT" ||
-            settings.type == "DELETE"
-        ) {
+        if (settings.type == "POST" || settings.type == "PUT" || settings.type == "DELETE") {
             function getCookie(name) {
                 var cookieValue = null;
                 if (document.cookie && document.cookie !== "") {
@@ -33,9 +26,7 @@ $.ajaxSetup({ // Функция присвоение CSRF токена для в
                         var cookie = jQuery.trim(cookies[i]);
                         // Does this cookie string begin with the name we want?
                         if (cookie.substring(0, name.length + 1) == name + "=") {
-                            cookieValue = decodeURIComponent(
-                                cookie.substring(name.length + 1)
-                            );
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                             break;
                         }
                     }
@@ -47,5 +38,5 @@ $.ajaxSetup({ // Функция присвоение CSRF токена для в
                 xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
             }
         }
-    },
+    }
 });

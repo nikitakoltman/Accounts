@@ -1,21 +1,21 @@
 {% extends 'base.html' %} {% load static %} {% block addons_head %}
 <title>Аккаунты</title>
-<link rel="stylesheet" href="{% static 'css/minimize/table-theme-blue.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/table-theme-blue.css' %}">
 
-<script type="text/javascript" src="{% static 'js/minimize/jquery.tablesorter.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/minimize/crypto-js.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/minimize/addons.min.js' %}?ver=1"></script>
-<script type="text/javascript" src="{% static 'js/minimize/account.min.js' %}?ver=1"></script>
+<script type="text/javascript" src="{% static 'js/addons/jquery.tablesorter.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/addons/crypto-js.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/addons.js' %}?ver=1"></script>
+<script type="text/javascript" src="{% static 'js/account.js' %}?ver=1"></script>
 {% endblock %} {% block content %}
 <header class="header-icons">
- <div class="body-chars account-name">• {{ request.user }}</div>
+ <div class="body-chars account-name">• {{ request.user.username }}</div>
  <div class="body-chars logout">‹ <a href="{% url 'logout_url' %}">Выход</a> ›</div>
 </header>
 <div class="container account_container">
  <div class="flex">
   <div class="flex-buttons">
    <button class="btn btn-primary" id="btn-create" data-toggle="modal" data-target="#CreateAccountModal">Добавить аккаунт</button>
-   <button class="btn btn-primary" id="btn-masterpassword" data-toggle="modal" data-target="#MasterPasswordModal">Изменить пароль</button>
+   <button class="btn btn-primary" data-toggle="modal" data-target="#MasterPasswordModal">Изменить пароль</button>
   </div>
   <input class="form-control" placeholder="Поиск" type="text" id="in-search">
  </div>
@@ -31,10 +31,10 @@
    <tr data-id="{{ account.id }}">
     <td class="td-site" data-id="{{ account.id }}">{{ account.site }}</td>
     <td class="td-description" data-id="{{ account.id }}">{{ account.description }}</td>
-    <td class="td-login tdencrypt" data-id="{{ account.id }}">{{ account.login }}</td>
-    <td class="td-password tdencrypt" data-id="{{ account.id }}">{{ account.password }}</td>
+    <td class="td-login td-hide" data-id="{{ account.id }}">{{ account.login }}</td>
+    <td class="td-password td-hide" data-id="{{ account.id }}">{{ account.password }}</td>
     <td class="td-btn">
-     <button class="btn btn-open btn-primary" data-toggle="modal" data-target="#AccountModal" data-id="{{ account.id }}">Открыть</button>
+     <button class="btn btn-primary" data-toggle="modal" data-target="#AccountModal" data-id="{{ account.id }}">Открыть</button>
     </td>
    </tr>
    {% endfor %}
@@ -45,8 +45,8 @@
  <div class="modal-dialog modal-lg">
   <div class="modal-content">
    <div class="modal-header modal-header-create-account">
-    <button type="button" class="btn btn-danger btn-round" style="width: 100px;" data-site="" data-diss-id="" id="modal-btn-delete">Удалить</button>
-    <button class="btn btn-primary bubbly-button btn-round btn-worklist" id="modal-btn-save">Сохранить</button>
+    <button type="button" class="btn btn-danger btn-round" style="width: 100px;" data-site="" data-id="" id="modal-btn-account_delete">Удалить</button>
+    <button class="btn btn-primary bubbly-button btn-round" id="modal-btn-save">Сохранить</button>
     <button type="button" class="close btn-close" data-dismiss="modal" aria-hidden="true">×</button>
     <h4 class="modal-title"></h4>
    </div>
@@ -60,14 +60,14 @@
     <label for="modal-login">Логин</label>
     <input class="form-control" type="text" id="modal-login">
 
-    <label for="modal-newpassword">Пароль</label>
-    <input class="form-control" type="password" id="modal-newpassword">
+    <label for="modal-new_password">Пароль</label>
+    <input class="form-control" type="password" id="modal-new_password">
 
     <input style="display: none;" id="modal-password">
    </div>
    <div class="modal-footer modal-footer-show-account">
-    <button class="btn btn-primary bubbly-button btn-round btn-worklist" id="modal-btn-login">Логин</button>
-    <button class="btn btn-primary bubbly-button btn-round btn-worklist" id="modal-btn-password">Пароль</button>
+    <button class="btn btn-primary bubbly-button btn-round" id="modal-btn-login">Логин</button>
+    <button class="btn btn-primary bubbly-button btn-round" id="modal-btn-password">Пароль</button>
    </div>
   </div>
  </div>
@@ -88,7 +88,7 @@
     <input class="form-control" type="text" id="in-login">
     <label for="in-password">Пароль</label>
     <input class="form-control" type="password" id="in-password">
-    <button class="btn btn-primary bubbly-button btn-round btnsend" id="btnsendaccount">Отправить</button>
+    <button class="btn btn-primary bubbly-button btn-round btn-send" id="btn-send_account">Отправить</button>
    </div>
   </div>
  </div>
@@ -101,18 +101,18 @@
     <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
    </div>
    <div class="modal-body modal-body-master-password">
-    <label for="in-oldpassword">Старый пароль</label>
-    <input class="form-control" type="password" id="in-oldpassword">
-    <label for="in-newpassword">Новый пароль</label>
-    <input class="form-control" type="password" id="in-newpassword">
-    <label for="in-renewpassword">Повторите новый пароль</label>
-    <input class="form-control" type="password" id="in-renewpassword">
-    <button class="btn btn-primary bubbly-button btn-round btnsend" id="btnsendmasterpassword">Отправить</button>
+    <label for="in-old_password">Старый пароль</label>
+    <input class="form-control" type="password" id="in-old_password">
+    <label for="in-new_password">Новый пароль</label>
+    <input class="form-control" type="password" id="in-new_password">
+    <label for="in-repeat_new_password">Повторите новый пароль</label>
+    <input class="form-control" type="password" id="in-repeat_new_password">
+    <button class="btn btn-primary bubbly-button btn-round btn-send" id="btn-send_master_password">Отправить</button>
    </div>
   </div>
  </div>
 </div>
-<div id="EnterKeyModal" class="modal fade" tabindex="-1" role="dialog" result="">
+<div id="EnterKeyModal" class="modal fade" tabindex="-1" role="dialog">
  <div class="modal-dialog modal-md">
   <div class="modal-content">
    <div class="modal-header modal-header-create-account">
@@ -120,9 +120,9 @@
     <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
    </div>
    <div class="modal-body modal-body-enter-password">
-    <label for="in-enterpassword">Введите пароль</label>
-    <input class="form-control" type="password" id="in-enterpassword" inputmode="text" autofocus>
-    <button class="btn btn-primary btn-round btnsend" id="btnenterpassword">ОК</button>
+    <label for="in-enter_password">Введите пароль</label>
+    <input class="form-control" type="password" id="in-enter_password" inputmode="text" autofocus>
+    <button class="btn btn-primary btn-round btn-send" id="btn-enter_password">ОК</button>
    </div>
   </div>
  </div>

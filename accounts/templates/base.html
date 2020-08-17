@@ -8,19 +8,19 @@
  <meta name="viewport" content="width=device-width, initial-scale=1.0" http-equiv="X-UA-Compatible">
 
  <link rel="manifest" href="{% static '/manifest.json' %}">
- <link rel="stylesheet" href="{% static 'css/minimize/bootstrap.min.css' %}">
- <link rel="stylesheet" href="{% static 'css/minimize/sweet-alert.min.css' %}">
- <link rel="stylesheet" href="{% static 'css/minimize/style.min.css' %}?ver=1">
+ <link rel="stylesheet" href="{% static 'css/addons/bootstrap.min.css' %}">
+ <link rel="stylesheet" href="{% static 'css/sweet-alert.css' %}">
+ <link rel="stylesheet" href="{% static 'css/style.css' %}?ver=1">
  <link href="{% static 'img/ico/favicon.ico' %}" rel="shortcut icon" type="image/x-icon">
 
- <script src="{% static 'js/minimize/jquery-3.5.1.min.js' %}"></script>
- <script src="{% static 'js/minimize/bootstrap.min.js' %}"></script>
- <script src="{% static 'js/minimize/jquery.easing.min.js' %}"></script>
- <script src="{% static 'js/minimize/sweet-alert.min.js' %}"></script>
+ <script src="{% static 'js/addons/jquery-3.5.1.min.js' %}"></script>
+ <script src="{% static 'js/addons/bootstrap.min.js' %}"></script>
+ <script src="{% static 'js/addons/jquery.easing.min.js' %}"></script>
+ <script src="{% static 'js/sweet-alert.js' %}"></script>
  {% block addons_head %}{% endblock %}
 </head>
 
-<body master_password="{{ master_password }}">
+<body data-master_password="{{ master_password }}">
  {% block content %} {% endblock %}
  <footer></footer>
 </body>

@@ -24,14 +24,15 @@ def create_account(site: str, description: str, login: str, password: str, user:
 
     return {
         'status': 'success',
-        'accountid': account.id
+        'account_id': account.id
     }
 
 
-def delete_account(user: User) -> dict:
+def delete_account(account_id: int) -> dict:
     """ Удаляет аккаунт """
     try:
-        Account.objects.get(user=user).delete()
+        account = Account.objects.get(id=account_id)
+        account.delete()
 
         return {
             'status': 'success'
@@ -43,10 +44,10 @@ def delete_account(user: User) -> dict:
         }
 
 
-def change_info_account(site: str, description: str, login: str, new_password: str, user: User) -> dict:
+def change_info_account(site: str, description: str, login: str, new_password: str, account_id: int) -> dict:
     """ Изменяет информацию аккаунта """
     try:
-        account = Account.objects.get(user=user)
+        account = Account.objects.get(id=account_id)
         account.site = site
         account.description = description
         account.login = login
@@ -88,6 +89,8 @@ def change_or_create_master_password(sites: str, descriptions: str, logins: str,
 
         # Перезаписываем все аккаунты на новые значения
         account = Account.objects.filter(user=user)
+        print('###########')
+        print(account)
         for item in account:
             item.site = sites[str(item.id)]
             item.description = descriptions[str(item.id)]

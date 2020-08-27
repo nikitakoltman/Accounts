@@ -6,3 +6,4 @@ env
 .vscode
 .idea
 db.sqlite3
+config.py

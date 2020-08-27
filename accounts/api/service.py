@@ -89,8 +89,7 @@ def change_or_create_master_password(sites: str, descriptions: str, logins: str,
 
         # Перезаписываем все аккаунты на новые значения
         account = Account.objects.filter(user=user)
-        print('###########')
-        print(account)
+
         for item in account:
             item.site = sites[str(item.id)]
             item.description = descriptions[str(item.id)]

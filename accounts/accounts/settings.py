@@ -1,8 +1,8 @@
 import os
-
+from configs.config import DJANGO_SECRET_KEY
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = 'dv71d0cf^9^0c!_0md@eu)u8v4x*tru!e8km+jyrtu2wmc(c9&'
+SECRET_KEY = DJANGO_SECRET_KEY
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
@@ -15,8 +15,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'crispy_forms',
+    'rest_framework',
 
-    'account',
+    'account.apps.AccountConfig',
+    'api.apps.ApiConfig'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

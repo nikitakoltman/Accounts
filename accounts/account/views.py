@@ -1,8 +1,8 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from . import service
-from .models import Account
+from api import service
+from api.models import Account
 
 
 def index(request):

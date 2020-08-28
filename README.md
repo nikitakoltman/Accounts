@@ -17,6 +17,12 @@ source env/bin/activate
 ```
 pip install -r requirements.txt
 ```
+Перейдите в директорию configs, создайте копию файла config-example.py с названием config.py и заполните
+в нем нужные параметры (переменные из config.py импортируются в settings.py).
+```
+cd accounts/configs
+cp config-example.py config.py
+```
 Перейдите в каталог accounts и проведите миграции.
 ```
 cd accounts

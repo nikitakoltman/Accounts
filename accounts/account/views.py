@@ -14,7 +14,8 @@ def index(request):
         'master_password': service.get_master_password(user=request.user)
     }
 
-    return render(request, 'account.html', context)
+    #return render(request, 'account.html', context)
+    return render(request, 'frontend/index.html')
 
 
 @service.base_view

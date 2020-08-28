@@ -1,8 +1,8 @@
 $(function() {
     var master_password = null, // Хранит мастер пароль для расшифровки данных таблицы
-    press_timer, // Хранит значение таймера для события долгого нажатия кнопки "Пароль"
-    is_allow_copy = true, // Разрешает копирование при долгом нажатии кнопки "Пароль"
-    is_allow_show_page = false; // Разрешает отображение страницы
+        press_timer, // Хранит значение таймера для события долгого нажатия кнопки "Пароль"
+        is_allow_copy = true, // Разрешает копирование при долгом нажатии кнопки "Пароль"
+        is_allow_show_page = false; // Разрешает отображение страницы
 
     function reload() { // Функция перезагрузки страницы
         location.href = location.href;
@@ -21,9 +21,9 @@ $(function() {
 
     function create_account() { // Функция создания нового аккаунта в таблице
         var site = $("#in-site").val(),
-        description = $("#in-description").val(),
-        login = $("#in-login").val(),
-        password = encrypt($("#in-password").val(), master_password);
+            description = $("#in-description").val(),
+            login = $("#in-login").val(),
+            password = encrypt($("#in-password").val(), master_password);
 
         $.ajax({
             url: "create_account/",
@@ -85,10 +85,10 @@ $(function() {
 
     function change_info_account() { // Функция изменения информации аккаунта
         var site = $("#modal-site").val(),
-        description = $("#modal-description").val(),
-        login = $("#modal-login").val(),
-        new_password = $('#modal-new_password').val(),
-        account_id = $('#modal-btn-account_delete').attr('data-id');
+            description = $("#modal-description").val(),
+            login = $("#modal-login").val(),
+            new_password = $('#modal-new_password').val(),
+            account_id = $('#modal-btn-account_delete').attr('data-id');
 
         if (new_password != "") { // Если был введен новый пароль...
             new_password = encrypt(new_password, master_password); // Шифруем его
@@ -340,10 +340,10 @@ $(function() {
 
     $('#AccountModal').on('show.bs.modal', function(event) { // Событие открытия модального окна просмотра аккаунта
         var account_id = $(event.relatedTarget).attr('data-id'),
-        site = $('.td-site[data-id="' + account_id + '"]').text(),
-        description = $('.td-description[data-id="' + account_id + '"]').text(),
-        login = $('.td-login[data-id="' + account_id + '"]').text(),
-        password = $('.td-password[data-id="' + account_id + '"]').text();
+            site = $('.td-site[data-id="' + account_id + '"]').text(),
+            description = $('.td-description[data-id="' + account_id + '"]').text(),
+            login = $('.td-login[data-id="' + account_id + '"]').text(),
+            password = $('.td-password[data-id="' + account_id + '"]').text();
 
         // Заполняем модальное окно
         $('#modal-site').val(site);

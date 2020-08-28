@@ -7,3 +7,6 @@ env
 .idea
 db.sqlite3
 config.py
+
+# react frontend
+node_modules

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --mode development ./account/src/index.js --output ./static/js/account/main.js",
-    "build": "webpack --mode production ./account/src/index.js --output ./static/js/account/main.js"
+    "dev": "export NODE_ENV=development && webpack --watch --mode development ./account/src/index.js --output ./static/js/account/main.js",
+    "build": "export NODE_ENV=production && webpack --mode production ./account/src/index.js --output ./static/js/account/main.js"
   },
   "keywords": [],
   "author": "",
@@ -22,10 +22,15 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.11.2",
+    "axios": "^0.20.0",
     "babel-preset-react-app": "^9.1.2",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-redux": "^7.2.1",
+    "redux": "^4.0.5",
+    "redux-devtools-extension": "^2.13.8",
+    "redux-thunk": "^2.3.0"
   },
   "babel": {
     "presets": [

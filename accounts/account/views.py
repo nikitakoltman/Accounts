@@ -1,21 +1,25 @@
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-
 from api import service
 from api.models import Account
+
+from django.views.generic import TemplateView
+
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.contrib.auth.models import User
+
+from .forms import RegisterForm
 
 
 def index(request):
     if not request.user.is_authenticated:
-        return HttpResponseRedirect('/login/')
+        return render(request, 'landing.html')
 
     context = {
         'accounts': Account.objects.filter(user=request.user),
         'master_password': service.get_master_password(user=request.user)
     }
 
-    #return render(request, 'account.html', context)
-    return render(request, 'frontend/index.html')
+    return render(request, 'account.html', context)
 
 
 @service.base_view
@@ -84,3 +88,31 @@ def change_or_create_master_password(request):
     )
 
     return service.json_response(answer)
+
+
+class RegisterView(TemplateView):
+    """ Регистрация пользователей """
+    template_name = "registration/register.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        context = {
+                'form': RegisterForm,
+                'form_error': None
+            }
+
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            password2 = request.POST.get('password2')
+
+            if password == password2:
+                try:
+                    User.objects.create_user(username, email, password)
+                    return redirect(reverse("login_url"))
+                except Exception as err:
+                    context.update({
+                        'form_error': err
+                    })
+
+        return render(request, self.template_name, context)

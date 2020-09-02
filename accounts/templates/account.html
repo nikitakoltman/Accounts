@@ -1,17 +1,14 @@
-{% extends 'base.html' %} {% load static %} {% block addons_head %}
-<title>Аккаунты</title>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Аккаунты{% endblock %}
+{% block addons_head %}
 <link rel="stylesheet" href="{% static 'css/table-theme-blue.css' %}">
 <script type="text/javascript" src="{% static 'js/addons/jquery.tablesorter.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/addons/crypto-js.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/addons.js' %}?ver=1"></script>
 <script type="text/javascript" src="{% static 'js/account.js' %}?ver=1"></script>
-{% endblock %} {% block content %}
-<header class="header-icons">
-    <div class="container">
-        <div class="body-chars account-name">• {{ request.user.username }}</div>
-        <div class="body-chars logout">‹ <a href="{% url 'logout_url' %}">Выход</a> ›</div>
-    </div>
-</header>
+{% endblock %}
+{% block content %}
 <div class="container account_container">
     <div class="flex">
         <div class="flex-buttons">

@@ -1,3 +1,5 @@
+import re
+
 from api import service
 from api.models import Account
 
@@ -20,6 +22,10 @@ def index(request):
     }
 
     return render(request, 'account.html', context)
+
+
+def noscript(request):
+    return render(request, 'noscript.html')
 
 
 @service.base_view
@@ -54,14 +60,14 @@ def change_info_account(request):
     """ Изменяет информацию об аккаунте """
     site = request.POST.get('site', None)
     description = request.POST.get('description', None)
-    login = request.POST.get('login', None)
+    new_login = request.POST.get('new_login', None)
     new_password = request.POST.get('new_password', None)
     account_id = request.POST.get('account_id', None)
 
     answer = service.change_info_account(
         site=site,
         description=description,
-        login=login,
+        new_login=new_login,
         new_password=new_password,
         account_id=account_id
     )
@@ -106,13 +112,27 @@ class RegisterView(TemplateView):
             password = request.POST.get('password')
             password2 = request.POST.get('password2')
 
-            if password == password2:
+            if self.check_if_password_correct(password, password2):
                 try:
-                    User.objects.create_user(username, email, password)
+                    User.objects.create_user(
+                        username=username,
+                        email=email,
+                        password=password
+                    )
                     return redirect(reverse("login_url"))
                 except Exception as err:
                     context.update({
-                        'form_error': err
+                        'form_error': err,
+                        'username': username,
+                        'email': email
                     })
 
         return render(request, self.template_name, context)
+
+    def check_if_password_correct(self, password: str, password2: str) -> bool:
+        """ Проверка корректности пароля """
+        if password == password2:
+            pattern_password = re.compile(r'^(?=.*[0-9].*)(?=.*[a-z].*)(?=.*[A-Z].*)[0-9a-zA-Z]{8,}$')
+            return bool(pattern_password.match(password))
+        else:
+            return False

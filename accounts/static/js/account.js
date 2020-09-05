@@ -6,6 +6,9 @@ $(function() {
         is_allow_copy = true, // Разрешает копирование при долгом нажатии кнопки "Пароль"
         is_allow_show_page = false; // Разрешает отображение страницы
 
+    const _login = 'login',
+        _password = 'password';
+
     function reload() { // Функция перезагрузки страницы
         location.href = location.href;
     }
@@ -40,14 +43,11 @@ $(function() {
                 var account_id = result['account_id'];
 
                 if (result['status'] == "success") {
-                    var tr = '<tr data-id="' + account_id + '">' +
+                    var tr = '<tr data-toggle="modal" data-target="#AccountModal" data-id="' + account_id + '">' +
                         '<td class="td-site" data-id="' + account_id + '">' + site + '</td>' +
                         '<td class="td-description" data-id="' + account_id + '">' + description + '</td>' +
                         '<td class="td-login td-hide" data-id="' + account_id + '">' + login + '</td>' +
                         '<td class="td-password td-hide" data-id="' + account_id + '">' + password + '</td>' +
-                        '<td class="td-btn">' +
-                        '<button class="btn btn-primary" data-toggle="modal" data-target="#AccountModal" data-id="' + account_id + '">Открыть</button>' +
-                        '</td>' +
                         '</tr>'; // Формируем запись для таблицы
 
                     $('tbody').append(tr); // Добавляем в конец таблицы только что созданную запись аккаунта
@@ -88,49 +88,51 @@ $(function() {
     function change_info_account() { // Функция изменения информации аккаунта
         var site = $("#modal-site").val(),
             description = $("#modal-description").val(),
-            login = $("#modal-login").val(),
+            new_login = $("#modal-new_login").val(),
             new_password = $('#modal-new_password').val(),
             account_id = $('#modal-btn-account_delete').attr('data-id');
 
+        if (new_login != "") {
+            new_login = encrypt(new_login, master_password);
+        }
         if (new_password != "") { // Если был введен новый пароль...
             new_password = encrypt(new_password, master_password); // Шифруем его
         }
 
         if ($("#modal-site").val() != "") {
             if ($("#modal-description").val() != "") {
-                if ($("#modal-login").val() != "") {
-                    $.ajax({
-                        url: "change_info_account/",
-                        type: "POST",
-                        data: {
-                            site: encrypt(site, master_password),
-                            description: encrypt(description, master_password),
-                            login: encrypt(login, master_password),
-                            new_password: new_password,
-                            account_id: account_id
-                        },
-                        success: function(result) {
-                            if (result['status'] == "success") {
-                                var tr = $('tr[data-id="' + account_id + '"]'); // Ищем в таблице аккаунт который изменяли
-                                // Обновляем значения в таблице
-                                tr.find('.td-site').text(site);
-                                tr.find('.td-description').text(description);
+                $.ajax({
+                    url: "change_info_account/",
+                    type: "POST",
+                    data: {
+                        site: encrypt(site, master_password),
+                        description: encrypt(description, master_password),
+                        new_login: new_login,
+                        new_password: new_password,
+                        account_id: account_id
+                    },
+                    success: function(result) {
+                        if (result['status'] == "success") {
+                            var tr = $('tr[data-id="' + account_id + '"]'); // Ищем в таблице аккаунт который изменяли
+                            // Обновляем значения в таблице
+                            tr.find('.td-site').text(site);
+                            tr.find('.td-description').text(description);
+                            if (login != "") { // Если был введен пароль...
                                 tr.find('.td-login').text(login);
-                                if (new_password != "") { // Если был введен пароль...
-                                    tr.find('.td-password').text(new_password);
-                                    $('#modal-new_password').val(''); // Чистим input ввода пароля
-                                }
-                                sort_table();
-                                sort_table();
-                                $('#AccountModal').modal('hide'); // Скрываем модальное окно просмотра аккаунта
-                            } else {
-                                swal("Ошибка!", result['result']);
+                                $('#modal-new_login').val(''); // Чистим input ввода пароля
                             }
+                            if (new_password != "") { // Если был введен пароль...
+                                tr.find('.td-password').text(new_password);
+                                $('#modal-new_password').val(''); // Чистим input ввода пароля
+                            }
+                            sort_table();
+                            sort_table();
+                            $('#AccountModal').modal('hide'); // Скрываем модальное окно просмотра аккаунта
+                        } else {
+                            swal("Ошибка!", result['result']);
                         }
-                    });
-                } else {
-                    swal('Заполните поле "Логин"');
-                }
+                    }
+                });
             } else {
                 swal('Заполните поле "Описание"');
             }
@@ -155,7 +157,7 @@ $(function() {
                 } else if (td.className == 'td-description') {
                     descriptions[account_id] = encrypt(td.innerHTML, new_master_password);
                 } else if (td.className == 'td-login td-hide') {
-                    logins[account_id] = encrypt(td.innerHTML, new_master_password);
+                    logins[account_id] = encrypt(decrypt(td.innerHTML, master_password), new_master_password);
                 } else if (td.className == 'td-password td-hide') {
                     // Тоже самое, только предварительно расшировать, потому что пароль хранится в ячейке в зашифрованном виде
                     passwords[account_id] = encrypt(decrypt(td.innerHTML, master_password), new_master_password);
@@ -199,6 +201,7 @@ $(function() {
             } else {
                 master_password = key; // Присваиваем ключ глобальной переменной "Мастер пароль"
                 is_allow_show_page = true;
+                $('.top-buttons').removeClass('top-buttons');
                 $('#EnterKeyModal').modal('hide'); // Скрываем модальное окно ввода пароля
             }
         }
@@ -214,8 +217,13 @@ $(function() {
         }
     }
 
-    function show_or_copy_password() { // Функция копирования/отображения пароля аккаунта
-        var key = decrypt($('#modal-password').val(), master_password);
+    function show_or_copy_login_or_password(type_data) { // Функция копирования/отображения пароля аккаунта
+        var key;
+        if (type_data == _login) {
+            key = decrypt($('#modal-login').val(), master_password);
+        } else {
+            key = decrypt($('#modal-password').val(), master_password);
+        }
 
         if (key != '') { // Если расшифрока дала результат...
             if (is_allow_copy) { // Если копирование разрешено...
@@ -332,8 +340,12 @@ $(function() {
         }
     });
 
+    $("#modal-btn-login").on('click', function() { // Событие нажатия кнопки "Пароль" в модальном окне просмотра аккаунта
+        show_or_copy_login_or_password(_login);
+    });
+
     $("#modal-btn-password").on('click', function() { // Событие нажатия кнопки "Пароль" в модальном окне просмотра аккаунта
-        show_or_copy_password();
+        show_or_copy_login_or_password(_password);
     });
 
     $("#modal-btn-login").on('click', function() { // Событие нажатия кнопки "Логин" в модальном окне просмотра аккаунта
@@ -379,11 +391,12 @@ $(function() {
     });
 
     $('#in-search').on('keyup', function() {
+        var tr = $('tbody tr');
         if ($(this).val() == "") {
-            $('tbody tr').css('display', '');
+            tr.fadeIn(100);
         } else {
             var td = $('.td-site:contains(' + $(this).val().toLowerCase() + ')');
-            $('tr').fadeOut(100);
+            tr.fadeOut(100);
             td.parent().fadeIn(100);
         }
     });
@@ -400,7 +413,17 @@ $(function() {
     })).on('touchstart mousedown', (function() { // Событие нажатия клавиши или сенсора
         press_timer = window.setTimeout(function() { // Устанавливаем таймер
             is_allow_copy = false; // Запрещаем копирование пароля в буфер обмена так как...
-            show_or_copy_password(); // В этой функции мы покажем пароль на экране
+            show_or_copy_login_or_password(password); // В этой функции мы покажем пароль на экране
+        }, 500); // 500 миллисекунд
+    }));
+
+    // Событие долгого нажатия кнопки "Пароль" клавишой мыши или сенсором телефона в модальном окне просмотра аккаунта
+    $("#modal-btn-login").on('touchend mouseup', (function() { // Событие отжатия клавиши или сенсора
+        clearTimeout(press_timer); // Очищаем таймер
+    })).on('touchstart mousedown', (function() { // Событие нажатия клавиши или сенсора
+        press_timer = window.setTimeout(function() { // Устанавливаем таймер
+            is_allow_copy = false; // Запрещаем копирование пароля в буфер обмена так как...
+            show_or_copy_login_or_password(login); // В этой функции мы покажем пароль на экране
         }, 500); // 500 миллисекунд
     }));
 });

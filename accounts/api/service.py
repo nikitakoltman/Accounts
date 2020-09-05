@@ -44,13 +44,17 @@ def delete_account(account_id: int) -> dict:
         }
 
 
-def change_info_account(site: str, description: str, login: str, new_password: str, account_id: int) -> dict:
+def change_info_account(site: str, description: str, new_login: str, new_password: str, account_id: int) -> dict:
     """ Изменяет информацию аккаунта """
     try:
         account = Account.objects.get(id=account_id)
         account.site = site
         account.description = description
-        account.login = login
+
+        if new_login is None:
+            account.login = account.login
+        else:
+            account.login = new_login
 
         if new_password is None:
             account.password = account.password

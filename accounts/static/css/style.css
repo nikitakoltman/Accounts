@@ -5,7 +5,8 @@ header {
     font-size: 2em;
 }
 
-p, h2 {
+p,
+h2 {
     font-family: Comfortaa;
 }
 
@@ -61,7 +62,8 @@ p, h2 {
     top: -62.5%;
 }
 
-.button-close::before, .button-close::after {
+.button-close::before,
+.button-close::after {
     height: 75%;
     background: #99acc2;
     width: 3px;
@@ -84,8 +86,58 @@ p, h2 {
 
 
 
+#password_info {
+    font-size: .875em;
+
+    position: absolute;
+    right: 55px;
+    bottom: -80px;
+
+    display: none;
+
+    width: 250px;
+    padding: 15px;
+
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #fefefe;
+    box-shadow: 0 1px 3px #ccc;
+}
+
+#password_info h4 {
+    font-weight: normal;
+
+    margin: 0 0 10px 0;
+    padding: 0;
+}
+
+.invalid {
+    color: #ec3f41;
+}
+
+.valid {
+    color: #3a7d34;
+}
+
+.input-invalid {
+    border-color: red !important;
+    box-shadow: 0 0px 5px red !important;
+}
 
 
+
+
+
+
+.flex {
+    display: flex;
+
+    justify-content: space-between;
+}
+
+.flex-buttons button {
+    margin-right: 10px;
+}
 
 
 
@@ -107,18 +159,33 @@ div {
     cursor: default;
 }
 
-.flex {
-    display: flex;
+.account-nav p {
+    font-size: 20px;
+    text-align: center;
+}
 
-    justify-content: space-between;
+.account-nav a {
+    cursor: pointer;
+}
+
+.account-nav li {
+    height: 50px;
+}
+
+.table-hover tbody tr:hover>td {
+    background-color: #eceeef;
+}
+
+tbody tr {
+    height: 40px;
 }
 
 #in-search {
-    width: auto;
+    margin-top: 10px;
 }
 
-.flex-buttons button {
-    margin-right: 10px;
+.top-buttons {
+    display: none !important;
 }
 
 .header-icons {
@@ -168,7 +235,7 @@ button:focus {
 .account_container {
     display: none;
 
-    margin-top: 60px;
+    margin-top: 44px;
 }
 
 label {
@@ -207,10 +274,6 @@ label {
 
 .card-title {
     margin-bottom: .75rem;
-}
-
-#btn-create {
-    float: right;
 }
 
 .btn-send {
@@ -343,14 +406,10 @@ label {
     animation: bottomBubbles ease-in-out .75s forwards;
 }
 
-@media (max-width: 767px) {
-    .flex-buttons button {
-        margin-right: 0;
-    }
-
-    #in-search {
-        width: 100%;
-        margin-top: 10px;
+@media (min-width: 768px) {
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
     }
 }
 

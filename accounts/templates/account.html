@@ -10,14 +10,8 @@
 {% endblock %}
 {% block content %}
 <div class="container account_container">
-    <div class="flex">
-        <div class="flex-buttons">
-            <button class="btn btn-primary" id="btn-create" data-toggle="modal" data-target="#CreateAccountModal">Добавить аккаунт</button>
-            <button class="btn btn-primary" data-toggle="modal" data-target="#MasterPasswordModal">Изменить пароль</button>
-        </div>
-        <input class="form-control" placeholder="Поиск" type="text" id="in-search">
-    </div>
-    <table id="Accounts_table" class="tablesorter">
+    <input class="form-control" placeholder="Поиск" type="text" id="in-search">
+    <table id="Accounts_table" class="tablesorter table-hover">
         <thead>
             <tr>
                 <th>Сайт</th>
@@ -26,14 +20,11 @@
         </thead>
         <tbody>
             {% for account in accounts %}
-            <tr data-id="{{ account.id }}">
+            <tr data-toggle="modal" data-target="#AccountModal" data-id="{{ account.id }}">
                 <td class="td-site" data-id="{{ account.id }}">{{ account.site }}</td>
                 <td class="td-description" data-id="{{ account.id }}">{{ account.description }}</td>
                 <td class="td-login td-hide" data-id="{{ account.id }}">{{ account.login }}</td>
                 <td class="td-password td-hide" data-id="{{ account.id }}">{{ account.password }}</td>
-                <td class="td-btn">
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#AccountModal" data-id="{{ account.id }}">Открыть</button>
-                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -53,10 +44,11 @@
                 <input class="form-control" type="text" id="modal-site">
                 <label for="modal-description">Описание</label>
                 <input class="form-control" type="text" id="modal-description">
-                <label for="modal-login">Логин</label>
-                <input class="form-control" type="text" id="modal-login">
+                <label for="modal-new_login">Логин</label>
+                <input class="form-control" type="text" id="modal-new_login">
                 <label for="modal-new_password">Пароль</label>
                 <input class="form-control" type="password" id="modal-new_password">
+                <input style="display: none;" id="modal-login">
                 <input style="display: none;" id="modal-password">
             </div>
             <div class="modal-footer modal-footer-show-account">

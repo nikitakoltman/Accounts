@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Пожертвования{% endblock %}
+{% block content %}
+<div class="container">
+    <main>
+        <section class="horizontal-bottom-line" style="margin-top: 70px;">
+            <h2 align="center">Пожертвования</h2>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <iframe src="https://money.yandex.ru/quickpay/shop-widget?writer=seller&targets=%D0%9D%D0%B0%20%D1%81%D0%B2%D0%B5%D1%82%D0%BB%D0%BE%D0%B5%20%D0%B1%D1%83%D0%B4%D1%83%D1%89%D0%B5%D0%B5%20%F0%9F%99%82&targets-hint=&default-sum=150&button-text=14&payment-type-choice=on&hint=&successURL=https%3A%2F%2Flavaccount.ru%2F&quickpay=shop&account=410019984608793" width="100%" height="222" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+                    </div>
+                    <div class="col-md-6">
+                        <p>С помощью яндекс формы вы можете пожертвовать проекту немного средств для развития и оплаты услуг хостинг провайдера.</p>
+                        <p>Благодаря вашим пожертвованиям этот веб сервис доступен всем и бесплатно! <span style="font-size: 24px;">😀👍</span></p>
+                        <p>Важны даже самые маленькие пожертвования. <span style="font-size: 24px;">🙏</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Помощь и поддержка{% endblock %}
+{% block addons_head %}
+<link rel="stylesheet" href="{% static 'css/support.css' %}">
+</link>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <main>
+        <section class="horizontal-bottom-line" style="margin-top: 70px;">
+            <h2 align="center">Помощь и поддержка</h2>
+            <div class="help_block">
+                <div class="support-content">
+                    <aside>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="simple-tabs__pagination">
+                                    <button class="simple-tabs" data-nav-tab="true" data-tabs-id="1">Почему при открытии записей в таблице я не вижу логин и пароль?</button>
+                                    <button class="simple-tabs" data-nav-tab="true" data-tabs-id="2">Как получить логин и пароль из записи?</button>
+                                    <button class="simple-tabs" data-nav-tab="true" data-tabs-id="3">Я забыл мастер пароль, что мне делать?</button>
+                                    <button class="simple-tabs" data-nav-tab="true" data-tabs-id="4">Как вы защищаете мои данные?</button>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="swiper-container">
+                                    <div data-tabs="1" class="active">
+                                        <strong>Почему при открытии записей в таблице я не вижу логин и пароль?</strong>
+                                        <p>Потому что там распологаются поля для ввода нового логина и пароля, из соображения безопастности они не выводятся на экран сразу.</p>
+                                    </div>
+                                    <div data-tabs="2">
+                                        <strong>Как получить логин и пароль из записи?</strong>
+                                        <p>Для этого есть кнопки "Логин" и "Пароль" справа внизу модального окна, если вы хотите скопировать данные в буфер обмена то достаточно один раз кликнуть по необходимой кнопке.</p>
+                                        <p>Если же вы хотите увидеть логин или пароль на экране, то нажмите и удерживаете нужную кнопку, и в течении секунды откроется окно с вашими данными.</p>
+                                    </div>
+                                    <div data-tabs="3">
+                                        <strong>Я забыл мастер пароль, что мне делать?</strong>
+                                        <p>Увы уже ничего не сделать, система шифрования не позволяет восстанавливать мастер пароль, поэтому если у вас ни как не получается вспомнить свой мастер пароль, то, вы можете воспользоваться <a href="{% url 'reset_url' %}">формой сброса аккаунта</a>.</p>
+                                        <p>Сбросив свой аккаунт вы можете задать новый мастер пароль, но при этом все данные которые вы заносили в таблицу будут удалены.</p>
+                                    </div>
+                                    <div data-tabs="4">
+                                        <strong>Как вы защищаете мои данные?</strong>
+                                        <p>Наша система использует современные методики защиты и шифрования данных в связке с общими практиками по информационной безопастности.</p>
+                                        <p>Более подробно о безопастности нашего приложения вы можете узнать на странице <a href="{% url 'protection_url' %}">защиты ваших данных</a>.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+<script>
+$(function() {
+    $('.simple-tabs').on('click', function() {
+        $('.swiper-container').find('div').removeClass('active');
+        $('[data-tabs="' + $(this).attr('data-tabs-id') + '"]').addClass('active');
+    });
+});
+</script>
+{% endblock %}

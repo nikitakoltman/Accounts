@@ -7,7 +7,7 @@
         {% load crispy_forms_tags %}
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title text-center">Войдите в свою учетную запись</h4>
+                <h4 class="card-title text-center">Вход в свою учетную запись</h4>
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next }}"> {{ form|crispy }}

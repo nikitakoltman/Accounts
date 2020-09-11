@@ -1,10 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Пожертвования{% endblock %}
+{% block addons_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/goodshare.js/6.1.5/goodshare.min.js"></script>
+{% endblock %}
 {% block content %}
 <div class="container">
     <main>
-        <section class="horizontal-bottom-line" style="margin-top: 70px;">
+        <section>
             <h2 align="center">Пожертвования</h2>
             <div class="container">
                 <div class="row">
@@ -19,6 +22,36 @@
                 </div>
             </div>
         </section>
+        <section>
+            <h2 align="center">Социальная поддержка</h2>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Вы также можете поддержать нас рассказав об этом сервисе своим и друзьям или поделиться ссылкой на нас в социальных сетях.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="https://vk.com/share.php?url=https://lavaccount.ru/">vk</a>
+                        <div class="goodshare" data-type="vk">
+                            Поделиться Вк
+                            <span data-counter="vk"></span>
+                        </div>
+                        <div id="share">
+                            <div class="like">Понравилось? Поделитесь с друзьями!</div>
+                            <div class="social" data-url="<?php echo 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];?>" data-title="Стильные кнопки поделится в соц сетях без использования сторонних сервисов">
+                                <a class="push facebook" data-id="fb"><i class="fa fa-facebook"></i> Facebook</a>
+                                <a class="push vkontakte" data-id="vk"><i class="fa fa-vk"></i> Вконтакте</a>
+                                <a class="push ok" data-id="ok"><i class="fa fa-odnoklassniki"></i> OK</a>
+                                <a class="push twitter" data-id="tw"><i class="fa fa-twitter"></i> Twitter</a>
+                                <a class="push google" data-id="gp"><i class="fa fa-google-plus"></i> Google+</a>
+                                <a class="push pinterest" data-id="pin"><i class="fa fa-pinterest"></i> Pinterest </a>
+                                <a class="push viber" data-id="viber"><i class="fa fa-phone"></i> Viber </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="horizontal-bottom-line"></div>
     </main>
 </div>
 {% endblock %}

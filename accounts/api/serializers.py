@@ -7,6 +7,7 @@ class AccountSerializer(serializers.ModelSerializer):
 		model = Account
 		fields = '__all__'
 
+
 class MasterPasswordSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = MasterPassword

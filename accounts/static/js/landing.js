@@ -2,15 +2,15 @@ $(function() {
 	generate_random_string();
 
     setInterval(
-    	function() { generate_random_string() },
+    	function() { generate_random_string(16) },
         2000
     );
 
-    function generate_random_string() {
-        let alphabet = 'qwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*()*QWERTYUIOPASDFGHJKLZXCVBNM',
+    function generate_random_string(length_string) {
+        let chars = 'qwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*()*QWERTYUIOPASDFGHJKLZXCVBNM',
             word = '';
-        for (let i = 0; i < 20; i++) {
-            word += alphabet[Math.round(Math.random() * (alphabet.length - 1))];
+        for (let i = 0; i < length_string; i++) {
+            word += chars[Math.round(Math.random() * (chars.length - 1))];
         }
         $('.random-string').text(word);
     }

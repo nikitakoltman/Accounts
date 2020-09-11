@@ -8,6 +8,16 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="description" content="Описание страницы. Не менее 160 символов. " />
     <meta name="keywords" content="Здесь указываем список ключевых слов, разделенные запятой." />
+
+    <meta property="og:title" content="Заголовок для репоста"/>
+    <meta property="og:description" content="Подпись для репоста"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https://lavaccount.ru/"/>
+    <meta property="og:image" content="{% static 'img/png/icon-512x512' %}"/>
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="512"/>
+    <meta property="og:image:height" content="512"/>
+
     <link rel="manifest" href="{% static '/manifest.json' %}">
     <link rel="stylesheet" href="{% static 'css/addons/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/sweet-alert.css' %}">
@@ -27,7 +37,7 @@
 </head>
 
 <body data-master_password="{{ master_password }}">
-    <header class="horizontal-bottom-line">
+    <header>
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -39,8 +49,8 @@
                 <a class="logo navbar-brand" href="{% url 'home_url' %}">LavAccount</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                {% if request.user.is_authenticated %}
                 <ul class="nav navbar-nav navbar-right account-nav">
+                    {% if request.user.is_authenticated %}
                     <li>
                         <a href="{% url 'donation_url' %}">
                             <p>Пожертвования</p>
@@ -56,17 +66,23 @@
                             <p>‹ Выход ›</p>
                         </a>
                     </li>
-                </ul>
-                {% else %}
-                <ul class="nav navbar-nav navbar-right">
+                    {% else %}
                     <li>
-                        <a href="{% url 'login_url' %}"><button class="btn btn-primary bubbly-button btn-round">Войти</button></a>
+                        <div align="center">
+                            <a href="{% url 'login_url' %}">
+                                <button class="btn btn-primary bubbly-button btn-round">Войти</button>
+                            </a>
+                        </div>
                     </li>
                     <li>
-                        <a href="{% url 'register_url' %}"><button class="btn btn-primary bubbly-button btn-round" style="width: 180px;">Зарегистрироваться</button></a>
+                        <div align="center">
+                            <a href="{% url 'register_url' %}">
+                                <button class="btn btn-primary bubbly-button btn-round" style="width: 180px;">Зарегистрироваться</button>
+                            </a>
+                        </div>
                     </li>
+                    {% endif %}
                 </ul>
-                {% endif %}
             </div>
         </nav>
     </header>

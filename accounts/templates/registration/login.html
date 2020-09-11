@@ -12,6 +12,9 @@
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next }}"> {{ form|crispy }}
                     <button type="submit" class="btn btn-primary btn-block bubbly-button">Войти</button>
+                    <div style="margin-top: 20px;" align="center">
+                        <a href="{% url 'reset_password_url' %}">Забыли пароль?</a>
+                    </div>
                 </form>
             </div>
         </div>

@@ -28,6 +28,14 @@ def noscript(request):
     return render(request, 'noscript.html')
 
 
+def reset_password(request):
+    return render(request, 'reset/reset_password.html')
+
+
+def reset_account(request):
+    return render(request, 'reset/reset_account.html')
+
+
 @service.base_view
 def create_account(request):
     """ Создает аккаунт """

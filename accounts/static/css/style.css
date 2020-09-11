@@ -5,8 +5,14 @@ header {
     font-size: 2em;
 }
 
+tr {
+    cursor: pointer;
+}
+
 p,
-h2 {
+h2,
+strong,
+.simple-tabs {
     font-family: Comfortaa;
 }
 
@@ -27,9 +33,15 @@ h2 {
     margin-top: 3em;
 }
 
+.btn-reload {
+    margin-top: 100px;
+    display: none;
+}
 
-
-
+.user-username {
+    display: none;
+    cursor: default;
+}
 
 
 
@@ -85,7 +97,6 @@ h2 {
 
 
 
-
 #password_info {
     font-size: .875em;
 
@@ -124,6 +135,15 @@ h2 {
     box-shadow: 0 0px 5px red !important;
 }
 
+.td-favicon {
+    width: 32px;
+    padding: 8px !important;
+}
+
+.delimiter {
+    border-left: 1px solid white;
+}
+
 
 
 
@@ -143,7 +163,9 @@ h2 {
 
 
 
-
+body.modal-open {
+    overflow: hidden;
+}
 
 
 :root {
@@ -159,8 +181,12 @@ div {
     cursor: default;
 }
 
+.account-nav {
+    margin-right: 10px;
+}
+
 .account-nav p {
-    font-size: 20px;
+    font-size: 16px;
     text-align: center;
 }
 
@@ -182,10 +208,6 @@ tbody tr {
 
 #in-search {
     margin-top: 10px;
-}
-
-.top-buttons {
-    display: none !important;
 }
 
 .header-icons {
@@ -412,6 +434,10 @@ label {
         padding-bottom: 10px;
     }
 }
+
+/*@media (max-width: 495px) {
+
+}*/
 
 
 @keyframes topBubbles {

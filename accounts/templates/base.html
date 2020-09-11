@@ -29,55 +29,51 @@
 <body data-master_password="{{ master_password }}">
     <header class="horizontal-bottom-line">
         <nav class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    {% if request.user.is_authenticated %}
-                    <div class="logo navbar-brand">• {{ request.user.username }}</div>
-                    {% else %}
-                    <a class="logo navbar-brand" href="{% url 'home_url' %}">LavAccount</a>
-                    {% endif %}
-                </div>
-                <div id="navbar" class="navbar-collapse collapse">
-                    {% if request.user.is_authenticated %}
-                    <ul class="nav navbar-nav navbar-right account-nav">
-                        <li>
-                            <a data-toggle="modal" data-target="#CreateAccountModal" class="top-buttons">
-                                <p>Добавить аккаунт</p>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-toggle="modal" data-target="#MasterPasswordModal" class="top-buttons">
-                                <p>Изменить пароль</p>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'logout_url' %}">
-                                <p>‹ Выход ›</p>
-                            </a>
-                        </li>
-                    </ul>
-                    {% else %}
-                    <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <a href="{% url 'login_url' %}"><button class="btn btn-primary bubbly-button btn-round">Войти</button></a>
-                        </li>
-                        <li>
-                            <a href="{% url 'register_url' %}"><button class="btn btn-primary bubbly-button btn-round" style="width: 180px;">Зарегистрироваться</button></a>
-                        </li>
-                    </ul>
-                    {% endif %}
-                </div>
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="logo navbar-brand" href="{% url 'home_url' %}">LavAccount</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                {% if request.user.is_authenticated %}
+                <ul class="nav navbar-nav navbar-right account-nav">
+                    <li>
+                        <a href="{% url 'donation_url' %}">
+                            <p>Пожертвования</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'support_url' %}">
+                            <p>Помощь</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'logout_url' %}">
+                            <p>‹ Выход ›</p>
+                        </a>
+                    </li>
+                </ul>
+                {% else %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="{% url 'login_url' %}"><button class="btn btn-primary bubbly-button btn-round">Войти</button></a>
+                    </li>
+                    <li>
+                        <a href="{% url 'register_url' %}"><button class="btn btn-primary bubbly-button btn-round" style="width: 180px;">Зарегистрироваться</button></a>
+                    </li>
+                </ul>
+                {% endif %}
             </div>
         </nav>
     </header>
     {% block content %}{% endblock %}
-    <footer></footer>
+    <footer>
+        <p align="center" style="margin-top: 1em; cursor: default;">© 2020 LavAccount.</p>
+    </footer>
     <script>
     document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
     </script>

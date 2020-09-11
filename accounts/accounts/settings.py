@@ -1,8 +1,9 @@
 import os
-from configs.config import DJANGO_SECRET_KEY
+from configs import config
+#from datetime import timedelta
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = DJANGO_SECRET_KEY
+SECRET_KEY = config.DJANGO_SECRET_KEY
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
@@ -16,9 +17,12 @@ INSTALLED_APPS = [
 
     'crispy_forms',
     'rest_framework',
+    #'rest_framework.authtoken',
+    #'djoser',
 
     'account.apps.AccountConfig',
-    'api.apps.ApiConfig'
+    'api.apps.ApiConfig',
+    'support.apps.SupportConfig'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -94,3 +98,54 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework.authentication.SessionAuthentication',
+#         'rest_framework.authentication.TokenAuthentication',
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ),
+#     'DEFAULT_PERMISSION_CLASSES': (
+#             'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+#     ),
+# }
+
+# EMAIL_USE_TLS = config.EMAIL_USE_TLS
+# EMAIL_HOST = config.EMAIL_HOST
+# EMAIL_HOST_USER = config.EMAIL_HOST_USER
+# EMAIL_HOST_PASSWORD = config.EMAIL_HOST_PASSWORD
+# EMAIL_PORT = config.EMAIL_PORT
+
+# DJOSER = {
+#     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+#     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+#     'ACTIVATION_URL': '#/activate/{uid}/{token}',
+#     'SEND_ACTIVATION_EMAIL': True,
+#     'SERIALIZERS': {},
+# }
+
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+#     'ROTATE_REFRESH_TOKENS': False,
+#     'BLACKLIST_AFTER_ROTATION': True,
+
+#     'ALGORITHM': 'HS256',
+#     'SIGNING_KEY': config.DJANGO_SECRET_KEY,
+#     'VERIFYING_KEY': None,
+#     'AUDIENCE': None,
+#     'ISSUER': None,
+
+#     'AUTH_HEADER_TYPES': ('JWT',),
+#     'USER_ID_FIELD': 'id',
+#     'USER_ID_CLAIM': 'user_id',
+
+#     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+#     'TOKEN_TYPE_CLAIM': 'token_type',
+
+#     'JTI_CLAIM': 'jti',
+
+#     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+#     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+#     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+# }

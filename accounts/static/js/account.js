@@ -25,6 +25,8 @@ $(function() {
     }
 
     function create_account() { // Функция создания нового аккаунта в таблице
+        preload_show();
+
         var site = $("#in-site").val(),
             description = $("#in-description").val(),
             login = encrypt($("#in-login").val(), master_password),
@@ -64,11 +66,15 @@ $(function() {
                 } else {
                     swal("Ошибка!", res['result']);
                 }
+
+                preload_hide();
             }
         });
     }
 
     function delete_account(account_id) { // Функция удаления аккаунта
+        preload_show();
+
         $.ajax({
             url: "delete_account/",
             type: "POST",
@@ -82,11 +88,15 @@ $(function() {
                 } else {
                     swal("Ошибка!", result['result']);
                 }
+
+                preload_hide();
             }
         });
     }
 
     function change_info_account() { // Функция изменения информации аккаунта
+        preload_show();
+
         var site = $("#modal-site").val(),
             description = $("#modal-description").val(),
             new_login = $("#modal-new_login").val(),
@@ -133,6 +143,8 @@ $(function() {
                         } else {
                             swal("Ошибка!", result['result']);
                         }
+
+                        preload_hide();
                     }
                 });
             } else {
@@ -144,6 +156,8 @@ $(function() {
     }
 
     function change_or_create_master_password(new_master_password) { // Функция изменения мастер пароля
+        preload_show();
+
         var sites = {},
             descriptions = {},
             logins = {},
@@ -178,6 +192,7 @@ $(function() {
                 new_master_password: encrypt(new_master_password, new_master_password),
             },
             success: function(result) {
+                preload_hide();
                 if (result['status'] == "success") {
                     reload();
                 } else {
@@ -271,51 +286,40 @@ $(function() {
     });
 
     $("#btn-send_account").on('click', function() { // Событие нажатия на кнопку "Отправить" в модальном окне создания нового аккаунта
-        if ($("#in-site").val() != "") {
-            if ($("#in-description").val() != "") {
-                if ($("#in-login").val() != "") {
-                    if ($("#in-password").val() != "") {
-                        create_account();
-                    } else {
-                        swal('Заполните поле "Пароль"');
-                    }
-                } else {
-                    swal('Заполните поле "Логин"');
-                }
-            } else {
-                swal('Заполните поле "Описание"');
-            }
-        } else {
+        if ($("#in-site").val() == "") {
             swal('Заполните поле "Сайт"');
+        }
+        else if ($("#in-description").val() == "") {
+            swal('Заполните поле "Описание"');
+        }
+        else if ($("#in-login").val() == "") {
+            swal('Заполните поле "Логин"');
+        }
+        else if ($("#in-password").val() == "") {
+            swal('Заполните поле "Пароль"');
+        } else {
+            create_account();
         }
     });
 
     $("#btn-send_master_password").on('click', function() { // Событие нажатия на кнопку "Отправить" в модальном окне изменения мастер пароля
-        if (($("#in-old_password").val() == "" && $("#in-old_password").attr('disabled')) ||
-            ($("#in-old_password").val() != "" && !$("#in-old_password").attr('disabled'))) {
-            if ($("#in-new_password").val() != "") {
-                if ($("#in-repeat_new_password").val() != "") {
-                    if ($("#in-new_password").val() == $("#in-repeat_new_password").val()) {
-                        if (!$("#in-old_password").attr('disabled')) {
-                            if (master_password == $('#in-old_password').val()) {
-                                change_or_create_master_password($("#in-repeat_new_password").val());
-                            } else {
-                                swal('Не правильный старый пароль');
-                            }
-                        } else {
-                            change_or_create_master_password($("#in-repeat_new_password").val());
-                        }
-                    } else {
-                        swal('Пароли не совпадают');
-                    }
-                } else {
-                    swal('Заполните поле "Подтвердите новый пароль"');
-                }
-            } else {
-                swal('Заполните поле "Новый пароль"');
-            }
-        } else {
+        if (
+            ($("#in-old_password").val() == "" && !$("#in-old_password").attr('disabled')) ||
+            ($("#in-old_password").val() != "" && $("#in-old_password").attr('disabled'))
+        ) {
             swal('Заполните поле "Старый пароль"');
+        } else if ($("#in-new_password").val() == "") {
+            swal('Заполните поле "Новый пароль"');
+        } else if ($("#in-old_password").val() == $("#in-new_password").val()) {
+            swal('Старый и новый пароль не могут совпадать');
+        } else if ($("#in-repeat_new_password").val() == "") {
+            swal('Заполните поле "Подтвердите новый пароль"');
+        } else if ($("#in-new_password").val() != $("#in-repeat_new_password").val()) {
+            swal('Пароли не совпадают');
+        } else if (master_password != $('#in-old_password').val()) {
+            swal('Не правильный старый пароль');
+        } else {
+            change_or_create_master_password($("#in-repeat_new_password").val());
         }
     });
 
@@ -337,11 +341,17 @@ $(function() {
     $("#modal-btn-save").on('click', function() { // Событие нажатия кнопки "Сохранить" в модальном окне просмотра аккаунта
         var key = decrypt($('#modal-password').val(), master_password);
 
-        if (key != '') { // Если расшифрока дала результат...
-            change_info_account(); // Изменяем аккаунт
-            $('#AccountModal').modal('hide');
-        } else {
+        if (key == '') { // Если расшифрока дала результат...
             swal('Не правильный пароль');
+        }
+        else if ($("#modal-site").val() == "") {
+            swal('Заполните поле "Сайт"');
+        }
+        else if ($("#modal-description").val() == "") {
+            swal('Заполните поле "Описание"');
+        }
+        else {
+            change_info_account(); // Изменяем аккаунт
         }
     });
 
@@ -408,8 +418,7 @@ $(function() {
             $('.btn-reload').hide(); // Скрываем кнопку загрузить таблицу
 
             $('.account_container').css('display', 'block'); // Показываем таблицу
-        }
-        else {
+        } else {
             $('.btn-reload').show(); // Показываем кнопку загрузить таблицу
             $('#in-enter_password').val('');
         }

@@ -4,6 +4,7 @@
 {% block addons_head %}
 <script type="text/javascript" src="{% static 'js/register.js' %}?ver=1"></script>
 <script type="text/javascript" src="{% static 'js/login.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/addons.js' %}?ver=1"></script>
 {% endblock %}
 {% block content %}
 <div class="container" style="margin-top: 90px;">
@@ -15,7 +16,7 @@
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next }}"> {{ form|crispy }}
-                    <button type="submit" id="submit" class="btn btn-primary btn-block bubbly-button">Регистрация</button>
+                    <button type="button" id="js-btn_submit" class="btn btn-primary btn-block">Регистрация</button>
                     <button type="button" class="show-password sp-register">
                         <img src="{% static 'img/svg/show-password.svg' %}" alt="show-password" height="30" width="30" />
                     </button>

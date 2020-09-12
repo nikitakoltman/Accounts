@@ -12,99 +12,145 @@ $(document).ready(function() {
             case 'None':
                 break;
             case 'UNIQUE constraint failed: auth_user.username':
-                swal('Ошибка', 'Данное имя уже занято, используйте другое.');
+                swal('Ошибка', 'Введенное имя уже используейтся, введите другое.');
                 break;
             case 'UNIQUE constraint failed: auth_user.email':
-                swal('Ошибка', 'Данная почта уже занята, используйте другую.');
+                swal('Ошибка', 'Введенная почта уже используется, введите другую.');
                 break;
             default:
-                swal('Не известная ошибка', error)
+                swal('Критическая ошибка', error);
         }
     }
-    var pattern = /^[a-z0-9_-]+@[a-z0-9-]+\.([a-z]{1,6}\.)?[a-z]{2,6}$/i,
-        mail = $('#id_email'),
 
-        email = false,
-        password = false,
-        password2 = false,
+    var pattern_email = /^[a-z0-9_-]+@[a-z0-9-]+\.([a-z]{1,6}\.)?[a-z]{2,6}$/i,
+
+        is_username = false,
+        is_email = false,
+        is_password = false,
+        is_password2 = false,
 
         // password
-        length = false,
-        letter = false,
-        capital = false,
-        number = false;
+        is_length = false,
+        is_letter = false,
+        is_capital = false,
+        is_number = false;
 
-    mail.on('keyup', function() {
-        if (mail.val().search(pattern) == 0) {
-            mail.removeClass('input-invalid');
-            email = true;
+    $('#id_email').on('keyup', function() {
+        if ($(this).val().search(pattern_email) == 0) {
+            $(this).removeClass('input-invalid');
+            is_email = true;
         } else {
-            mail.addClass('input-invalid');
-            email = false;
+            $(this).addClass('input-invalid');
+            is_email = false;
         }
     });
 
-    $("form").on('submit', function() {
-        if (!(length && letter && capital && number && email && password && password2)) {
-            return false;
-        }
+    $("#js-btn_submit").on('click', function() {
+        preload_show();
+        var username = $("#id_username").val(),
+            email = $("#id_email").val();
+
+        $.ajax({
+            url: "check_username_and_email/",
+            type: "POST",
+            data: {
+                username: username,
+                email: email,
+            },
+            success: function(result) {
+                if (result['status'] == "success") {
+                    var is_exist_username = result['is_exist_username'],
+                        is_exist_email = result['is_exist_email'];
+
+                    if ($('#id_username').val() == '') {
+                        swal("Ошибка!", 'Заполните поле "Имя".');
+                    }
+                    else if (is_exist_username) {
+                        swal("Ошибка", 'Введенное имя уже используейтся, введите другое.');
+                    }
+                    else if (is_exist_email) {
+                        swal("Ошибка", 'Введенная почта уже используется, введите другую.');
+                    }
+                    else if (!is_email) {
+                        $('#id_email').addClass('input-invalid');
+                    }
+                    else if (!(is_length && is_letter && is_capital && is_number && is_password)) {
+                        $('#id_password').addClass('input-invalid');
+                    }
+                    else if (is_password2) {
+                        $('form').submit();
+                    }
+
+                    preload_hide();
+                } else {
+                    preload_hide();
+                    swal("Ошибка!", res['result']);
+                }
+            }
+        });
     });
 
     $('#id_password2').on('keyup', function() {
-        var value2 = $(this).val(),
-            value = $('#id_password').val();
-
-        if (value === value2) {
-            $('#id_password2').removeClass('input-invalid');
-            password2 = true;
-        } else {
-            $('#id_password2').addClass('input-invalid');
-            password2 = false;
-        }
+        check_password2();
     });
 
-    $('#id_password').on('keyup', function() {
-        var value = $(this).val();
+    function check_password2() {
+        var password = $('#id_password').val(),
+            password2 = $('#id_password2').val();
 
-        if (value.length < 8) {
+        if (password === password2) {
+            $('#id_password2').removeClass('input-invalid');
+            is_password2 = true;
+        } else {
+            $('#id_password2').addClass('input-invalid');
+            is_password2 = false;
+        }
+    }
+
+    $('#id_password').on('keyup', function() {
+        var password = $(this).val();
+
+        if (password.length < 8) {
             $('#length').removeClass('valid').addClass('invalid');
-            length = false;
+            is_length = false;
         } else {
             $('#length').removeClass('invalid').addClass('valid');
-            length = true;
+            is_length = true;
         }
 
-        if (value.match(/[a-z]/)) {
+        if (password.match(/[a-z]/)) {
             $('#letter').removeClass('invalid').addClass('valid');
-            letter = true;
+            is_letter = true;
         } else {
             $('#letter').removeClass('valid').addClass('invalid');
-            letter = false;
+            is_letter = false;
         }
 
-        if (value.match(/[A-Z]/)) {
+        if (password.match(/[A-Z]/)) {
             $('#capital').removeClass('invalid').addClass('valid');
-            capital = true;
+            is_capital = true;
         } else {
             $('#capital').removeClass('valid').addClass('invalid');
-            capital = false;
+            is_capital = false;
         }
 
-        if (value.match(/[0-9]/)) {
+        if (password.match(/[0-9]/)) {
             $('#number').removeClass('invalid').addClass('valid');
-            number = true;
+            is_number = true;
         } else {
             $('#number').removeClass('valid').addClass('invalid');
-            number = false;
+            is_number = false;
         }
 
-        if (length && letter && capital && number) {
+        if (is_length && is_letter && is_capital && is_number) {
             $('#id_password').removeClass('input-invalid');
-            password = true;
+            is_password = true;
         } else {
             $('#id_password').addClass('input-invalid');
-            password = false;
+            is_password = false;
         }
+
+        check_password2();
 
     }).focus(function() {
         $('#password_info').show();

@@ -109,6 +109,30 @@ def change_or_create_master_password(sites: str, descriptions: str, logins: str,
     }
 
 
+def check_username_and_email(username: str, email: str) -> dict:
+    """ Проверяет существование имени и почты в БД """
+    is_exist_username = False
+    is_exist_email = False
+
+    try:
+        user = User.objects.get(username=username)
+        is_exist_username = True
+    except User.DoesNotExist:
+        pass
+
+    try:
+        user = User.objects.get(email=email)
+        is_exist_email = True
+    except User.DoesNotExist:
+        pass
+
+    return {
+        'status': 'success',
+        'is_exist_username': is_exist_username,
+        'is_exist_email': is_exist_email
+    }
+
+
 def get_master_password(user: User) -> str:
     """ Возвращает мастер пароль """
     try:

@@ -104,6 +104,20 @@ def change_or_create_master_password(request):
     return service.json_response(answer)
 
 
+@service.base_view
+def check_username_and_email(request):
+    """ Проверяет существование имени и почты в БД """
+    username = request.POST.get('username', None)
+    email = request.POST.get('email', None)
+
+    answer = service.check_username_and_email(
+        username=username,
+        email=email
+    )
+
+    return service.json_response(answer)
+
+
 class RegisterView(TemplateView):
     """ Регистрация пользователей """
     template_name = "registration/register.html"

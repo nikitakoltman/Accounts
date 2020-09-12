@@ -8,16 +8,6 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="description" content="Описание страницы. Не менее 160 символов. " />
     <meta name="keywords" content="Здесь указываем список ключевых слов, разделенные запятой." />
-
-    <meta property="og:title" content="Заголовок для репоста"/>
-    <meta property="og:description" content="Подпись для репоста"/>
-    <meta property="og:type" content="website"/>
-    <meta property="og:url" content="https://lavaccount.ru/"/>
-    <meta property="og:image" content="{% static 'img/png/icon-512x512' %}"/>
-    <meta property="og:image:type" content="image/png">
-    <meta property="og:image:width" content="512"/>
-    <meta property="og:image:height" content="512"/>
-
     <link rel="manifest" href="{% static '/manifest.json' %}">
     <link rel="stylesheet" href="{% static 'css/addons/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/sweet-alert.css' %}">
@@ -27,6 +17,7 @@
     <script src="{% static 'js/addons/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/addons/jquery.easing.min.js' %}"></script>
     <script src="{% static 'js/sweet-alert.js' %}"></script>
+    <script src="{% static 'js/base.js' %}"></script>
     <title>{% block title %}{% endblock %}</title>
     {% block addons_head %}{% endblock %}
     {% block noscript %}
@@ -37,6 +28,25 @@
 </head>
 
 <body data-master_password="{{ master_password }}">
+    <div id="page-preload" class="preload">
+        <div class="windows8">
+            <div class="wBall" id="wBall_1">
+                <div class="wInnerBall"></div>
+            </div>
+            <div class="wBall" id="wBall_2">
+                <div class="wInnerBall"></div>
+            </div>
+            <div class="wBall" id="wBall_3">
+                <div class="wInnerBall"></div>
+            </div>
+            <div class="wBall" id="wBall_4">
+                <div class="wInnerBall"></div>
+            </div>
+            <div class="wBall" id="wBall_5">
+                <div class="wInnerBall"></div>
+            </div>
+        </div>
+    </div>
     <header>
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-header">

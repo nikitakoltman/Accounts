@@ -94,6 +94,38 @@ strong,
 
 
 
+.show-password {
+    position: absolute;
+
+    border: none;
+    background: none;
+
+    transition: transform ease-in .1s, box-shadow ease-in .25s;
+}
+
+.sp-login {
+    top: 149px;
+    left: 215px;
+}
+
+.sp-register {
+    top: 223px;
+    left: 215px;
+}
+
+.show-password:active {
+    transform: scale(.9);
+}
+
+#id_password {
+    width: 85%;
+}
+
+
+
+
+
+
 
 
 

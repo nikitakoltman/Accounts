@@ -26,11 +26,22 @@
                     <div class="col-md-6">
                         <p>Вы также можете поддержать нас рассказав об этом сервисе своим друзьям или поделиться ссылкой на нас в социальных сетях.</p>
                     </div>
-                    <div class="col-md-6">
-                        <a href="http://vk.com/share.php?url=https://lavaccount.ru/&title=LavAccount&description=Новый менеджер паролей&image={% static 'img/png/icon-512x512' %}&noparse=true">ВКонтакте</a>
-                        <a href="https://www.facebook.com/sharer/sharer.php?u=https://lavaccount.ru/">Facebook</a>
-                        <a href="https://connect.ok.ru/offer?url=https://lavaccount.ru/">Одноклассники</a>
-                        <a href="https://twitter.com/intent/tweet?url=https://lavaccount.ru/">Twitter</a>
+                    <div class="col-md-6 share-container" align="center">
+                        <a href="http://vk.com/share.php?url=https://lavaccount.ru/&image=https://lavaccount.ru{% static 'img/png/icon-512x512.png' %}&noparse=true" target="_blank" title="Вконтакте" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
+                            <img src="{% static 'img/svg/vk.svg' %}" height="50" width="50" alt="vk">
+                        </a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=https://lavaccount.ru/&picture=https://lavaccount.ru{% static 'img/png/icon-512x512.png' %}" target="_blank" title="Фейсбук" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
+                            <img src="{% static 'img/svg/fb.svg' %}" height="50" width="50" alt="facebook">
+                        </a>
+                        <a href="https://connect.ok.ru/offer?url=https://lavaccount.ru/" target="_blank" title="Одноклассники" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
+                            <img src="{% static 'img/svg/ok.svg' %}" height="50" width="50" alt="ok">
+                        </a>
+                        <a href="https://twitter.com/share?url=https://lavaccount.ru/&text=Веб приложение для храниения аккаунтов&hashtags=lavaccount" target="_blank" title="Твиттер" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
+                            <img src="{% static 'img/svg/twitter.svg' %}" height="50" width="50" alt="twitter">
+                        </a>
+                        <a href="http://connect.mail.ru/share?url=https://lavaccount.ru/&title=LavAccount&description=Веб приложение для храниения аккаунтов&image_url=https://lavaccount.ru{% static 'img/png/icon-512x512.png' %}" target="_blank" title="Мой мир" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
+                            <img src="{% static 'img/svg/mailru.svg' %}" height="50" width="50" alt="mailru" style="background-color: #2166a9;border-radius: 30px;padding: 5px;">
+                        </a>
                     </div>
                 </div>
         </section>

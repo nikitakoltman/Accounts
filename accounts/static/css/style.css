@@ -93,6 +93,16 @@ strong,
 
 
 
+.share-container a:hover {
+    color: #ffffff;
+}
+
+
+
+
+
+
+
 
 .show-password {
     position: absolute;

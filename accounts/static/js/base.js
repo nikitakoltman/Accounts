@@ -27,6 +27,23 @@ $(function() {
         main_show_preload();
     }
 
+    window.generate_random_string = function(length_string) {
+        let chars = 'qwertyuiopasdfghjklzxcvbnm1234567890!@#$%QWERTYUIOPASDFGHJKLZXCVBNM',
+            word = '';
+        // TODO: Сделать что-то по приличней, сейчас костыль.
+        do {
+            for (let i = 0; i < length_string; i++) {
+                word += chars[Math.round(Math.random() * (chars.length - 1))];
+            }
+            if (word.match(/[a-z][A-Z][0-9]/)) {
+                return word;
+            } else {
+                word = '';
+            }
+        }
+        while (!word.match(/[a-z][A-Z][0-9]/));
+    }
+
     $(document).ready(function() {
         main_hide_preload();
     });

@@ -5,9 +5,14 @@
 <script type="text/javascript" src="{% static 'js/register.js' %}?ver=1"></script>
 <script type="text/javascript" src="{% static 'js/login.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/addons.js' %}?ver=1"></script>
+<style type="text/css">
+    #id_password {
+        width: 70%;
+    }
+</style>
 {% endblock %}
 {% block content %}
-<div class="container" style="margin-top: 90px;">
+<div class="container registration-container">
     <div class="row flex nomargin">
         {% load crispy_forms_tags %}
         <div class="card">
@@ -17,8 +22,11 @@
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next }}"> {{ form|crispy }}
                     <button type="button" id="js-btn_submit" class="btn btn-primary btn-block">Регистрация</button>
-                    <button type="button" class="show-password sp-register">
-                        <img src="{% static 'img/svg/show-password.svg' %}" alt="show-password" height="30" width="30" />
+                    <button type="button" class="in-password_additional_button js-show_password" style="top: 223px; left: 187px;">
+                        <img title="Показать пароль" src="{% static 'img/svg/show-password.svg' %}" alt="show-password" height="30" width="30" />
+                    </button>
+                    <button type="button" class="in-password_additional_button js-generate_password" style="top: 223px; left: 225px;">
+                        <img title="Сгенерировать пароль" src="{% static 'img/svg/lock.svg' %}" alt="show-password" height="30" width="30" />
                     </button>
                 </form>
                 <div id="password_info">

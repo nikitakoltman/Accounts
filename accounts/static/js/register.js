@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var error = $('#in-hide-form_error').val(),
+    let error = $('#in-hide-form_error').val(),
         username = $('#in-hide-username').val(),
         email = $('#in-hide-email').val();
 
@@ -17,23 +17,32 @@ $(document).ready(function() {
             case 'UNIQUE constraint failed: auth_user.email':
                 swal('Ошибка', 'Введенная почта уже используется, введите другую.');
                 break;
+            case 'broken rule [pass == pass2]':
+                swal('Ошибка валидации', 'Пароли не совподают');
+                break;
+            case 'broken rule [len > 8]':
+                swal('Ошибка валидации', 'Длинна пароля должна быть больше 8 символов');
+                break;
+            case 'broken rule [a-z]':
+                swal('Ошибка валидации', 'Пароль должен содержать как минимум одну маленькую букву');
+                break;
+            case 'broken rule [A-Z]':
+                swal('Ошибка валидации', 'Пароль должен содержать как минимум одну заглавную букву');
+                break;
+            case 'broken rule [0-9]':
+                swal('Ошибка валидации', 'Пароль должен содержать как минимум одну цифру');
+                break;
             default:
                 swal('Критическая ошибка', error);
         }
     }
 
-    var pattern_email = /^[a-z0-9_-]+@[a-z0-9-]+\.([a-z]{1,6}\.)?[a-z]{2,6}$/i,
+    let pattern_email = /^[a-z0-9_-]+@[a-z0-9-]+\.([a-z]{1,6}\.)?[a-z]{2,6}$/i,
 
         is_username = false,
         is_email = false,
         is_password = false,
-        is_password2 = false,
-
-        // password
-        is_length = false,
-        is_letter = false,
-        is_capital = false,
-        is_number = false;
+        is_password2 = false;
 
     $('#id_email').on('keyup', function() {
         if ($(this).val().search(pattern_email) == 0) {
@@ -47,7 +56,7 @@ $(document).ready(function() {
 
     $("#js-btn_submit").on('click', function() {
         preload_show();
-        var username = $("#id_username").val(),
+        let username = $("#id_username").val(),
             email = $("#id_email").val();
 
         $.ajax({
@@ -59,7 +68,7 @@ $(document).ready(function() {
             },
             success: function(result) {
                 if (result['status'] == "success") {
-                    var is_exist_username = result['is_exist_username'],
+                    let is_exist_username = result['is_exist_username'],
                         is_exist_email = result['is_exist_email'];
 
                     if ($('#id_username').val() == '') {
@@ -74,7 +83,7 @@ $(document).ready(function() {
                     else if (!is_email) {
                         $('#id_email').addClass('input-invalid');
                     }
-                    else if (!(is_length && is_letter && is_capital && is_number && is_password)) {
+                    else if (!is_password) {
                         $('#id_password').addClass('input-invalid');
                     }
                     else if (is_password2) {
@@ -90,25 +99,32 @@ $(document).ready(function() {
         });
     });
 
-    $('#id_password2').on('keyup', function() {
+    $('.js-generate_password').on('touchstart mousedown', function() {
+        let password = generate_random_string(10);
+        $('#id_password').val(password);
+        swal('Генератор', 'Ваш пароль: ' + password + '\nСтарайтесь избегать хранения паролей на электронных устройствах в открытом виде.');
+        check_password();
+    });
+
+    $('#id_password').on('keyup', function() {
+        check_password();
+    }).focus(function() {
+        $('#password_info').show();
+    }).blur(function() {
+        $('#password_info').hide();
+    });
+
+    $('#id_password2').on('keyup change', function() {
         check_password2();
     });
 
-    function check_password2() {
-        var password = $('#id_password').val(),
-            password2 = $('#id_password2').val();
+    function check_password() {
+        let password = $('#id_password').val(),
 
-        if (password === password2) {
-            $('#id_password2').removeClass('input-invalid');
-            is_password2 = true;
-        } else {
-            $('#id_password2').addClass('input-invalid');
-            is_password2 = false;
-        }
-    }
-
-    $('#id_password').on('keyup', function() {
-        var password = $(this).val();
+            is_length = false,
+            is_letter = false,
+            is_capital = false,
+            is_number = false;
 
         if (password.length < 8) {
             $('#length').removeClass('valid').addClass('invalid');
@@ -152,9 +168,18 @@ $(document).ready(function() {
 
         check_password2();
 
-    }).focus(function() {
-        $('#password_info').show();
-    }).blur(function() {
-        $('#password_info').hide();
-    });
+    }
+
+    function check_password2() {
+        let password = $('#id_password').val(),
+            password2 = $('#id_password2').val();
+
+        if (password == password2) {
+            $('#id_password2').removeClass('input-invalid');
+            is_password2 = true;
+        } else {
+            $('#id_password2').addClass('input-invalid');
+            is_password2 = false;
+        }
+    }
 });

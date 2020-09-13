@@ -104,31 +104,23 @@ strong,
 
 
 
-.show-password {
+.in-password_additional_button {
     position: absolute;
 
     border: none;
     background: none;
 
+    padding: 0;
+
     transition: transform ease-in .1s, box-shadow ease-in .25s;
 }
 
-.sp-login {
-    top: 149px;
-    left: 215px;
-}
-
-.sp-register {
-    top: 223px;
-    left: 215px;
-}
-
-.show-password:active {
+.in-password_additional_button:active {
     transform: scale(.9);
 }
 
-#id_password {
-    width: 85%;
+.registration-container {
+    margin-top: 90px;
 }
 
 

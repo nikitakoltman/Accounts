@@ -134,7 +134,8 @@ class RegisterView(TemplateView):
             password = request.POST.get('password')
             password2 = request.POST.get('password2')
 
-            if self.check_if_password_correct(password, password2):
+            answer = self.check_if_password_correct(password, password2)
+            if answer == 'success':
                 try:
                     User.objects.create_user(
                         username=username,
@@ -148,13 +149,25 @@ class RegisterView(TemplateView):
                         'username': username,
                         'email': email
                     })
-
+            else:
+                context.update({
+                        'form_error': answer,
+                        'username': username,
+                        'email': email
+                    })
         return render(request, self.template_name, context)
 
-    def check_if_password_correct(self, password: str, password2: str) -> bool:
+    def check_if_password_correct(self, password: str, password2: str) -> str:
         """ Проверка корректности пароля """
-        if password == password2:
-            pattern_password = re.compile(r'^(?=.*[0-9].*)(?=.*[a-z].*)(?=.*[A-Z].*)[0-9a-zA-Z]{8,}$')
-            return bool(pattern_password.match(password))
+        if password != password2:
+            return 'broken rule [pass == pass2]'
+        if len(password) < 8:
+            return 'broken rule [len > 8]'
+        elif re.search('[a-z]', password) is None:
+            return 'broken rule [a-z]'
+        elif re.search('[A-Z]', password) is None:
+            return 'broken rule [A-Z]'
+        elif re.search('[0-9]', password) is None:
+            return 'broken rule [0-9]'
         else:
-            return False
+            return 'success'

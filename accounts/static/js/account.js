@@ -1,6 +1,6 @@
 $(function() {
-    var master_password = null, // Хранит мастер пароль для расшифровки данных таблицы
-        press_timer, // Хранит значение таймера для события долгого нажатия кнопки "Пароль"
+    let master_password = null, // Хранит мастер пароль для расшифровки данных таблицы
+        press_timer = 0, // Хранит значение таймера для события долгого нажатия кнопки "Пароль"
         is_allow_copy = true, // Разрешает копирование при долгом нажатии кнопки "Пароль"
         is_allow_show_page = false; // Разрешает отображение страницы
 
@@ -27,7 +27,7 @@ $(function() {
     function create_account() { // Функция создания нового аккаунта в таблице
         preload_show();
 
-        var site = $("#in-site").val(),
+        let site = $("#in-site").val(),
             description = $("#in-description").val(),
             login = encrypt($("#in-login").val(), master_password),
             password = encrypt($("#in-password").val(), master_password);
@@ -42,10 +42,10 @@ $(function() {
                 password: password,
             },
             success: function(result) {
-                var account_id = result['account_id'];
+                let account_id = result['account_id'];
 
                 if (result['status'] == "success") {
-                    var tr = '<tr data-toggle="modal" data-target="#AccountModal" data-id="' + account_id + '">' +
+                    let tr = '<tr data-toggle="modal" data-target="#AccountModal" data-id="' + account_id + '">' +
                         '<td class="td-favicon"><img data-id="' + account_id + '" class="favicon-sites" height="16" width="16" alt="icon" ' +
                         'src="http://favicon.yandex.net/favicon/' + site + '"></td>' +
                         '<td class="td-site" data-id="' + account_id + '">' + site + '</td>' +
@@ -97,7 +97,7 @@ $(function() {
     function change_info_account() { // Функция изменения информации аккаунта
         preload_show();
 
-        var site = $("#modal-site").val(),
+        let site = $("#modal-site").val(),
             description = $("#modal-description").val(),
             new_login = $("#modal-new_login").val(),
             new_password = $('#modal-new_password').val(),
@@ -124,7 +124,7 @@ $(function() {
                     },
                     success: function(result) {
                         if (result['status'] == "success") {
-                            var tr = $('tr[data-id="' + account_id + '"]'); // Ищем в таблице аккаунт который изменяли
+                            let tr = $('tr[data-id="' + account_id + '"]'); // Ищем в таблице аккаунт который изменяли
                             // Обновляем значения в таблице
                             tr.find('.td-favicon').find('img').attr('src', 'http://favicon.yandex.net/favicon/' + site);
                             tr.find('.td-site').text(site);
@@ -158,7 +158,7 @@ $(function() {
     function change_or_create_master_password(new_master_password) { // Функция изменения мастер пароля
         preload_show();
 
-        var sites = {},
+        let sites = {},
             descriptions = {},
             logins = {},
             passwords = {},
@@ -166,7 +166,7 @@ $(function() {
 
         if (tds.length > 0) { // Если таблица не пустая...
             tds.each(function(index, td) {
-                var account_id = td.getAttribute('data-id');
+                let account_id = td.getAttribute('data-id');
                 if (td.className == 'td-site') {
                     // Шифруем строку из ячейки и присваиваем ее массиву под индексом ее id в базе данных
                     sites[account_id] = encrypt(td.innerHTML, new_master_password);
@@ -203,7 +203,7 @@ $(function() {
     }
 
     function check_key() { // Функция авторизации/проверки ключа
-        var key = $('#in-enter_password').val();
+        let key = $('#in-enter_password').val();
 
         if (key == '') { // Если ключ не был введен...
             $('#in-enter_password').focus(); // Переводим фокус на input
@@ -234,7 +234,7 @@ $(function() {
     }
 
     function show_or_copy_login_or_password(type_data) { // Функция копирования/отображения пароля аккаунта
-        var key;
+        let key = '';
 
         if (type_data == _login) {
             key = decrypt($('#modal-login').val(), master_password);
@@ -257,7 +257,7 @@ $(function() {
     }
 
     function copy_clipboard(text) { // Функция копирования текста в буфер обмена
-        var $tmp = $("<input>");
+        let $tmp = $("<input>");
         $("#AccountModal").append($tmp);
         $tmp.val(text).select();
         document.execCommand("copy");
@@ -316,7 +316,7 @@ $(function() {
             swal('Заполните поле "Подтвердите новый пароль"');
         } else if ($("#in-new_password").val() != $("#in-repeat_new_password").val()) {
             swal('Пароли не совпадают');
-        } else if (master_password != $('#in-old_password').val()) {
+        } else if (master_password != $('#in-old_password').val() && !$("#in-old_password").attr('disabled')) {
             swal('Не правильный старый пароль');
         } else {
             change_or_create_master_password($("#in-repeat_new_password").val());
@@ -339,7 +339,7 @@ $(function() {
     });
 
     $("#modal-btn-save").on('click', function() { // Событие нажатия кнопки "Сохранить" в модальном окне просмотра аккаунта
-        var key = decrypt($('#modal-password').val(), master_password);
+        let key = decrypt($('#modal-password').val(), master_password);
 
         if (key == '') { // Если расшифрока дала результат...
             swal('Не правильный пароль');
@@ -371,7 +371,7 @@ $(function() {
     });
 
     $('#AccountModal').on('show.bs.modal', function(event) { // Событие открытия модального окна просмотра аккаунта
-        var account_id = $(event.relatedTarget).attr('data-id'),
+        let account_id = $(event.relatedTarget).attr('data-id'),
             site = $('.td-site[data-id="' + account_id + '"]').text(),
             description = $('.td-description[data-id="' + account_id + '"]').text(),
             login = $('.td-login[data-id="' + account_id + '"]').text(),
@@ -394,7 +394,7 @@ $(function() {
 
     $("#EnterKeyModal").on('hidden.bs.modal', function() { // Событие закрытия модального окна ввода ключа
         if (is_allow_show_page) { // Если не нажата кнопка "Отмена"...
-            var tds = $('td');
+            let tds = $('td');
             if (tds.length > 0) { // Если таблицы не пустая...
                 tds.each(function(index, td) { // Проходим циклом по всем ячейкам
                     // Кроме ячейки пароля и ячейки в которой находится кнопка "Открыть"
@@ -407,7 +407,7 @@ $(function() {
 
             // Создаем favicon для каждого сайта в таблице
             $('.favicon-sites').each(function() {
-                var account_id = $(this).attr('data-id');
+                let account_id = $(this).attr('data-id');
                 $(this).attr('src', 'http://favicon.yandex.net/favicon/' + $('.td-site[data-id="' + account_id + '"]').text())
             });
 
@@ -430,11 +430,11 @@ $(function() {
     });
 
     $('#in-search').on('keyup', function() {
-        var tr = $('tbody tr');
+        let tr = $('tbody tr');
         if ($(this).val() == "") {
             tr.fadeIn(100);
         } else {
-            var td = $('.td-site:contains(' + $(this).val().toLowerCase() + ')');
+            let td = $('.td-site:contains(' + $(this).val().toLowerCase() + ')');
             tr.fadeOut(100);
             td.parent().fadeIn(100);
         }

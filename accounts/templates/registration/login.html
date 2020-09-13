@@ -3,9 +3,14 @@
 {% block title %}Авторизация{% endblock %}
 {% block addons_head %}
 <script type="text/javascript" src="{% static 'js/login.js' %}"></script>
+<style type="text/css">
+    #id_password {
+        width: 85%;
+    }
+</style>
 {% endblock %}
 {% block content %}
-<div class="container" style="margin-top: 90px;">
+<div class="container registration-container">
     <div class="row flex nomargin">
         {% load crispy_forms_tags %}
         <div class="card">
@@ -18,8 +23,8 @@
                     <div style="margin-top: 20px;" align="center">
                         <a href="{% url 'reset_password_url' %}">Забыли пароль?</a>
                     </div>
-                    <button type="button" class="show-password sp-login">
-                        <img src="{% static 'img/svg/show-password.svg' %}" alt="show-password" height="30" width="30" />
+                    <button type="button" class="in-password_additional_button js-show_password" style="top: 149px; left: 222px;">
+                        <img title="Показать пароль" src="{% static 'img/svg/show-password.svg' %}" alt="show-password" height="30" width="30" />
                     </button>
                 </form>
             </div>

@@ -99,6 +99,8 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Для тестов в консоль
+
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATION_CLASSES': (
 #         'rest_framework.authentication.SessionAuthentication',
@@ -106,15 +108,15 @@ MEDIA_URL = '/media/'
 #         'rest_framework_simplejwt.authentication.JWTAuthentication',
 #     ),
 #     'DEFAULT_PERMISSION_CLASSES': (
-#             'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+#         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
 #     ),
 # }
 
-# EMAIL_USE_TLS = config.EMAIL_USE_TLS
-# EMAIL_HOST = config.EMAIL_HOST
-# EMAIL_HOST_USER = config.EMAIL_HOST_USER
-# EMAIL_HOST_PASSWORD = config.EMAIL_HOST_PASSWORD
-# EMAIL_PORT = config.EMAIL_PORT
+EMAIL_USE_TLS = config.EMAIL_USE_TLS
+EMAIL_HOST = config.EMAIL_HOST
+EMAIL_HOST_USER = config.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = config.EMAIL_HOST_PASSWORD
+EMAIL_PORT = config.EMAIL_PORT
 
 # DJOSER = {
 #     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',

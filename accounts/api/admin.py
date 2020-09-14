@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Account, MasterPassword
+from .models import Account, MasterPassword, TokenConfirmEmail
 
 
 class AccountAdmin(admin.ModelAdmin):
@@ -18,3 +18,4 @@ class MasterPasswordAdmin(admin.ModelAdmin):
 
 admin.site.register(Account)
 admin.site.register(MasterPassword)
+admin.site.register(TokenConfirmEmail)

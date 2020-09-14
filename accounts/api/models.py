@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class Account(models.Model):
     """ Аккаунты пользователя """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
     site = models.CharField('Сайт', max_length=255)
     description = models.CharField('Описание', max_length=255)
     login = models.CharField('Логин', max_length=255)
@@ -25,7 +25,7 @@ class Account(models.Model):
 
 class MasterPassword(models.Model):
     """ Мастер пароль пользователя """
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, verbose_name="Пользователь", on_delete=models.CASCADE)
     password = models.CharField('Пароль', max_length=255)
 
     def __str__(self):
@@ -34,3 +34,16 @@ class MasterPassword(models.Model):
     class Meta:
         verbose_name = 'Мастер пароль'
         verbose_name_plural = 'Мастер пароли'
+
+
+class TokenConfirmEmail(models.Model):
+    """ Токен подтверждения электронной почты """
+    user = models.OneToOneField(User, verbose_name="Пользователь", on_delete=models.CASCADE)
+    token = models.CharField("Токен", max_length=255)
+
+    def __str__(self):
+        return self.user.username
+
+    class Meta:
+        verbose_name = 'Токен'
+        verbose_name_plural = 'Токены'

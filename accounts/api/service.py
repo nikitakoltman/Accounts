@@ -1,5 +1,6 @@
 import functools
 import json
+import threading
 import logging as log
 import traceback
 from datetime import datetime
@@ -10,6 +11,42 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 
 from .models import Account, MasterPassword
+from django.core.mail import EmailMessage
+from django.template.loader import get_template
+from configs.config import EMAIL_HOST_USER
+
+
+class EmailThread(threading.Thread):
+    """ Отправка почты в новом потоке """
+    def __init__(self, subject, html_content, recipient_list):
+        self.subject = subject
+        self.recipient_list = recipient_list
+        self.html_content = html_content
+        threading.Thread.__init__(self)
+
+    def run(self):
+        msg = EmailMessage(self.subject, self.html_content, EMAIL_HOST_USER, self.recipient_list)
+        msg.content_subtype = "html"
+        msg.send()
+
+
+def send_email(email: str, subject: str, template: str, context: str) -> None:
+    """ Отправка почты """
+    htmly = get_template(f'email/{template}.html')
+    html_content = htmly.render(context)
+
+    EmailThread(subject, html_content, [email]).start()
+
+
+def confirm_email(username: str, email: str) -> None:
+    send_email(
+        email=email,
+        subject='Добро пожаловать в LavAccount',
+        template='confirm_email',
+        context= {
+            'username': username
+        }
+    )
 
 
 def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:

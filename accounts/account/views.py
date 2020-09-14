@@ -142,6 +142,9 @@ class RegisterView(TemplateView):
                         email=email,
                         password=password
                     )
+
+                    service.confirm_email(username, email)
+
                     return redirect(reverse("login_url"))
                 except Exception as err:
                     context.update({
@@ -156,6 +159,7 @@ class RegisterView(TemplateView):
                         'email': email
                     })
         return render(request, self.template_name, context)
+
 
     def check_if_password_correct(self, password: str, password2: str) -> str:
         """ Проверка корректности пароля """

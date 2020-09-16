@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" http-equiv="X-UA-Compatible"/>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta name="description" content="Описание страницы. Не менее 160 символов."/>
+    <meta name="keywords" content="Здесь указываем список ключевых слов, разделенные запятой."/>
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="LavAccount"/>
+    <meta name="twitter:description" content="Веб приложение для храниения аккаунтов"/>
+    <meta name="twitter:image:src" content="https://lavaccount.ru{% static 'img/png/icon-512x512.png' %}"/>
+    <meta name="twitter:url" content="https://lavaccount.ru/"/>
+    <meta name="twitter:domain" content="lavaccount.ru"/>
+
+    <meta property="og:title" content="LavAccount"/>
+    <meta property="og:description" content="Веб приложение для храниения аккаунтов"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https://lavaccount.ru/"/>
+    <meta property="og:image" content="https://lavaccount.ru{% static 'img/png/icon-512x512.png' %}"/>
+    <meta property="og:image:type" content="image/png"/>
+    <meta property="og:image:width" content="512"/>
+    <meta property="og:image:height" content="512"/>
+
+    <link rel="manifest" href="{% static '/manifest.json' %}"/>
+    <link rel="stylesheet" href="{% static 'css/addons/bootstrap.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/sweet-alert.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?ver=1"/>
+    <link href="{% static 'img/ico/favicon.ico' %}" rel="shortcut icon" type="image/x-icon"/>
+    <script src="{% static 'js/addons/jquery-3.5.1.min.js' %}"></script>
+    <script src="{% static 'js/addons/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/addons/jquery.easing.min.js' %}"></script>
+    <script src="{% static 'js/sweet-alert.js' %}"></script>
+    <script src="{% static 'js/base.js' %}"></script>
+    <title>{% block title %}{% endblock %}</title>
+    {% block addons_head %}{% endblock %}
+    {% block noscript %}
+    <noscript>
+        <meta http-equiv="refresh" content="0; url={% url 'noscript_url' %}" />
+    </noscript>
+    {% endblock %}
+</head>
+
+<body data-master_password="{{ master_password }}">
+    <div id="page-preload" class="preload">
+        <div class="windows8">
+            <div class="wBall" id="wBall_1">
+                <div class="wInnerBall"></div>
+            </div>
+            <div class="wBall" id="wBall_2">
+                <div class="wInnerBall"></div>
+            </div>
+            <div class="wBall" id="wBall_3">
+                <div class="wInnerBall"></div>
+            </div>
+            <div class="wBall" id="wBall_4">
+                <div class="wInnerBall"></div>
+            </div>
+            <div class="wBall" id="wBall_5">
+                <div class="wInnerBall"></div>
+            </div>
+        </div>
+    </div>
+    <header>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="logo navbar-brand" href="{% url 'home_url' %}">LavAccount</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right account-nav">
+                    {% if request.user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'donation_url' %}">
+                            <p>Пожертвования</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'support_url' %}">
+                            <p>Помощь</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'logout' %}">
+                            <p>‹ Выход ›</p>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <div align="center">
+                            <a href="{% url 'login' %}">
+                                <button class="btn btn-primary bubbly-button btn-round">Войти</button>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div align="center">
+                            <a href="{% url 'register_url' %}">
+                                <button class="btn btn-primary bubbly-button btn-round" style="width: 180px;">Зарегистрироваться</button>
+                            </a>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </header>
+    {% block content %}{% endblock %}
+    <footer>
+        <p align="center" style="margin-top: 1em; cursor: default;">© 2020 LavAccount.</p>
+        {% if not request.user.profile.is_active_email and request.user.is_authenticated %}
+        <div class="footer-confirm_email">
+            <p>Нужно подтвердить почту. Сделать это можно <a href="{% url 'confirm_email_url' %}">здесь</a>.</p>
+        </div>
+        {% endif %}
+        <!--<div class="ads"></div> Реклама-->
+    </footer>
+    <script>
+    document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
+    </script>
+</body>
+
+</html>

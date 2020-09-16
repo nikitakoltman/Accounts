@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Авторизация{% endblock %}
+{% block addons_head %}
+<script type="text/javascript" src="{% static 'js/login.js' %}"></script>
+<style type="text/css">
+    #id_password {
+        width: 85%;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container registration-container">
+    <div class="row flex nomargin">
+        {% load crispy_forms_tags %}
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title text-center">Вход в свою учетную запись</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}"> {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary btn-block bubbly-button">Войти</button>
+                    <div style="margin-top: 20px;" align="center">
+                        <a href="{% url 'password_reset' %}">Забыли пароль?</a>
+                    </div>
+                    <button type="button" class="in-password_additional_button js-show_password" style="top: 149px; left: 222px;">
+                        <img title="Показать пароль" src="{% static 'img/svg/show-password.svg' %}" alt="show-password" height="30" width="30" />
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

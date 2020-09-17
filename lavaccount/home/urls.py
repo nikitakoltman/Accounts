@@ -16,8 +16,11 @@ urlpatterns = [
 
     path('register/check_username_and_email/', views.check_username_and_email),
     path('confirm_email/', views.confirm_email, name='confirm_email_url'),
+    path('confirm_email_done/', views.confirm_email_done, name='confirm_email_done_url'),
+    path('confirm_email_complete/', views.confirm_email_complete, name='confirm_email_complete_url'),
+    path('activate_email/<uidb64>[0-9A-Za-z_\-]+)/<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/', views.activate_email, name='activate_email'),
 
-    path('reset-account/', views.reset_account, name='reset_account_url'),
+    path('master_password_reset/', views.master_password_reset, name='master_password_reset_url'),
 
     path('accounts/', include('django.contrib.auth.urls')),
 

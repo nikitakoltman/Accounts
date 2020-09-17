@@ -1,6 +1,6 @@
 import functools
 import json
-import random
+import base64
 import threading
 import logging as log
 import traceback
@@ -11,10 +11,16 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 
-from .models import Account, MasterPassword, TokenConfirmEmail
+from .models import Account, MasterPassword
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
 from configs.config import EMAIL_HOST_USER
+
+from django.contrib.sites.models import Site
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+
+from .tokens import account_activation_token
 
 
 class EmailThread(threading.Thread):
@@ -40,12 +46,7 @@ def send_email(email: str, subject: str, template: str, context: str) -> None:
 
 
 def confirm_email(user: User, email: str) -> None:
-    token = generate_token()
-
-    TokenConfirmEmail.objects.create(
-        user = user,
-        token = token
-    )
+    current_site = Site.objects.get_current()
 
     send_email(
         email=email,
@@ -53,14 +54,12 @@ def confirm_email(user: User, email: str) -> None:
         template='page_to_confirm_email',
         context= {
             'username': user.username,
-            'token': token
+            'protocol': 'http',
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': account_activation_token.make_token(user),
         }
     )
-
-
-def generate_token():
-    random.seed()
-    return str(random.randint(10000,99999))
 
 
 def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:

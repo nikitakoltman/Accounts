@@ -115,10 +115,10 @@
     </header>
     {% block content %}{% endblock %}
     <footer>
-        <p align="center" style="margin-top: 1em; cursor: default;">© 2020 LavAccount.</p>
+        <p align="center" class="copyright">© 2020 LavAccount.</p>
         {% if not request.user.profile.is_active_email and request.user.is_authenticated %}
         <div class="footer-confirm_email">
-            <p>Нужно подтвердить почту. Сделать это можно <a href="{% url 'confirm_email_url' %}">здесь</a>.</p>
+            <p>Вам нужно подтвердить почту. Мы уже отправили вам письмо с инструкциями. Если письмо не пришло то нажмите <a href="{% url 'confirm_email_url' %}">здесь</a> для повторной отправки письма.</p>
         </div>
         {% endif %}
         <!--<div class="ads"></div> Реклама-->

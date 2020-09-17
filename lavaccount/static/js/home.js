@@ -11,7 +11,7 @@ $(function() {
         location.href = location.href;
     }
 
-    $('footer').hide(); // Прячем футер чтобы не мешал
+    $('.copyright').hide(); // Прячем копирайт чтобы не мешал
 
     master_password = $('body').attr('data-master_password');
     $('body').attr('data-master_password', null);
@@ -397,7 +397,7 @@ $(function() {
 
     $('#MasterPasswordModal').on('hidden.bs.modal', function() { // Событие открытия модального окна ввода мастер пароля
         if (master_password == 'DoesNotExist') {
-            $('#MasterPasswordModal').modal('show'); // Открываем модальное окно изменения пароля
+            $('.js-reload_master_password_modal').show();
         }
     });
 
@@ -422,13 +422,13 @@ $(function() {
 
             // Показываем скрытые пункты меню
             $('.account-nav').find('li').css('display', '');
-            $('footer').show(); // Показываем ранее спрятанный футер
+            $('.copyright').show(); // Показываем ранее спрятанный копирайт
             $('.user-username').show(); // Показываем спрятанный блок с именем пользователя
-            $('.btn-reload').hide(); // Скрываем кнопку загрузить таблицу
+            $('.js-reload_enter_key_modal').hide(); // Скрываем кнопку загрузить таблицу
 
             $('.account_container').css('display', 'block'); // Показываем таблицу
         } else {
-            $('.btn-reload').show(); // Показываем кнопку загрузить таблицу
+            $('.js-reload_enter_key_modal').show(); // Показываем кнопку загрузить таблицу
             $('#in-enter_password').val('');
         }
     });

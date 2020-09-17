@@ -1,7 +1,8 @@
 import re
+import base64
 
 from api import service
-from api.models import Account, TokenConfirmEmail
+from api.models import Account, TokenConfirmEmail, MasterPassword
 
 from django.views.generic import TemplateView
 
@@ -9,7 +10,13 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from .forms import RegisterForm, ConfirmEmailForm
+from .forms import RegisterForm, ConfirmEmailForm, MasterPasswordResetForm
+
+from django.contrib.auth.hashers import check_password
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_text
+
+from api.tokens import account_activation_token
 
 
 def index(request):
@@ -28,6 +35,27 @@ def noscript(request):
     return render(request, 'noscript.html')
 
 
+def confirm_email_done(request):
+    context = {
+        'title': 'Письмо отправленно'
+    }
+    return render(request, 'email/confirm_email_done.html', context)
+
+
+def confirm_email_complete(request):
+    valid = False
+
+    if 'valid' in request.session:
+        valid = request.session['valid']
+        del request.session['valid']
+
+    context = {
+        'title': 'Подтверждение почты',
+        'valid': valid
+    }
+    return render(request, 'email/confirm_email_complete.html', context)
+
+
 # TODO: Удалить
 def email(request):
     return render(request, 'email/page_to_confirm_email.html', {'username':request.user.username, 'token': service.generate_token()})
@@ -36,39 +64,57 @@ def email(request):
 def confirm_email(request):
     if not request.user.is_authenticated:
         return redirect(reverse("home_url"))
+    service.confirm_email(request.user, request.user.email)
+    return redirect(reverse("confirm_email_done_url"))
+
+
+def activate_email(request, uidb64, token):
+    if not request.user.is_authenticated:
+        return redirect(reverse("home_url"))
 
     try:
-        user_token = TokenConfirmEmail.objects.get(user=request.user)
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.profile.is_active_email = True
+        user.save()
+        request.session['valid'] = True
+    return redirect(reverse("confirm_email_complete_url"))
 
+
+def master_password_reset(request):
+    if not request.user.is_authenticated:
+        return redirect(reverse("home_url"))
+
+    try:
         context = {
-            'form': ConfirmEmailForm,
+            'title': 'Сброс мастер пароля',
+            'form': MasterPasswordResetForm,
             'form_error': None
         }
 
         if request.method == 'POST':
-            token = request.POST.get('token')
+            password = request.POST.get('password')
 
-            if token == user_token.token:
-                user = User.objects.get(id=request.user.id)
-                user.profile.is_active_email = True
-                user.save()
-                user_token.delete()
+            if check_password(password, request.user.password):
+                master_password = MasterPassword.objects.get(user=request.user)
+                master_password.delete()
+
+                accounts = Account.objects.filter(user=request.user)
+                accounts.delete()
+
                 return redirect(reverse("home_url"))
             else:
                 context.update({
-                    'form_error': 'Token is not valid'
+                    'form_error': 'Password is not valid'
                 })
-    except TokenConfirmEmail.DoesNotExist:
-        return redirect(reverse("home_url"))
     except Exception as err:
         context.update({
             'form_error': err
         })
-    return render(request, 'email/confirm_email.html', context)
-
-
-def reset_account(request):
-    return render(request, 'dj_accounts/account_reset.html')
+    return render(request, 'registration/master_password_reset.html', context)
 
 
 @service.base_view

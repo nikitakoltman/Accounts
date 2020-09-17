@@ -1,28 +1,7 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-	<head>
-		<meta charset="utf-8">
-		<title></title>
-		<style>
-			@import url('https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900');
-			p {
-				font-size:15.5px;
-				margin: 10px 20px 10px 20px;
-			}
-			span {
-				font-weight: bold;
-			}
-		</style>
-	</head>
-	<body style="background: #f5f8fa;font-family: 'Roboto', sans-serif;">
-		<div style="width: 90%;max-width:600px;margin: 20px auto;background: #ffffff;">
-			<section style="margin: 0 15px;color:#425b76;">
-				<h2 style="margin: 40px 0 27px 0;text-align: center;">Спасибо за регистрацию</h2>
-				<hr style="border:0;border-top: 1px solid rgba(66,91,118,0.3);max-width: 50%">
-				<p>Привет, {{ username }}, мы очень рады что вы выбрали нас.</p>
-				<p>На данный момент тебе нужно подтвердить что это твоя почта, для этого нужно ввести следующий код подтверждения: <span>{{ token }}</span> на <a href="{% url 'confirm_email_url' %}">странице подтверждения почты</a>.</p>
-			</section>
-		</div>
-	</body>
-	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
-</html>
+{% autoescape off %}
+Привет, {{ username }}. Вы получили это письмо, потому что вы (или кто-то другой) зарегистрировался на сайте {{ domain }}, с использованием адреса вашей электронной почты.
+Пожалуйста, перейдите на эту страницу для подтверждения регистрации.
+{{ protocol }}://{{ domain }}{% url 'activate_email' uidb64=uid token=token %}
+Спасибо, что используете наш сайт!
+Команда сайта {{ domain }}
+{% endautoescape %}

@@ -33,13 +33,18 @@ strong,
     font-size: 3rem;
 }
 
-.btn-reload {
+.btn-reshow_modal {
     margin-top: 100px;
     display: none;
 }
 
 .user-username {
     display: none;
+    cursor: default;
+}
+
+.copyright {
+    margin-top: 1em;
     cursor: default;
 }
 

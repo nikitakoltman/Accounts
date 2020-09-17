@@ -8,8 +8,8 @@ class RegisterForm(forms.Form):
     password2 = forms.CharField(label='Повторите пароль', max_length=100, widget=forms.PasswordInput)
 
 
-class ResetForm(forms.Form):
-    username = forms.CharField(label='Логин', max_length=100)
+class MasterPasswordResetForm(forms.Form):
+    password = forms.CharField(label='Пароль', max_length=100, widget=forms.PasswordInput)
 
 
 class ConfirmEmailForm(forms.Form):

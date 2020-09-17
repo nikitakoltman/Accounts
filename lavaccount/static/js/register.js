@@ -34,6 +34,7 @@ $(document).ready(function() {
                 break;
             default:
                 swal('Критическая ошибка', error);
+                break;
         }
     }
 
@@ -54,7 +55,17 @@ $(document).ready(function() {
         }
     });
 
+    $('form input').on('keydown', function(e) {
+        if (e.keyCode == 13) { // Если нажата клавиша "Enter"...
+            form_submit();
+        }
+    });
+
     $("#js-btn_submit").on('click', function() {
+        form_submit();
+    });
+
+    function form_submit() {
         preload_show();
         let username = $("#id_username").val(),
             email = $("#id_email").val();
@@ -97,7 +108,7 @@ $(document).ready(function() {
                 }
             }
         });
-    });
+    }
 
     $('.js-generate_password').on('touchstart mousedown', function() {
         let password = generate_random_string(10);

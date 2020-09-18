@@ -1,0 +1,36 @@
+.support-content {
+    color: #333;
+    background: #fff;
+}
+
+.simple-tabs {
+    color: #333;
+    background-color: #fff;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.swiper-container {
+    color: #333;
+}
+
+.lk-block {
+    background-color: #EEEEEE;
+    border-radius: 3px;
+    padding: 10px;
+    margin: 5px;
+}
+
+.lk-block_info {
+    margin-right: -15px;
+}
+
+.support-content p {
+    margin: 0;
+}
+
+@media (max-width: 991px) {
+    .lk-block_info {
+        margin-right: 5px;
+    }
+}

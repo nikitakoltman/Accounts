@@ -43,7 +43,9 @@ $(document).ready(function() {
         is_username = false,
         is_email = false,
         is_password = false,
-        is_password2 = false;
+        is_password2 = false,
+
+        is_form_submit = false;
 
     $('#id_email').on('keyup', function() {
         if ($(this).val().search(pattern_email) == 0) {
@@ -55,60 +57,50 @@ $(document).ready(function() {
         }
     });
 
-    $('form input').on('keydown', function(e) {
-        if (e.keyCode == 13) { // Если нажата клавиша "Enter"...
-            form_submit();
-        }
-    });
-
-    $("#js-btn_submit").on('click', function() {
-        form_submit();
-    });
-
-    function form_submit() {
+    $('form').on('submit', function() {
         preload_show();
         let username = $("#id_username").val(),
             email = $("#id_email").val();
 
-        $.ajax({
-            url: "check_username_and_email/",
-            type: "POST",
-            data: {
-                username: username,
-                email: email,
-            },
-            success: function(result) {
-                if (result['status'] == "success") {
-                    let is_exist_username = result['is_exist_username'],
-                        is_exist_email = result['is_exist_email'];
+        if (!is_form_submit) {
+            $.ajax({
+                url: "check_username_and_email/",
+                type: "POST",
+                data: {
+                    username: username,
+                    email: email,
+                },
+                success: function(result) {
+                    if (result['status'] == "success") {
+                        let is_exist_username = result['is_exist_username'],
+                            is_exist_email = result['is_exist_email'];
 
-                    if ($('#id_username').val() == '') {
-                        swal("Ошибка!", 'Заполните поле "Имя".');
-                    }
-                    else if (is_exist_username) {
-                        swal("Ошибка", 'Введенное имя уже используейтся, введите другое.');
-                    }
-                    else if (is_exist_email) {
-                        swal("Ошибка", 'Введенная почта уже используется, введите другую.');
-                    }
-                    else if (!is_email) {
-                        $('#id_email').addClass('input-invalid');
-                    }
-                    else if (!is_password) {
-                        $('#id_password').addClass('input-invalid');
-                    }
-                    else if (is_password2) {
-                        $('form').submit();
-                    }
+                        if ($('#id_username').val() == '') {
+                            swal("Ошибка!", 'Заполните поле "Имя".');
+                        } else if (is_exist_username) {
+                            swal("Ошибка", 'Введенное имя уже используейтся, введите другое.');
+                        } else if (is_exist_email) {
+                            swal("Ошибка", 'Введенная почта уже используется, введите другую.');
+                        } else if (!is_email) {
+                            $('#id_email').addClass('input-invalid');
+                        } else if (!is_password) {
+                            $('#id_password').addClass('input-invalid');
+                        } else if (is_password2) {
+                            is_form_submit = true;
+                            $('form').submit();
+                        }
 
-                    preload_hide();
-                } else {
-                    preload_hide();
-                    swal("Ошибка!", res['result']);
+                        preload_hide();
+                    } else {
+                        preload_hide();
+                        swal("Ошибка!", res['result']);
+                    }
                 }
-            }
-        });
-    }
+            });
+
+            return false;
+        }
+    });
 
     $('.js-generate_password').on('touchstart mousedown', function() {
         let password = generate_random_string(10);

@@ -18,6 +18,9 @@ from django.utils.encoding import force_text
 
 from api.tokens import account_activation_token
 
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
+
 
 def index(request):
     if not request.user.is_authenticated:
@@ -33,6 +36,13 @@ def index(request):
 
 def noscript(request):
     return render(request, 'noscript.html')
+
+
+def lk(request):
+    context = {
+        'title': 'Личный кабинет'
+    }
+    return render(request, 'lk.html', context)
 
 
 def confirm_email_done(request):
@@ -199,11 +209,37 @@ def check_username_and_email(request):
     return service.json_response(answer)
 
 
+def lav_login(request):
+    """ Авторизация пользователей """
+    if request.user.is_authenticated:
+        return redirect(reverse("home_url"))
+
+    context = {
+        'form': AuthenticationForm,
+        'form_error': None
+    }
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect(reverse("home_url"))
+        else:
+            context.update({
+                'form_error': 'Login error'
+            })
+    return render(request, 'registration/login.html', context)
+
+
 class RegisterView(TemplateView):
     """ Регистрация пользователей """
     template_name = "registration/register.html"
 
     def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(reverse("home_url"))
+
         context = {
                 'form': RegisterForm,
                 'form_error': None
@@ -226,7 +262,7 @@ class RegisterView(TemplateView):
 
                     service.confirm_email(user, email)
 
-                    return redirect(reverse("login_url"))
+                    return redirect(reverse("lav_login"))
                 except Exception as err:
                     context.update({
                         'form_error': err,

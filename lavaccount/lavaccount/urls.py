@@ -7,6 +7,7 @@ from lavaccount import settings
 urlpatterns = [
     path('', include('home.urls')),
     path('support/', include('support.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
     #path('', include('api.urls')),
     #path('auth/', include('djoser.urls')),
     #path('auth/', include('djoser.urls.authtoken')),

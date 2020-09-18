@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+{% block addons_head %}
+<link rel="stylesheet" href="{% static 'css/support.css' %}" />
+<link rel="stylesheet" href="{% static 'css/lk.css' %}" />
+<script type="text/javascript" src="{% static 'js/lk.js' %}"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <main>
+        <section>
+            <h2 align="center">{{ title }}</h2>
+            <div class="support-content">
+                <aside>
+                    <div class="row">
+                        <div class="col-md-4 lk-block">
+                            <div align="center">
+                                <p>Здравствуйте, <span style="font-weight: bold;">{{ request.user.username }}</span></p>
+                            </div>
+                            <div align="center">
+                                <button class="simple-tabs" data-nav-tab="true" data-tabs-id="1">
+                                    <p align="center">Профиль</p>
+                                </button>
+                                <button class="simple-tabs" data-nav-tab="true" data-tabs-id="2">
+                                    <p align="center">История пожертвований</p>
+                                </button>
+                                <button class="simple-tabs" data-nav-tab="true" data-tabs-id="3">
+                                    <p align="center">История авторизаций</p>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-8 lk-block lk-block_info">
+                            <div class="swiper-container">
+                                <div data-tabs="1" class="active">
+                                    <strong>Профиль</strong>
+                                    <div class="card" style="width: 250px;">
+                                        <div class="card-body">
+                                            {% load crispy_forms_tags %}
+                                            <form method="post">{% csrf_token %}
+                                                <input type="hidden" name="next" value="{{ next }}"> {{ form|crispy }}
+                                                <button type="submit" class="btn btn-primary btn-block bubbly-button default">Сохранить</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <p>Изменить пароль вы можете <a href="{% url 'password_change' %}">здесь</a>.</p>
+                                    <p>Сбросить мастер пароль вы можете <a href="{% url 'master_password_reset_url' %}">здесь</a>.</p>
+                                </div>
+                                <div data-tabs="2">
+                                    <strong>История пожертвований</strong>
+                                    <p>История пожертвований</p>
+                                </div>
+                                <div data-tabs="3">
+                                    <strong>История авторизаций</strong>
+                                    <p>История авторизаций</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+        <div class="horizontal-bottom-line"></div>
+    </main>
+</div>
+<script>
+$(function() {
+    $('.simple-tabs').on('click', function() {
+        $('.swiper-container').find('div').removeClass('active');
+        $('[data-tabs="' + $(this).attr('data-tabs-id') + '"]').addClass('active');
+    });
+});
+</script>
+{% endblock %}

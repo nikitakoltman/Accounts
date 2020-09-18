@@ -244,6 +244,7 @@ div {
 .account-nav p {
     font-size: 16px;
     text-align: center;
+    margin: 5px 0 5px;
 }
 
 .account-nav div {

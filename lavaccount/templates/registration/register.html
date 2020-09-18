@@ -21,7 +21,7 @@
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next }}"> {{ form|crispy }}
-                    <button type="button" id="js-btn_submit" class="btn btn-primary btn-block bubbly-button btn-block">Регистрация</button>
+                    <button type="submit" class="btn btn-primary btn-block bubbly-button btn-block">Регистрация</button>
                     <button type="button" class="in-password_additional_button js-show_password" style="top: 223px; left: 187px;">
                         <img title="Показать пароль" src="{% static 'img/svg/show-password.svg' %}" alt="show-password" height="30" width="30" />
                     </button>

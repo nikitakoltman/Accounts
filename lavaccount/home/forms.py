@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
+
 class RegisterForm(forms.Form):
     username = forms.CharField(label='Имя пользователя', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'ivan123'}))
     email = forms.CharField(label='Почта', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'ivan123@mail.ru'}))

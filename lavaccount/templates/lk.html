@@ -4,6 +4,7 @@
 {% block addons_head %}
 <link rel="stylesheet" href="{% static 'css/support.css' %}" />
 <link rel="stylesheet" href="{% static 'css/lk.css' %}" />
+<script type="text/javascript" src="{% static 'js/ajax_setup.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/lk.js' %}"></script>
 {% endblock %}
 {% block content %}
@@ -32,20 +33,31 @@
                         </div>
                         <div class="col-md-8 lk-block lk-block_info">
                             <div class="swiper-container">
-                                <div data-tabs="1" class="active">
+                                <div data-tabs="1" class="active" align="center">
                                     <strong>Профиль</strong>
-                                    <div class="card" style="width: 250px;">
-                                        <div class="card-body">
-                                            {% load crispy_forms_tags %}
-                                            <form method="post">{% csrf_token %}
-                                                <input type="hidden" name="next" value="{{ next }}"> {{ form|crispy }}
-                                                <button type="submit" class="btn btn-primary btn-block bubbly-button default">Сохранить</button>
-                                            </form>
+                                    <div class="col-sm-6">
+                                        <div class="card" style="width: 250px;">
+                                            <div class="card-body">
+                                                <strong align="center">Изменить почтовый адрес</strong>
+                                                {% load crispy_forms_tags %}
+                                                <form method="post">{% csrf_token %}
+                                                    <input type="hidden" name="next" value="{{ next }}"> {{ email_change_form|crispy }}
+                                                    <button type="submit" class="btn btn-primary btn-block bubbly-button default">Сохранить</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                     <br>
-                                    <p>Изменить пароль вы можете <a href="{% url 'password_change' %}">здесь</a>.</p>
-                                    <p>Сбросить мастер пароль вы можете <a href="{% url 'master_password_reset_url' %}">здесь</a>.</p>
+                                    <div class="col-sm-6">
+                                        <div class="card" style="width: 250px;">
+                                            <div class="card-body">
+                                                <strong align="center">Прочее</strong>
+                                                <a href="{% url 'password_change' %}"><button type="submit" class="btn btn-primary btn-block bubbly-button default">Изменить пароль</button></a>
+                                                <br>
+                                                <a href="{% url 'master_password_reset_url' %}"><button type="submit" class="btn btn-primary btn-block bubbly-button default">Сбросить мастер пароль</button></a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div data-tabs="2">
                                     <strong>История пожертвований</strong>
@@ -64,12 +76,5 @@
         <div class="horizontal-bottom-line"></div>
     </main>
 </div>
-<script>
-$(function() {
-    $('.simple-tabs').on('click', function() {
-        $('.swiper-container').find('div').removeClass('active');
-        $('[data-tabs="' + $(this).attr('data-tabs-id') + '"]').addClass('active');
-    });
-});
-</script>
+<input type="hidden" id="form_message" value="{{ form_message }}">
 {% endblock %}

@@ -15,3 +15,7 @@ class MasterPasswordResetForm(forms.Form):
 
 class ConfirmEmailForm(forms.Form):
     token = forms.CharField(label='Код подтверждения', max_length=100)
+
+
+class EmailChangeForm(forms.Form):
+    email = forms.CharField(label='Почта', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'ivan123@mail.ru'}))

@@ -12,6 +12,7 @@ tr {
 
 p,
 h2,
+h4,
 strong,
 .simple-tabs {
     font-family: Comfortaa;
@@ -142,7 +143,7 @@ strong,
 }
 
 .registration-container {
-    margin-top: 90px;
+    margin-top: 56px;
 }
 
 
@@ -158,7 +159,7 @@ strong,
 
     position: absolute;
     right: 55px;
-    bottom: -80px;
+    bottom: 0px;
 
     display: none;
 

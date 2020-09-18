@@ -10,7 +10,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from .forms import RegisterForm, ConfirmEmailForm, MasterPasswordResetForm
+from .forms import RegisterForm, ConfirmEmailForm, MasterPasswordResetForm, EmailChangeForm
 
 from django.contrib.auth.hashers import check_password
 from django.utils.http import urlsafe_base64_decode
@@ -40,8 +40,18 @@ def noscript(request):
 
 def lk(request):
     context = {
-        'title': 'Личный кабинет'
+        'title': 'Личный кабинет',
+        'email_change_form': EmailChangeForm,
+        'form_message': 'None'
     }
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        service.confirm_email(request.user, email)
+        context.update({
+            'form_message': 'email confirm complite'
+        })
+
     return render(request, 'lk.html', context)
 
 
@@ -102,7 +112,7 @@ def master_password_reset(request):
         context = {
             'title': 'Сброс мастер пароля',
             'form': MasterPasswordResetForm,
-            'form_error': None
+            'form_message': 'None'
         }
 
         if request.method == 'POST':
@@ -118,11 +128,11 @@ def master_password_reset(request):
                 return redirect(reverse("home_url"))
             else:
                 context.update({
-                    'form_error': 'Password is not valid'
+                    'form_message': 'Password is not valid'
                 })
     except Exception as err:
         context.update({
-            'form_error': err
+            'form_message': err
         })
     return render(request, 'registration/master_password_reset.html', context)
 
@@ -216,7 +226,7 @@ def lav_login(request):
 
     context = {
         'form': AuthenticationForm,
-        'form_error': None
+        'form_message': 'None'
     }
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -227,7 +237,7 @@ def lav_login(request):
             return redirect(reverse("home_url"))
         else:
             context.update({
-                'form_error': 'Login error'
+                'form_message': 'Login error'
             })
     return render(request, 'registration/login.html', context)
 
@@ -242,7 +252,7 @@ class RegisterView(TemplateView):
 
         context = {
                 'form': RegisterForm,
-                'form_error': None
+                'form_message': 'None'
             }
 
         if request.method == 'POST':
@@ -265,13 +275,13 @@ class RegisterView(TemplateView):
                     return redirect(reverse("lav_login"))
                 except Exception as err:
                     context.update({
-                        'form_error': err,
+                        'form_message': err,
                         'username': username,
                         'email': email
                     })
             else:
                 context.update({
-                        'form_error': answer,
+                        'form_message': answer,
                         'username': username,
                         'email': email
                     })

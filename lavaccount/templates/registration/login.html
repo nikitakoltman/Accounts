@@ -2,7 +2,8 @@
 {% load static %}
 {% block title %}Авторизация{% endblock %}
 {% block addons_head %}
-<script type="text/javascript" src="{% static 'js/login.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/login.js' %}?ver=2"></script>
+<script type="text/javascript" src="{% static 'js/form_message_handler.js' %}"></script>
 <style type="text/css">
     #id_password {
         width: 85%;
@@ -23,7 +24,7 @@
                     <div style="margin-top: 20px;" align="center">
                         <a href="{% url 'password_reset' %}">Забыли пароль?</a>
                     </div>
-                    <button type="button" class="in-password_additional_button js-show_password" style="top: 149px; left: 222px;">
+                    <button type="button" class="in-password_additional_button js-show_password" style="top: 149px; left: 257px;">
                         <img title="Показать пароль" src="{% static 'img/svg/show-password.svg' %}" alt="show-password" height="30" width="30" />
                     </button>
                 </form>
@@ -31,5 +32,5 @@
         </div>
     </div>
 </div>
-<input type="hidden" id="in-hide-form_error" value="{{ form_error }}">
+<input type="hidden" id="form_message" value="{{ form_message }}">
 {% endblock %}

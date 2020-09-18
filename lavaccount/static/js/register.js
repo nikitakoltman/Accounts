@@ -1,42 +1,9 @@
 $(document).ready(function() {
-    let error = $('#in-hide-form_error').val(),
-        username = $('#in-hide-username').val(),
+    let username = $('#in-hide-username').val(),
         email = $('#in-hide-email').val();
 
-    show_form_error(error);
     $('#id_username').val(username);
     $('#id_email').val(email);
-
-    function show_form_error(error) {
-        switch (error) {
-            case 'None':
-                break;
-            case 'UNIQUE constraint failed: auth_user.username':
-                swal('Ошибка', 'Введенное имя уже используейтся, введите другое.');
-                break;
-            case 'UNIQUE constraint failed: auth_user.email':
-                swal('Ошибка', 'Введенная почта уже используется, введите другую.');
-                break;
-            case 'broken rule [pass == pass2]':
-                swal('Ошибка валидации', 'Пароли не совподают');
-                break;
-            case 'broken rule [len > 8]':
-                swal('Ошибка валидации', 'Длинна пароля должна быть больше 8 символов');
-                break;
-            case 'broken rule [a-z]':
-                swal('Ошибка валидации', 'Пароль должен содержать как минимум одну маленькую букву');
-                break;
-            case 'broken rule [A-Z]':
-                swal('Ошибка валидации', 'Пароль должен содержать как минимум одну заглавную букву');
-                break;
-            case 'broken rule [0-9]':
-                swal('Ошибка валидации', 'Пароль должен содержать как минимум одну цифру');
-                break;
-            default:
-                swal('Критическая ошибка', error);
-                break;
-        }
-    }
 
     let pattern_email = /^[a-z0-9_-]+@[a-z0-9-]+\.([a-z]{1,6}\.)?[a-z]{2,6}$/i,
 

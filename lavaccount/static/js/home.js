@@ -11,7 +11,7 @@ $(function() {
         location.href = location.href;
     }
 
-    $('.copyright').hide(); // Прячем копирайт чтобы не мешал
+    $('.footer-urls').hide(); // Прячем копирайт чтобы не мешал
 
     master_password = $('body').attr('data-master_password');
     $('body').attr('data-master_password', null);
@@ -422,7 +422,7 @@ $(function() {
 
             // Показываем скрытые пункты меню
             $('.account-nav').find('li').css('display', '');
-            $('.copyright').show(); // Показываем ранее спрятанный копирайт
+            $('.footer-urls').show(); // Показываем ранее спрятанный копирайт
             $('.user-username').show(); // Показываем спрятанный блок с именем пользователя
             $('.js-reload_enter_key_modal').hide(); // Скрываем кнопку загрузить таблицу
 

@@ -2,18 +2,18 @@
 {% load static %}
 {% block title %}Аккаунты{% endblock %}
 {% block addons_head %}
-<link rel="stylesheet" href="{% static 'css/table-theme-blue.css' %}">
+<link rel="stylesheet" href="{% static 'css/table-theme-blue.css' %}?ver={{ static_version }}">
 <script type="text/javascript" src="{% static 'js/addons/jquery.tablesorter.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/addons/crypto-js.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/addons.js' %}?ver=1"></script>
-<script type="text/javascript" src="{% static 'js/ajax_setup.js' %}?ver=1"></script>
-<script type="text/javascript" src="{% static 'js/home.js' %}?ver=1"></script>
+<script type="text/javascript" src="{% static 'js/addons.js' %}?ver={{ static_version }}"></script>
+<script type="text/javascript" src="{% static 'js/ajax_setup.js' %}?ver={{ static_version }}"></script>
+<script type="text/javascript" src="{% static 'js/home.js' %}?ver={{ static_version }}"></script>
 {% endblock %}
 {% block content %}
 <div class="container account_container">
     <div align="center" style="margin-top: 10px;">
         <button data-toggle="modal" data-target="#CreateAccountModal" class="btn btn-primary">Добавить аккаунт</button>
-        <button data-toggle="modal" data-target="#MasterPasswordModal" class="btn btn-primary">Изменить пароль</button>
+        <button data-toggle="modal" data-target="#MasterPasswordModal" class="btn btn-primary">Мастер пароль</button>
     </div>
     <input class="form-control" placeholder="Поиск" type="text" id="in-search">
     <table id="Accounts_table" class="tablesorter table-hover">
@@ -36,6 +36,7 @@
             {% endfor %}
         </tbody>
     </table>
+    <div class="horizontal-bottom-line"></div>
 </div>
 <div align="center" class="btn-reshow_modal js-reload_enter_key_modal" data-toggle="modal" data-target="#EnterKeyModal">
     <button class="btn btn-primary">Загрузить таблицу</button>
@@ -126,5 +127,4 @@
         </div>
     </div>
 </div>
-<p align="center" class="user-username">Пользователь: {{ request.user.username }}</p>
 {% endblock %}

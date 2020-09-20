@@ -32,6 +32,8 @@ LOGOUT_REDIRECT_URL = '/'
 
 SITE_ID = 1
 
+static_version = config.static_version
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

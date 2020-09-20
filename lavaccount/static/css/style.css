@@ -1,13 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Mali:wght@700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&display=swap');
 
+:root {
+    --colorscheme: #1e9de7;
+    --colorschemehover: #1986c5;
+}
+
+body {
+    padding-right: 0 !important;
+}
+
 header {
     font-size: 2em;
-    margin-bottom: 51px;/*44*/
+    margin-bottom: 51px;
+}
+
+div {
+    cursor: default;
 }
 
 tr {
     cursor: pointer;
+}
+
+tbody tr {
+    height: 40px;
+}
+
+label {
+    font-weight: bold;
+
+    margin-top: .5rem;
+    margin-bottom: 0;
+}
+
+button:focus {
+    outline: 0 !important;
 }
 
 p,
@@ -16,6 +44,14 @@ h4,
 strong,
 .simple-tabs {
     font-family: Comfortaa;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.h2, h2 {
+    font-size: 28px;
 }
 
 .logo {
@@ -39,20 +75,17 @@ strong,
     display: none;
 }
 
-.user-username {
-    display: none;
-    cursor: default;
-}
-
 .copyright {
     margin-top: 1em;
     cursor: default;
 }
 
-
-
-
-/* btn-close */
+.terms_confirm-text {
+    font-size: 9px;
+    color: #656565;
+    line-height: 12px;
+    text-align: center;
+}
 
 .button-close {
     position: absolute;
@@ -92,22 +125,27 @@ strong,
     left: 50%;
 }
 
-
-
-
-
-
-
-
-.share-container a:hover {
-    color: #ffffff;
+.footer-policy_terms {
+    list-style: none outside none;
+    padding-left: 0;
 }
 
+.footer-urls a {
+    color: #849292;
+    text-decoration: none;
+}
 
+.footer-urls_privacy-terms {
+    width: 270px;
+}
 
+.footer-urls_privacy-terms p {
+    font-size: 12px;
+}
 
-
-
+.footer-urls_privacy-terms a:hover {
+    color: black;
+}
 
 .footer-confirm_email {
     background-color: #cce7ff;
@@ -121,11 +159,61 @@ strong,
     margin: 10px 0 10px;
 }
 
+#cookie_notification {
+    z-index: 1;
+
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+
+    display: none;
+
+    width: 900px;
+    max-width: 90%;
+    padding: 25px;
+
+    transform: translateX(-50%);
+
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: 2px 3px 10px rgba(0, 0, 0, .4);
+
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+#cookie_notification p {
+    font-size: 10px;
+
+    margin: 0;
+
+    text-align: left;
+
+    max-width: 90%;
+}
+
+#cookie_notification button {
+    float: right;
+}
 
 
+@media (min-width: 576px) {
+    #cookie_notification.show {
+        display: flex;
+    }
+}
 
+@media (max-width: 575px) {
+    #cookie_notification.show {
+        display: block;
 
+        text-align: left;
+    }
+}
 
+.share-container a:hover {
+    color: #ffffff;
+}
 
 .in-password_additional_button {
     position: absolute;
@@ -145,14 +233,6 @@ strong,
 .registration-container {
     margin-top: 56px;
 }
-
-
-
-
-
-
-
-
 
 #password_info {
     font-size: .875em;
@@ -201,11 +281,6 @@ strong,
     border-left: 1px solid white;
 }
 
-
-
-
-
-
 .flex {
     display: flex;
 
@@ -216,26 +291,13 @@ strong,
     margin-right: 10px;
 }
 
-
-
-
-
-body.modal-open {
-    overflow: hidden;
+.share-button:active {
+    transition: transform ease-in .1s, box-shadow ease-in .25s;
+    transform: scale(.9);
 }
 
-
-:root {
-    --colorscheme: #1e9de7;
-    --colorschemehover: #1986c5;
-}
-
-body {
-    padding-right: 0 !important;
-}
-
-div {
-    cursor: default;
+#Accounts_table {
+    border-radius: 4px;
 }
 
 .account-nav {
@@ -262,10 +324,6 @@ div {
 
 .table-hover tbody tr:hover>td {
     background-color: #eceeef;
-}
-
-tbody tr {
-    height: 40px;
 }
 
 #in-search {
@@ -302,10 +360,6 @@ tbody tr {
     color: white;
 }
 
-button:focus {
-    outline: 0 !important;
-}
-
 .td-description {
     word-break: break-word;
 }
@@ -320,13 +374,6 @@ button:focus {
     display: none;
 
     margin-top: 44px;
-}
-
-label {
-    font-weight: bold;
-
-    margin-top: .5rem;
-    margin-bottom: 0;
 }
 
 .card {
@@ -496,10 +543,6 @@ label {
         padding-bottom: 10px;
     }
 }
-
-/*@media (max-width: 495px) {
-
-}*/
 
 
 @keyframes topBubbles {

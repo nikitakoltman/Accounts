@@ -12,14 +12,16 @@ from django.contrib.auth.models import User
 
 from .forms import RegisterForm, ConfirmEmailForm, MasterPasswordResetForm, EmailChangeForm
 
-from django.contrib.auth.hashers import check_password
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_text
-
-from api.tokens import account_activation_token
-
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.sites.models import Site
+
+from lavaccount.settings import static_version
+
+
+# TODO: Удалить
+def email(request):
+    return render(request, 'email/page_to_confirm_email.html', {'username':request.user.username, 'token': service.generate_token()})
 
 
 def index(request):
@@ -28,41 +30,98 @@ def index(request):
 
     context = {
         'accounts': Account.objects.filter(user=request.user),
-        'master_password': service.get_master_password(user=request.user)
+        'master_password': service.get_master_password(user=request.user),
+        'static_version': static_version
     }
 
     return render(request, 'home.html', context)
 
 
 def noscript(request):
+    """ Страница отображаемая если пользователь отключит javascript """
     return render(request, 'noscript.html')
 
 
 def lk(request):
+    """ Личный кабинет пользователя """
     context = {
         'title': 'Личный кабинет',
-        'email_change_form': EmailChangeForm,
-        'form_message': 'None'
+        'static_version': static_version
     }
-
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        service.confirm_email(request.user, email)
-        context.update({
-            'form_message': 'email confirm complite'
-        })
 
     return render(request, 'lk.html', context)
 
 
-def confirm_email_done(request):
+def email_change(request):
+    """ Изменить адрес электронной почты """
     context = {
-        'title': 'Письмо отправленно'
+        'title': 'Изменить почтовый адрес',
+        'form': EmailChangeForm,
+        'static_version': static_version
+    }
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        user = User.objects.get(id=request.user.id)
+        current_site = Site.objects.get_current()
+        service.confirm_email(
+            user=user,
+            email=email,
+            subject='Привязка email к аккаунту',
+            template='email_change_email'
+        )
+        service.send_email(
+            email=user.email,
+            subject='Привязка email к аккаунту',
+            template='email_change_notification_to_old_email',
+            context={
+                'email': service.hiding_email(email),
+                'username': user.username,
+                'domain': current_site.domain
+            }
+        )
+        user.email = email
+        user.profile.is_active_email = False
+        user.save()
+        return redirect(reverse("email_change_done_url"))
+
+    return render(request, 'email/email_change_form.html', context)
+
+def email_change_done(request):
+    """ Страница которая говорит о том что письмо с
+    инструкциями по изменению почтового адреса отправлено """
+    context = {
+        'title': 'Письмо с инструкциями по изменению почтового адреса отправлено',
+        'static_version': static_version
+    }
+
+    return render(request, 'email/email_change_done.html', context)
+
+
+def email_change_complete(request):
+    """ Страница которая говорит о том что
+    изменение адреса почты завершено """
+    context = {
+        'title': 'Изменение адреса почты завершено',
+        'static_version': static_version
+    }
+
+    return render(request, 'email/email_change_complete.html', context)
+
+
+def confirm_email_done(request):
+    """ Страница которая говорит о том что
+    отправленно письмо подтверждения почты после регистрации """
+    context = {
+        'title': 'Письмо отправленно',
+        'static_version': static_version
     }
     return render(request, 'email/confirm_email_done.html', context)
 
 
 def confirm_email_complete(request):
+    """ Страница которая говорит о том что
+    пользователь успешно подтвердили почту после регистрации """
     valid = False
 
     if 'valid' in request.session:
@@ -71,40 +130,39 @@ def confirm_email_complete(request):
 
     context = {
         'title': 'Подтверждение почты',
-        'valid': valid
+        'valid': valid,
+        'static_version': static_version
     }
     return render(request, 'email/confirm_email_complete.html', context)
 
 
-# TODO: Удалить
-def email(request):
-    return render(request, 'email/page_to_confirm_email.html', {'username':request.user.username, 'token': service.generate_token()})
-
-
 def confirm_email(request):
+    """ Отправка письма о подтверждении
+    почты после регистрации """
     if not request.user.is_authenticated:
         return redirect(reverse("home_url"))
-    service.confirm_email(request.user, request.user.email)
+    service.confirm_email(
+        user=request.user,
+        email=request.user.email,
+        subject='Добро пожаловать в LavAccount',
+        template='registration_email_confirm_email'
+    )
     return redirect(reverse("confirm_email_done_url"))
 
 
 def activate_email(request, uidb64, token):
+    """ Активация почты """
     if not request.user.is_authenticated:
-        return redirect(reverse("home_url"))
+        return redirect(reverse("lav_login"))
 
-    try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-    if user is not None and account_activation_token.check_token(user, token):
-        user.profile.is_active_email = True
-        user.save()
+    if service.activate_email(uidb64, token):
         request.session['valid'] = True
+
     return redirect(reverse("confirm_email_complete_url"))
 
 
 def master_password_reset(request):
+    """ Сброс мастер пароля """
     if not request.user.is_authenticated:
         return redirect(reverse("home_url"))
 
@@ -112,19 +170,14 @@ def master_password_reset(request):
         context = {
             'title': 'Сброс мастер пароля',
             'form': MasterPasswordResetForm,
-            'form_message': 'None'
+            'form_message': 'None',
+            'static_version': static_version
         }
 
         if request.method == 'POST':
             password = request.POST.get('password')
 
-            if check_password(password, request.user.password):
-                master_password = MasterPassword.objects.get(user=request.user)
-                master_password.delete()
-
-                accounts = Account.objects.filter(user=request.user)
-                accounts.delete()
-
+            if service.master_password_reset(request.user, password):
                 return redirect(reverse("home_url"))
             else:
                 context.update({
@@ -226,7 +279,8 @@ def lav_login(request):
 
     context = {
         'form': AuthenticationForm,
-        'form_message': 'None'
+        'form_message': 'None',
+        'static_version': static_version
     }
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -252,7 +306,8 @@ class RegisterView(TemplateView):
 
         context = {
                 'form': RegisterForm,
-                'form_message': 'None'
+                'form_message': 'None',
+                'static_version': static_version
             }
 
         if request.method == 'POST':
@@ -270,7 +325,12 @@ class RegisterView(TemplateView):
                         password=password
                     )
 
-                    service.confirm_email(user, email)
+                    service.confirm_email(
+                        user=user,
+                        email=email,
+                        subject='Добро пожаловать в LavAccount',
+                        template='registration_email_confirm_email'
+                    )
 
                     return redirect(reverse("lav_login"))
                 except Exception as err:

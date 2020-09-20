@@ -2,8 +2,8 @@
 {% load static %}
 {% block title %}Авторизация{% endblock %}
 {% block addons_head %}
-<script type="text/javascript" src="{% static 'js/login.js' %}?ver=2"></script>
-<script type="text/javascript" src="{% static 'js/form_message_handler.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/login.js' %}?ver={{ static_version }}"></script>
+<script type="text/javascript" src="{% static 'js/form_message_handler.js' %}?ver={{ static_version }}"></script>
 <style type="text/css">
     #id_password {
         width: 85%;
@@ -19,7 +19,7 @@
                 <h4 class="card-title text-center">Вход в свою учетную запись</h4>
                 <form method="post">
                     {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ next }}"> {{ form|crispy }}
+                    {{ form|crispy }}
                     <button type="submit" class="btn btn-primary btn-block bubbly-button">Войти</button>
                     <div style="margin-top: 20px;" align="center">
                         <a href="{% url 'password_reset' %}">Забыли пароль?</a>

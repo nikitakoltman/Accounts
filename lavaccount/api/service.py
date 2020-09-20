@@ -22,6 +22,10 @@ from django.utils.http import urlsafe_base64_encode
 
 from .tokens import account_activation_token
 
+from django.contrib.auth.hashers import check_password
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_text
+
 
 class EmailThread(threading.Thread):
     """ Отправка почты в новом потоке """
@@ -45,13 +49,14 @@ def send_email(email: str, subject: str, template: str, context: str) -> None:
     EmailThread(subject, html_content, [email]).start()
 
 
-def confirm_email(user: User, email: str) -> None:
+def confirm_email(user: User, email: str, subject: str, template: str) -> None:
+    """ Отправить письмо о подтверждении почты """
     current_site = Site.objects.get_current()
 
     send_email(
         email=email,
-        subject='Добро пожаловать в LavAccount',
-        template='page_to_confirm_email',
+        subject=subject,
+        template=template,
         context= {
             'username': user.username,
             'protocol': 'http',
@@ -60,6 +65,37 @@ def confirm_email(user: User, email: str) -> None:
             'token': account_activation_token.make_token(user),
         }
     )
+
+
+def activate_email(uidb64, token) -> bool:
+    """ Активация почты """
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.profile.is_active_email = True
+        user.save()
+        return True
+    return False
+
+
+def hiding_email(email: str) -> str:
+    """ Скрывает тремя звездочками часть email адреса """
+    return email[0:2] + '***' + email[email.index('@'):]
+
+
+def master_password_reset(user: User, password: str) -> bool:
+    """ Сброс мастер пароля """
+    if check_password(password, user.password):
+        master_password = MasterPassword.objects.get(user=user)
+        master_password.delete()
+
+        accounts = Account.objects.filter(user=user)
+        accounts.delete()
+        return True
+    return False
 
 
 def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:

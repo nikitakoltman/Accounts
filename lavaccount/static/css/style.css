@@ -6,6 +6,42 @@
     --colorschemehover: #1986c5;
 }
 
+::-webkit-scrollbar-button {
+    width: 6px;
+    height: 0;
+
+    background-image: url('');
+    background-repeat: no-repeat;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #32312e;
+    box-shadow: 0 0 3px #000 inset;
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background-color: #d9d9d9;
+    background-image: url('https://yraaa.ru/_pu/24/59610063.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    box-shadow: 0 1px 1px #fff inset;
+}
+
+::-webkit-resizer {
+    width: 7px;
+    height: 0;
+
+    background-image: url('');
+    background-repeat: no-repeat;
+}
+
+::-webkit-scrollbar {
+    width: 11px;
+}
+
+
 body {
     padding-right: 0 !important;
 }

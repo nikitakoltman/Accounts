@@ -2,6 +2,7 @@
 {% load static %}
 {% block title %}Авторизация{% endblock %}
 {% block addons_head %}
+<script type="text/javascript" src="{% static 'js/client_detection.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/login.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/form_message_handler.js' %}?ver={{ static_version }}"></script>
 <style type="text/css">
@@ -14,9 +15,9 @@
 <div class="container registration-container">
     <div class="row flex nomargin">
         {% load crispy_forms_tags %}
-        <div class="card">
+        <div class="card" style="width: 305px;">
             <div class="card-body">
-                <h4 class="card-title text-center">Вход в свою учетную запись</h4>
+                <h4 class="card-title text-center">Авторизация</h4>
                 <form method="post">
                     {% csrf_token %}
                     {{ form|crispy }}

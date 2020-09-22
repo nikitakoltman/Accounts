@@ -1,8 +1,9 @@
 import re
 import base64
+import datetime
 
 from api import service
-from api.models import Account, TokenConfirmEmail, MasterPassword
+from api.models import Account, TokenConfirmEmail, MasterPassword, LoginHistory
 
 from django.views.generic import TemplateView
 
@@ -10,13 +11,18 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from .forms import RegisterForm, ConfirmEmailForm, MasterPasswordResetForm, EmailChangeForm
+from .forms import RegisterForm, MasterPasswordResetForm, EmailChangeForm, LoginForm
 
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.sites.models import Site
 
 from lavaccount.settings import static_version
+from django.template.defaulttags import register
+import locale
+
+
+# Русская локализация для даты
+locale.setlocale(locale.LC_ALL, "")
 
 
 # TODO: Удалить
@@ -25,6 +31,7 @@ def email(request):
 
 
 def index(request):
+    """ Главная страница """
     if not request.user.is_authenticated:
         return render(request, 'landing.html')
 
@@ -44,12 +51,36 @@ def noscript(request):
 
 def lk(request):
     """ Личный кабинет пользователя """
+    login_history = LoginHistory.objects.filter(user=request.user).order_by('-date')
+    lh_date = dict()
+    today = datetime.datetime.today()
+    for lh in login_history:
+        if lh.date.day == today.day:
+            string = f'Сегодня в {lh.date.hour}:{lh.date.minute}'
+        elif lh.date.day == today.day - 1:
+            string = f'Вчера в {lh.date.hour}:{lh.date.minute}'
+        elif lh.date.year == today.year:
+            string = lh.date.strftime("%d %B") + f' в {lh.date.hour}:{lh.date.minute}'
+        else:
+            string = lh.date.strftime("%d %B %Y") + f' в {lh.date.hour}:{lh.date.minute}'
+        lh_date.update({
+            lh.id: string
+        })
+
     context = {
         'title': 'Личный кабинет',
+        'login_history': login_history,
+        'lh_date': lh_date,
         'static_version': static_version
     }
 
     return render(request, 'lk.html', context)
+
+
+@register.filter
+def get_item_dict(dictionary, key):
+    """ Фильтр для шаблона. Получить значение словаря по ключу """
+    return dictionary.get(key)
 
 
 def email_change(request):
@@ -174,6 +205,16 @@ def master_password_reset(request):
             'static_version': static_version
         }
 
+        try:
+            MasterPassword.objects.get(user=request.user)
+            context.update({
+                'master_password': True
+            })
+        except MasterPassword.DoesNotExist:
+            context.update({
+                'master_password': False
+            })
+
         if request.method == 'POST':
             password = request.POST.get('password')
 
@@ -278,16 +319,26 @@ def lav_login(request):
         return redirect(reverse("home_url"))
 
     context = {
-        'form': AuthenticationForm,
+        'form': LoginForm,
         'form_message': 'None',
         'static_version': static_version
     }
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+        system = request.POST.get('system')
+        browser = request.POST.get('browser')
+
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
             login(request, user)
+            service.new_login_history(
+                request=request,
+                system=system,
+                browser=browser
+            )
             return redirect(reverse("home_url"))
         else:
             context.update({

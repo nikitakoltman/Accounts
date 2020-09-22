@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 
-from .models import Account, MasterPassword
+from .models import Account, MasterPassword, LoginHistory
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
 from configs.config import EMAIL_HOST_USER
@@ -25,6 +25,9 @@ from .tokens import account_activation_token
 from django.contrib.auth.hashers import check_password
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
+
+import urllib.request
+import json
 
 
 class EmailThread(threading.Thread):
@@ -96,6 +99,66 @@ def master_password_reset(user: User, password: str) -> bool:
         accounts.delete()
         return True
     return False
+
+
+def new_login_history(request, system: str, browser: str):
+    """ Создает новую запись истории авторизаций """
+    ip = get_client_ip(request)
+    ip_info = get_ip_info(ip)
+
+    if ip_info['completed_requests'] > 9500:
+        pass # TODO: Сделать уведомление на почту что уже много запросов
+
+    if ip_info['success']:
+        if ip_info['city'] == ip_info['country']:
+            location = f"{ip_info['country']}"
+        else:
+            location = f"{ip_info['city']}, {ip_info['country']}"
+
+        LoginHistory.objects.create(
+            user=request.user,
+            ip=ip,
+            system=system,
+            location=location,
+            browser=browser
+        )
+
+        # Удаляем последний элемент, если их становится больше 6, так как
+        # в выводится 6 элементов, чтобы не мусорить в БД
+        login_history = LoginHistory.objects.filter(user=request.user)
+        if login_history.count() > 6:
+            last_element = login_history.order_by('-id').last()
+            last_element.delete()
+    else:
+        pass
+        # TODO: Сделать какое нибудь логирование ошибки
+        # ip_info['message']
+
+
+def get_ip_info(ip: str) -> dict:
+    """ Получить информацию о пользователе по ip """
+    # Отправка API запроса
+    info = 'success,message,type,country,city,completed_requests'
+    url = f'https://ipwhois.app/json/{ ip }?objects={info}&lang=ru'
+    with urllib.request.urlopen(url) as response:
+        return json.load(response)
+
+
+def get_client_ip(request) -> str:
+    """ Получить ip адрес пользователя """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for.split(',')[-1].strip()
+    else:
+        return request.META.get('REMOTE_ADDR')
+
+
+def get_client_host(request) -> str: # WARNING: Не используется
+    """ Получить host адресной строки пользователя """
+    host = request.META.get('HTTP_HOST')
+    if host:
+        return host
+    return request.META.get('REMOTE_HOST')
 
 
 def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:

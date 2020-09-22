@@ -1,21 +1,50 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UsernameField, AuthenticationForm
 
 
 class RegisterForm(forms.Form):
-    username = forms.CharField(label='Имя пользователя', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'ivan123'}))
-    email = forms.CharField(label='Адрес электронной почты', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'ivan123@mail.ru'}))
-    password = forms.CharField(label='Пароль', max_length=100, widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Повторите пароль', max_length=100, widget=forms.PasswordInput)
+    """ Форма для регистрации """
+    username = UsernameField(
+        label='Имя пользователя',
+        widget=forms.TextInput(attrs={'autofocus': True})
+    )
+    email = forms.EmailField(
+        label='Адрес электронной почты',
+        max_length=254,
+        widget=forms.EmailInput(attrs={'autocomplete': 'email'})
+    )
+    password1 = forms.CharField(
+        label='Пароль',
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
+    )
+    password2 = forms.CharField(
+        label='Повторите пароль',
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        strip=False
+    )
+
+
+class LoginForm(AuthenticationForm):
+    """ Форма расширяющая форму авторизации """
+    system = forms.CharField(widget=forms.HiddenInput())
+    browser = forms.CharField(widget=forms.HiddenInput())
 
 
 class MasterPasswordResetForm(forms.Form):
-    password = forms.CharField(label='Пароль', max_length=100, widget=forms.PasswordInput)
-
-
-class ConfirmEmailForm(forms.Form):
-    token = forms.CharField(label='Код подтверждения', max_length=100)
+    """ Форма сброса мастер пароля """
+    password = forms.CharField(
+        label='Пароль',
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'autofocus': True})
+    )
 
 
 class EmailChangeForm(forms.Form):
-    email = forms.CharField(label='Адрес электронной почты', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'ivan123@mail.ru'}))
+    """ Форма изменения электронной почты """
+    email = forms.EmailField(
+        label='Адрес электронной почты',
+        max_length=254,
+        widget=forms.EmailInput(attrs={'autocomplete': 'email', 'autofocus': True})
+    )

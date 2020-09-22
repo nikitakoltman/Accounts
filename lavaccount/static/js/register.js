@@ -51,7 +51,7 @@ $(document).ready(function() {
                         } else if (!is_email) {
                             $('#id_email').addClass('input-invalid');
                         } else if (!is_password) {
-                            $('#id_password').addClass('input-invalid');
+                            $('#id_password1').addClass('input-invalid');
                         } else if (is_password2) {
                             is_form_submit = true;
                             $('form').submit();
@@ -71,12 +71,12 @@ $(document).ready(function() {
 
     $('.js-generate_password').on('touchstart mousedown', function() {
         let password = generate_random_string(10);
-        $('#id_password').val(password);
+        $('#id_password1').val(password);
         swal('Генератор', 'Ваш пароль: ' + password + '\nСтарайтесь избегать хранения паролей на электронных устройствах в открытом виде.');
         check_password();
     });
 
-    $('#id_password').on('keyup', function() {
+    $('#id_password1').on('keyup', function() {
         check_password();
     }).focus(function() {
         $('#password_info').show();
@@ -89,7 +89,7 @@ $(document).ready(function() {
     });
 
     function check_password() {
-        let password = $('#id_password').val(),
+        let password = $('#id_password1').val(),
 
             is_length = false,
             is_letter = false,
@@ -129,10 +129,10 @@ $(document).ready(function() {
         }
 
         if (is_length && is_letter && is_capital && is_number) {
-            $('#id_password').removeClass('input-invalid');
+            $('#id_password1').removeClass('input-invalid');
             is_password = true;
         } else {
-            $('#id_password').addClass('input-invalid');
+            $('#id_password1').addClass('input-invalid');
             is_password = false;
         }
 
@@ -141,7 +141,7 @@ $(document).ready(function() {
     }
 
     function check_password2() {
-        let password = $('#id_password').val(),
+        let password = $('#id_password1').val(),
             password2 = $('#id_password2').val();
 
         if (password == password2) {

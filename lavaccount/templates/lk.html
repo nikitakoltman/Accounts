@@ -29,7 +29,7 @@
                         </div>
                         <div class="col-md-8 lk-block lk-block_info">
                             <div class="swiper-container">
-                                <div data-tabs="1" class="active" align="center">
+                                <div data-tabs="1" class="" align="center">
                                     <strong>Профиль</strong>
                                     <div class="col-sm-6">
                                         <div class="card" style="width: 250px;">
@@ -69,9 +69,33 @@
                                     <strong>История пожертвований</strong>
                                     <p>История пожертвований</p>
                                 </div>
-                                <div data-tabs="3">
+                                <div data-tabs="3" class="active">
                                     <strong>История авторизаций</strong>
-                                    <p>История авторизаций</p>
+                                    {% for history in login_history %}
+                                    <div class="auth">
+                                        <div class="auth-ip" number="{{ forloop.counter }}">
+                                            IP адрес: {{ history.ip }}
+                                        </div>
+                                        <div class="auth-top">
+                                            <div class="auth-display">
+                                                {{ history.system }}
+                                            </div>
+                                            <span class="auth-display">|</span>
+                                            <div class="js-auth-location auth-display" number="{{ forloop.counter }}">
+                                                {{ history.location }}
+                                            </div>
+                                        </div>
+                                        <div class="auth-bottom">
+                                            <div class="auth-display">
+                                                {{ lh_date|get_item_dict:history.id }}
+                                            </div>
+                                            <span class="auth-display">|</span>
+                                            <div class="auth-display">
+                                                {{ history.browser }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>

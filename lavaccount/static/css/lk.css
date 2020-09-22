@@ -30,6 +30,44 @@
     margin: 0;
 }
 
+.auth {
+    margin: 6px 0 0 0;
+    height: 48px;
+    line-height: 1.23;
+    padding-left: 20px;
+}
+
+.auth-top {
+    padding: 8px 0 2px;
+}
+
+.auth-ip {
+    display: none;
+    background: #262626b8;
+    border: 0;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px #000000b8;
+    position: absolute;
+    left: 100px;
+    color: white;
+    width: fit-content;
+    margin-top: -10px;
+    padding: 5px 15px 5px;
+}
+
+.auth-display {
+    display: inline-block;
+}
+
+.auth-bottom {
+    color: grey;
+    max-width: 450px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 12.5px;
+}
+
 @media (max-width: 991px) {
     .lk-block_info {
         margin-right: 5px;

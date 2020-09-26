@@ -1,5 +1,5 @@
 $(function() {
-    let master_password = null, // Хранит мастер пароль для расшифровки данных таблицы
+    let master_password = $('#data-master_password').val(), // Хранит мастер пароль для расшифровки данных таблицы
         press_timer = 0, // Хранит значение таймера для события долгого нажатия кнопки "Пароль"
         is_allow_copy = true, // Разрешает копирование при долгом нажатии кнопки "Пароль"
         is_allow_show_page = false; // Разрешает отображение страницы
@@ -13,8 +13,9 @@ $(function() {
 
     $('.footer-urls').hide(); // Прячем копирайт чтобы не мешал
 
-    master_password = $('body').attr('data-master_password');
-    $('body').attr('data-master_password', null);
+    // Стираем промежуточные значения
+    $('#data-master_password').val('');
+    $('#data-training_completed').val('');
 
     if (master_password != 'DoesNotExist') {
         $('#EnterKeyModal').modal('show'); // Открываем модальное окно ввода ключа
@@ -291,14 +292,11 @@ $(function() {
     $("#btn-send_account").on('click', function() { // Событие нажатия на кнопку "Отправить" в модальном окне создания нового аккаунта
         if ($("#in-site").val() == "") {
             swal('Заполните поле "Сайт"');
-        }
-        else if ($("#in-description").val() == "") {
+        } else if ($("#in-description").val() == "") {
             swal('Заполните поле "Описание"');
-        }
-        else if ($("#in-login").val() == "") {
+        } else if ($("#in-login").val() == "") {
             swal('Заполните поле "Логин"');
-        }
-        else if ($("#in-password").val() == "") {
+        } else if ($("#in-password").val() == "") {
             swal('Заполните поле "Пароль"');
         } else {
             create_account();
@@ -346,14 +344,11 @@ $(function() {
 
         if (key == '') { // Если расшифрока дала результат...
             swal('Не правильный пароль');
-        }
-        else if ($("#modal-site").val() == "") {
+        } else if ($("#modal-site").val() == "") {
             swal('Заполните поле "Сайт"');
-        }
-        else if ($("#modal-description").val() == "") {
+        } else if ($("#modal-description").val() == "") {
             swal('Заполните поле "Описание"');
-        }
-        else {
+        } else {
             change_info_account(); // Изменяем аккаунт
         }
     });
@@ -388,6 +383,7 @@ $(function() {
         $('#modal-new_password').val('');
         $('#modal-btn-account_delete').attr('data-id', account_id);
         $('#modal-btn-account_delete').attr('data-site', site);
+        account_modal_tour();
     });
 
     $('#EnterKeyModal').on('shown.bs.modal', function() { // Событие открытия модального окна ввода ключа
@@ -427,6 +423,7 @@ $(function() {
             $('.js-reload_enter_key_modal').hide(); // Скрываем кнопку загрузить таблицу
 
             $('.account_container').css('display', 'block'); // Показываем таблицу
+            account_table_tour();
         } else {
             $('.js-reload_enter_key_modal').show(); // Показываем кнопку загрузить таблицу
             $('#in-enter_password').val('');

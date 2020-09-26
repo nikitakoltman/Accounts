@@ -78,6 +78,9 @@ p,
 h2,
 h4,
 strong,
+label,
+.popover-title,
+.popover-content,
 .simple-tabs {
     font-family: Comfortaa;
 }
@@ -114,6 +117,14 @@ body.modal-open {
 .copyright {
     margin-top: 1em;
     cursor: default;
+}
+
+.popover-navigation {
+    padding: 9px !important;
+}
+
+.popover-navigation *[data-role="end"] {
+    float: initial !important;
 }
 
 .terms_confirm-text {

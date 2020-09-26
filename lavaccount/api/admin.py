@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Account, MasterPassword, TokenConfirmEmail, Profile, LoginHistory
+from .models import Account, MasterPassword, Profile, LoginHistory
 
 
 class AccountAdmin(admin.ModelAdmin):
@@ -8,6 +8,7 @@ class AccountAdmin(admin.ModelAdmin):
 
     class Meta:
         model = Account
+
 
 class MasterPasswordAdmin(admin.ModelAdmin):
     list_display = ['user', 'password']
@@ -18,6 +19,5 @@ class MasterPasswordAdmin(admin.ModelAdmin):
 
 admin.site.register(Account)
 admin.site.register(MasterPassword)
-admin.site.register(TokenConfirmEmail)
 admin.site.register(Profile)
 admin.site.register(LoginHistory)

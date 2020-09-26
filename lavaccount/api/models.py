@@ -1,12 +1,12 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
 class Account(models.Model):
     """ Аккаунты пользователя """
-    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
     site = models.CharField('Сайт', max_length=255)
     description = models.CharField('Описание', max_length=255)
     login = models.CharField('Логин', max_length=255)
@@ -22,12 +22,12 @@ class Account(models.Model):
     class Meta:
         verbose_name = 'Аккаунт'
         verbose_name_plural = 'Аккаунты'
-        ordering = ["-id", "-timestamp"]
+        ordering = ['-id', '-timestamp']
 
 
 class MasterPassword(models.Model):
     """ Мастер пароль пользователя """
-    user = models.OneToOneField(User, verbose_name="Пользователь", on_delete=models.CASCADE)
+    user = models.OneToOneField(User, verbose_name='Пользователь', on_delete=models.CASCADE)
     password = models.CharField('Пароль', max_length=255)
 
     def __str__(self):
@@ -38,21 +38,9 @@ class MasterPassword(models.Model):
         verbose_name_plural = 'Мастер пароли'
 
 
-class TokenConfirmEmail(models.Model):
-    """ Токен подтверждения электронной почты """
-    user = models.OneToOneField(User, verbose_name="Пользователь", on_delete=models.CASCADE)
-    token = models.CharField("Токен", max_length=255)
-
-    def __str__(self):
-        return self.user.username
-
-    class Meta:
-        verbose_name = 'Токен'
-        verbose_name_plural = 'Токены'
-
-
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    """ Профиль пользователя """
+    user = models.OneToOneField(User, verbose_name='Пользователь', on_delete=models.CASCADE)
     is_active_email = models.BooleanField('Подтверждение почты', default=False)
 
     def __str__(self):
@@ -64,11 +52,12 @@ class Profile(models.Model):
 
 
 class LoginHistory(models.Model):
-    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
-    ip = models.GenericIPAddressField(verbose_name="IP адрес")
-    system = models.CharField("Операционная система", max_length=255)
-    location = models.CharField("Локация", max_length=255)
-    browser = models.CharField("Браузер", max_length=255)
+    """ История авторизаций """
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    ip = models.GenericIPAddressField(verbose_name='IP адрес')
+    system = models.CharField('Операционная система', max_length=255)
+    location = models.CharField('Локация', max_length=255)
+    browser = models.CharField('Браузер', max_length=255)
     date = models.DateTimeField(
         'Дата', auto_now=False, auto_now_add=True)
 

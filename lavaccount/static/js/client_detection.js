@@ -1,9 +1,11 @@
+/* Получение информации о пользователе */
+
 (function (window) {
     {
-        var unknown = 'Unknown'; //var unknown = '-';
+        let unknown = 'Unknown'; // let unknown = '-';
 
         // screen
-        /*var screenSize = '';
+        /*let screenSize = '';
         if (screen.width) {
             width = (screen.width) ? screen.width : '';
             height = (screen.height) ? screen.height : '';
@@ -11,12 +13,12 @@
         }*/
 
         //browser
-        var nVer = navigator.appVersion;
-        var nAgt = navigator.userAgent;
-        var browser = navigator.appName;
-        var version = '' + parseFloat(navigator.appVersion);
-        var majorVersion = parseInt(navigator.appVersion, 10);
-        var nameOffset, verOffset, ix;
+        let nVer = navigator.appVersion;
+        let nAgt = navigator.userAgent;
+        let browser = navigator.appName;
+        let version = '' + parseFloat(navigator.appVersion);
+        let majorVersion = parseInt(navigator.appVersion, 10);
+        let nameOffset, verOffset, ix;
 
         // Opera
         if ((verOffset = nAgt.indexOf('Opera')) != -1) {
@@ -107,10 +109,10 @@
         }
 
         // mobile version
-        //var mobile = /Mobile|mini|Fennec|Android|iP(ad|od|hone)/.test(nVer);
+        //let mobile = /Mobile|mini|Fennec|Android|iP(ad|od|hone)/.test(nVer);
 
         // cookie
-        /*var cookieEnabled = (navigator.cookieEnabled) ? true : false;
+        /*let cookieEnabled = (navigator.cookieEnabled) ? true : false;
 
         if (typeof navigator.cookieEnabled == 'undefined' && !cookieEnabled) {
             document.cookie = 'testcookie';
@@ -118,8 +120,8 @@
         }*/
 
         // system
-        var os = unknown;
-        var clientStrings = [
+        let os = unknown;
+        let clientStrings = [
             {s:'Windows 3.11', r:/Win16/},
             {s:'Windows 95', r:/(Windows 95|Win95|Windows_95)/},
             {s:'Windows ME', r:/(Win 9x 4.90|Windows ME)/},
@@ -147,15 +149,15 @@
             {s:'OS/2', r:/OS\/2/},
             {s:'Search Bot', r:/(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/}
         ];
-        for (var id in clientStrings) {
-            var cs = clientStrings[id];
+        for (let id in clientStrings) {
+            let cs = clientStrings[id];
             if (cs.r.test(nAgt)) {
                 os = cs.s;
                 break;
             }
         }
 
-        var osVersion = unknown;
+        let osVersion = unknown;
 
         if (/Windows/.test(os)) {
             osVersion = /Windows (.*)/.exec(os)[1];

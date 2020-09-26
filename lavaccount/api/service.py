@@ -1,37 +1,32 @@
 import functools
 import json
-import base64
-import threading
 import logging as log
+import threading
 import traceback
+import urllib.request
 from datetime import datetime
 
-from lavaccount.settings import DEBUG
+from configs.config import EMAIL_HOST_USER
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from django.core.mail import EmailMessage
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
+from django.template.loader import get_template
+from django.utils.encoding import force_bytes
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
+from django.utils.http import urlsafe_base64_encode
+from lavaccount.settings import DEBUG
 
 from .models import Account, MasterPassword, LoginHistory
-from django.core.mail import EmailMessage
-from django.template.loader import get_template
-from configs.config import EMAIL_HOST_USER
-
-from django.contrib.sites.models import Site
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-
 from .tokens import account_activation_token
-
-from django.contrib.auth.hashers import check_password
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_text
-
-import urllib.request
-import json
 
 
 class EmailThread(threading.Thread):
     """ Отправка почты в новом потоке """
+
     def __init__(self, subject, html_content, recipient_list):
         self.subject = subject
         self.recipient_list = recipient_list
@@ -60,12 +55,12 @@ def confirm_email(user: User, email: str, subject: str, template: str) -> None:
         email=email,
         subject=subject,
         template=template,
-        context= {
+        context={
             'username': user.username,
             'protocol': 'http',
             'domain': current_site.domain,
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            'token': account_activation_token.make_token(user),
+            'token': account_activation_token.make_token(user)
         }
     )
 
@@ -94,11 +89,11 @@ def master_password_reset(user: User, password: str) -> bool:
     if check_password(password, user.password):
         master_password = MasterPassword.objects.get(user=user)
         master_password.delete()
-
         accounts = Account.objects.filter(user=user)
         accounts.delete()
         return True
-    return False
+    else:
+        return False
 
 
 def new_login_history(request, system: str, browser: str):
@@ -107,7 +102,7 @@ def new_login_history(request, system: str, browser: str):
     ip_info = get_ip_info(ip)
 
     if ip_info['completed_requests'] > 9500:
-        pass # TODO: Сделать уведомление на почту что уже много запросов
+        pass  # TODO: Сделать уведомление на почту что уже много запросов
 
     if ip_info['success']:
         if ip_info['city'] == ip_info['country']:
@@ -138,8 +133,8 @@ def new_login_history(request, system: str, browser: str):
 def get_ip_info(ip: str) -> dict:
     """ Получить информацию о пользователе по ip """
     # Отправка API запроса
-    info = 'success,message,type,country,city,completed_requests'
-    url = f'https://ipwhois.app/json/{ ip }?objects={info}&lang=ru'
+    objects = 'success,message,type,country,city,completed_requests'
+    url = f'https://ipwhois.app/json/{ip}?objects={objects}&lang=ru'
     with urllib.request.urlopen(url) as response:
         return json.load(response)
 
@@ -153,7 +148,7 @@ def get_client_ip(request) -> str:
         return request.META.get('REMOTE_ADDR')
 
 
-def get_client_host(request) -> str: # WARNING: Не используется
+def get_client_host(request) -> str:  # WARNING: Функция не используется
     """ Получить host адресной строки пользователя """
     host = request.META.get('HTTP_HOST')
     if host:
@@ -263,17 +258,11 @@ def check_username_and_email(username: str, email: str) -> dict:
     is_exist_username = False
     is_exist_email = False
 
-    try:
-        user = User.objects.get(username=username)
+    if User.objects.filter(username=username).exists():
         is_exist_username = True
-    except User.DoesNotExist:
-        pass
 
-    try:
-        user = User.objects.get(email=email)
+    if User.objects.filter(email=email).exists():
         is_exist_email = True
-    except User.DoesNotExist:
-        pass
 
     return {
         'status': 'success',
@@ -330,7 +319,7 @@ def error_response(exception: Exception) -> json_response:
     """ Форматирует HTTP ответ с описанием ошибки """
     result = {
         'status': 'error',
-        'result': str(exception),
+        'result': str(exception)
     }
 
     return json_response(data=result, status=400)

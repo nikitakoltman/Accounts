@@ -1,6 +1,6 @@
 import os
+
 from configs import config
-#from datetime import timedelta
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config.DJANGO_SECRET_KEY
@@ -18,8 +18,8 @@ INSTALLED_APPS = [
 
     'crispy_forms',
     'rest_framework',
-    #'rest_framework.authtoken',
-    #'djoser',
+    # 'rest_framework.authtoken',
+    # 'djoser',
 
     'home.apps.HomeConfig',
     'api.apps.ApiConfig',
@@ -104,6 +104,12 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
+EMAIL_USE_TLS = config.EMAIL_USE_TLS
+EMAIL_HOST = config.EMAIL_HOST
+EMAIL_HOST_USER = config.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = config.EMAIL_HOST_PASSWORD
+EMAIL_PORT = config.EMAIL_PORT
+
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Для тестов в консоль
 
 # REST_FRAMEWORK = {
@@ -116,12 +122,6 @@ MEDIA_URL = '/media/'
 #         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
 #     ),
 # }
-
-EMAIL_USE_TLS = config.EMAIL_USE_TLS
-EMAIL_HOST = config.EMAIL_HOST
-EMAIL_HOST_USER = config.EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = config.EMAIL_HOST_PASSWORD
-EMAIL_PORT = config.EMAIL_PORT
 
 # DJOSER = {
 #     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',

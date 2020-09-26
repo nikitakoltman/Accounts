@@ -1,25 +1,19 @@
-import re
-import base64
 import datetime
+import locale
+import re
 
 from api import service
-from api.models import Account, TokenConfirmEmail, MasterPassword, LoginHistory
-
-from django.views.generic import TemplateView
-
-from django.shortcuts import redirect, render
-from django.urls import reverse
+from api.models import Account, MasterPassword, LoginHistory
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from django.shortcuts import redirect, render
+from django.template.defaulttags import register
+from django.urls import reverse
+from django.views.generic import TemplateView
+from lavaccount.settings import static_version
 
 from .forms import RegisterForm, MasterPasswordResetForm, EmailChangeForm, LoginForm
-
-from django.contrib.auth import authenticate, login
-from django.contrib.sites.models import Site
-
-from lavaccount.settings import static_version
-from django.template.defaulttags import register
-import locale
-
 
 # Русская локализация для даты
 locale.setlocale(locale.LC_ALL, "")
@@ -27,7 +21,11 @@ locale.setlocale(locale.LC_ALL, "")
 
 # TODO: Удалить
 def email(request):
-    return render(request, 'email/page_to_confirm_email.html', {'username':request.user.username, 'token': service.generate_token()})
+    context = {
+        'username': request.user.username,
+        'token': service.generate_token()
+    }
+    return render(request, 'email/page_to_confirm_email.html', context)
 
 
 def index(request):
@@ -40,7 +38,6 @@ def index(request):
         'master_password': service.get_master_password(user=request.user),
         'static_version': static_version
     }
-
     return render(request, 'home.html', context)
 
 
@@ -73,7 +70,6 @@ def lk(request):
         'lh_date': lh_date,
         'static_version': static_version
     }
-
     return render(request, 'lk.html', context)
 
 
@@ -115,8 +111,8 @@ def email_change(request):
         user.profile.is_active_email = False
         user.save()
         return redirect(reverse("email_change_done_url"))
-
     return render(request, 'email/email_change_form.html', context)
+
 
 def email_change_done(request):
     """ Страница которая говорит о том что письмо с
@@ -125,7 +121,6 @@ def email_change_done(request):
         'title': 'Письмо с инструкциями по изменению почтового адреса отправлено',
         'static_version': static_version
     }
-
     return render(request, 'email/email_change_done.html', context)
 
 
@@ -136,7 +131,6 @@ def email_change_complete(request):
         'title': 'Изменение адреса почты завершено',
         'static_version': static_version
     }
-
     return render(request, 'email/email_change_complete.html', context)
 
 
@@ -188,7 +182,6 @@ def activate_email(request, uidb64, token):
 
     if service.activate_email(uidb64, token):
         request.session['valid'] = True
-
     return redirect(reverse("confirm_email_complete_url"))
 
 
@@ -197,23 +190,22 @@ def master_password_reset(request):
     if not request.user.is_authenticated:
         return redirect(reverse("home_url"))
 
-    try:
-        context = {
-            'title': 'Сброс мастер пароля',
-            'form': MasterPasswordResetForm,
-            'form_message': 'None',
-            'static_version': static_version
-        }
+    context = {
+        'title': 'Сброс мастер пароля',
+        'form': MasterPasswordResetForm,
+        'form_message': 'None',
+        'static_version': static_version
+    }
 
-        try:
-            MasterPassword.objects.get(user=request.user)
-            context.update({
-                'master_password': True
-            })
-        except MasterPassword.DoesNotExist:
-            context.update({
-                'master_password': False
-            })
+    try:
+        is_master_password = False
+
+        if MasterPassword.objects.filter(user=request.user).exists():
+            is_master_password = True
+
+        context.update({
+            'master_password': is_master_password
+        })
 
         if request.method == 'POST':
             password = request.POST.get('password')
@@ -246,7 +238,6 @@ def create_account(request):
         password=password,
         user=request.user
     )
-
     return service.json_response(answer)
 
 
@@ -274,7 +265,6 @@ def change_info_account(request):
         new_password=new_password,
         account_id=account_id
     )
-
     return service.json_response(answer)
 
 
@@ -295,7 +285,6 @@ def change_or_create_master_password(request):
         new_master_password=new_master_password,
         user=request.user
     )
-
     return service.json_response(answer)
 
 
@@ -309,7 +298,6 @@ def check_username_and_email(request):
         username=username,
         email=email
     )
-
     return service.json_response(answer)
 
 
@@ -347,6 +335,25 @@ def lav_login(request):
     return render(request, 'registration/login.html', context)
 
 
+def check_if_password_correct(password1: str, password2: str) -> str:
+    """ Проверка корректности пароля """
+    print('@@@@@@@@')
+    print(password1)
+    print(password2)
+    if password1 != password2:
+        return 'broken rule [pass == pass2]'
+    if len(password1) < 8:
+        return 'broken rule [len > 8]'
+    elif re.search('[a-z]', password1) is None:
+        return 'broken rule [a-z]'
+    elif re.search('[A-Z]', password1) is None:
+        return 'broken rule [A-Z]'
+    elif re.search('[0-9]', password1) is None:
+        return 'broken rule [0-9]'
+    else:
+        return 'success'
+
+
 class RegisterView(TemplateView):
     """ Регистрация пользователей """
     template_name = "registration/register.html"
@@ -356,24 +363,24 @@ class RegisterView(TemplateView):
             return redirect(reverse("home_url"))
 
         context = {
-                'form': RegisterForm,
-                'form_message': 'None',
-                'static_version': static_version
-            }
+            'form': RegisterForm,
+            'form_message': 'None',
+            'static_version': static_version
+        }
 
         if request.method == 'POST':
             username = request.POST.get('username')
             email = request.POST.get('email')
-            password = request.POST.get('password')
+            password1 = request.POST.get('password1')
             password2 = request.POST.get('password2')
 
-            answer = self.check_if_password_correct(password, password2)
+            answer = check_if_password_correct(password1, password2)
             if answer == 'success':
                 try:
                     user = User.objects.create_user(
                         username=username,
                         email=email,
-                        password=password
+                        password=password1
                     )
 
                     service.confirm_email(
@@ -392,24 +399,8 @@ class RegisterView(TemplateView):
                     })
             else:
                 context.update({
-                        'form_message': answer,
-                        'username': username,
-                        'email': email
-                    })
+                    'form_message': answer,
+                    'username': username,
+                    'email': email
+                })
         return render(request, self.template_name, context)
-
-
-    def check_if_password_correct(self, password: str, password2: str) -> str:
-        """ Проверка корректности пароля """
-        if password != password2:
-            return 'broken rule [pass == pass2]'
-        if len(password) < 8:
-            return 'broken rule [len > 8]'
-        elif re.search('[a-z]', password) is None:
-            return 'broken rule [a-z]'
-        elif re.search('[A-Z]', password) is None:
-            return 'broken rule [A-Z]'
-        elif re.search('[0-9]', password) is None:
-            return 'broken rule [0-9]'
-        else:
-            return 'success'

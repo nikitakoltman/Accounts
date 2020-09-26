@@ -1,3 +1,5 @@
+/* Валидация полей для ввода пароля */
+
 $(function() {
 	$('#hint_id_new_password1').css('display', 'none');
 

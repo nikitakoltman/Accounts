@@ -1,6 +1,6 @@
 {
-  "name": "Accounts",
-  "short_name": "Accounts",
+  "name": "LavAccount",
+  "short_name": "LavAccount",
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "display": "standalone",

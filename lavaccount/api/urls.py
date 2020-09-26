@@ -1,6 +1,6 @@
 from rest_framework import routers
-from .api import AccountViewSet, MasterPasswordViewSet
 
+from .api import AccountViewSet, MasterPasswordViewSet
 
 router = routers.DefaultRouter()
 router.register('api/account', AccountViewSet, 'account')

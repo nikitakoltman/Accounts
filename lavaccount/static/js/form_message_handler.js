@@ -1,3 +1,5 @@
+/* Обработчик сообщений форм */
+
 $(function() {
     let form_message = $('#form_message').val(),
         password_change_error = $('#error_1_id_old_password strong').text();
@@ -30,7 +32,7 @@ $(function() {
                 swal('Ошибка', 'Введенная почта уже используется, введите другую.');
                 break;
             case 'broken rule [pass == pass2]':
-                swal('Ошибка валидации', 'Пароли не совподают');
+                swal('Ошибка валидации', 'Пароли не совпадают');
                 break;
             case 'broken rule [len > 8]':
                 swal('Ошибка валидации', 'Длинна пароля должна быть больше 8 символов');

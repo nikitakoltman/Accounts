@@ -1,4 +1,6 @@
-$.ajaxSetup({ // Функция присвоение CSRF токена для всех ajax функций
+/* Присвоение CSRF токена для всех ajax запросов */
+
+$.ajaxSetup({
     beforeSend: function(xhr, settings) {
         if (settings.type == "POST" || settings.type == "PUT" || settings.type == "DELETE") {
             function getCookie(name) {

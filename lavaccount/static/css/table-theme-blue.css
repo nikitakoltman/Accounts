@@ -12,7 +12,7 @@ table.tablesorter {
 
     text-align: left;
 
-    background-color: #cdcdcd;
+    background-color: #cccccc;
 }
 
 table.tablesorter thead tr th,
@@ -22,7 +22,7 @@ table.tablesorter tfoot tr th {
     padding: 4px;
 
     border: 1px solid #fff;
-    background-color: #e6eeee;
+    background-color: #afcee9;
 }
 
 table.tablesorter thead tr .header {
@@ -52,5 +52,5 @@ table.tablesorter thead tr .headerSortDown {
 
 table.tablesorter thead tr .headerSortDown,
 table.tablesorter thead tr .headerSortUp {
-    background-color: #8dbdd8;
+    background-color: #73a9d9;
 }

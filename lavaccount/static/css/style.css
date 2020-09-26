@@ -243,21 +243,6 @@ body.modal-open {
     float: right;
 }
 
-
-@media (min-width: 576px) {
-    #cookie_notification.show {
-        display: flex;
-    }
-}
-
-@media (max-width: 575px) {
-    #cookie_notification.show {
-        display: block;
-
-        text-align: left;
-    }
-}
-
 .share-container a:hover {
     color: #ffffff;
 }
@@ -591,6 +576,19 @@ body.modal-open {
     }
 }
 
+@media (min-width: 576px) {
+    #cookie_notification.show {
+        display: flex;
+    }
+}
+
+@media (max-width: 575px) {
+    #cookie_notification.show {
+        display: block;
+
+        text-align: left;
+    }
+}
 
 @keyframes topBubbles {
     0% {

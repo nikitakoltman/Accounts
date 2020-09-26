@@ -1,4 +1,6 @@
-$(document).ready(function() {
+/* Регистрация */
+
+$(function() {
     let username = $('#in-hide-username').val(),
         email = $('#in-hide-email').val();
 
@@ -22,6 +24,12 @@ $(document).ready(function() {
             $(this).addClass('input-invalid');
             is_email = false;
         }
+    });
+
+    $('.js-show_password').on('click', function() {
+        /* Показать пароль в поле ввода пароля */
+    	password = $('#id_password1');
+        password.attr('type', password.attr('type') === 'password' ? 'text' : 'password');
     });
 
     $('form').on('submit', function() {
@@ -70,14 +78,15 @@ $(document).ready(function() {
     });
 
     $('.js-generate_password').on('touchstart mousedown', function() {
+        /* Генерация пароля для поля ввода пароля */
         let password = generate_random_string(10);
         $('#id_password1').val(password);
         swal('Генератор', 'Ваш пароль: ' + password + '\nСтарайтесь избегать хранения паролей на электронных устройствах в открытом виде.');
-        check_password();
+        check_password_is_correct();
     });
 
     $('#id_password1').on('keyup', function() {
-        check_password();
+        check_password_is_correct();
     }).focus(function() {
         $('#password_info').show();
     }).blur(function() {
@@ -85,10 +94,11 @@ $(document).ready(function() {
     });
 
     $('#id_password2').on('keyup change', function() {
-        check_password2();
+        check_password2_is_correct();
     });
 
-    function check_password() {
+    function check_password_is_correct() {
+        /* Проверить правильность пароля */
         let password = $('#id_password1').val(),
 
             is_length = false,
@@ -140,7 +150,8 @@ $(document).ready(function() {
 
     }
 
-    function check_password2() {
+    function check_password2_is_correct() {
+        /* Проверить правильность второго пароля */
         let password = $('#id_password1').val(),
             password2 = $('#id_password2').val();
 

@@ -1,5 +1,4 @@
 from django.urls import path
-from django.contrib.auth.views import LoginView, LogoutView
 
 from . import views
 
@@ -22,9 +21,10 @@ urlpatterns = [
     path('confirm_email/', views.confirm_email, name='confirm_email_url'),
     path('confirm_email/done/', views.confirm_email_done, name='confirm_email_done_url'),
     path('confirm_email/complete/', views.confirm_email_complete, name='confirm_email_complete_url'),
-    path('activate_email/<uidb64>[0-9A-Za-z_\-]+)/<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/', views.activate_email, name='activate_email'),
+    path('activate_email/<uidb64>[0-9A-Za-z_\-]+)/<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/', views.activate_email,
+         name='activate_email'),
 
     path('master_password_reset/', views.master_password_reset, name='master_password_reset_url'),
 
-    path('email/', views.email, name='email_url'), # TODO: удалить
+    path('email/', views.email, name='email_url'),  # TODO: удалить
 ]

@@ -1,3 +1,5 @@
+/* Анимации bubbly кнопок */
+
 $(function() {
     let animateButton = function(e) {
         e.preventDefault;

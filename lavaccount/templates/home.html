@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{% static 'css/table-theme-blue.css' %}?ver={{ static_version }}">
 <script type="text/javascript" src="{% static 'js/addons/jquery.tablesorter.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/addons/crypto-js.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/addons.js' %}?ver={{ static_version }}"></script>
+<script type="text/javascript" src="{% static 'js/bubbly_animation.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/ajax_setup.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/tour.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/home.js' %}?ver={{ static_version }}"></script>
@@ -123,9 +123,9 @@
                 <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body modal-body-enter-password">
-                <label for="in-enter_password">Введите мастер пароль</label>
-                <input class="form-control" type="password" id="in-enter_password" inputmode="text" autofocus>
-                <button class="btn btn-primary btn-round btn-send" id="btn-enter_password">Войти</button>
+                <label for="in-enter_master_password">Введите мастер пароль</label>
+                <input class="form-control" type="password" id="in-enter_master_password" inputmode="text" autofocus>
+                <button class="btn btn-primary btn-round btn-send" id="btn-enter_master_password">Войти</button>
             </div>
         </div>
     </div>

@@ -1,10 +1,9 @@
 from django import forms
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import UsernameField, AuthenticationForm
 
 
 class RegisterForm(forms.Form):
-    """ Форма для регистрации """
+    """ Форма регистрации """
     username = UsernameField(
         label='Имя пользователя',
         widget=forms.TextInput(attrs={'autofocus': True})
@@ -21,8 +20,8 @@ class RegisterForm(forms.Form):
     )
     password2 = forms.CharField(
         label='Повторите пароль',
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
-        strip=False
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
     )
 
 

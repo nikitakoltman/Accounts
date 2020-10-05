@@ -326,18 +326,28 @@ def error_response(exception: Exception) -> json_response:
 def write_error_to_log_file(traceback_format_exc: str) -> None:
     """ Запись исключения в файл """
     try:
-        file = open('logs/logs.log.json')
+        file = open('logs/log.json')
         text = json.loads(file.read())
-        file.close()
-        with open('logs/logs.log.json', 'w+') as f:
+
+        with open('logs/log.json', 'w+') as f:
             text.update({
                 len(text): {'type': 'ERROR', 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}
             })
             f.write(
                 json.dumps(text, indent=4)
             )
+
+        # Если размер файла больше либо равен 10 мегабайт архивируем логи
+        if len(file.read()) >= 10485760:
+            with zipfile.ZipFile('logs/log_json__' + datetime.now().strftime('%d-%m-%Y_%H-%M-%S') + '__.zip', 'w') as arzip:
+                arzip.write('logs/log.json')
+                f = open('logs/log.json', 'w+')
+                f.write(json.dumps(json.loads('{}'), indent=4))
+                f.close()
+
+        file.close()
     except FileNotFoundError:
-        f = open('logs/logs.log.json', 'x')
+        f = open('logs/log.json', 'x')
         text = json.loads('{}')
         text.update({
             len(text): {'type': 'ERROR', 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}

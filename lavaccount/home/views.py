@@ -62,7 +62,7 @@ def logs(request):
     if not request.user.is_superuser:
         return HttpResponseNotFound()
 
-    file = open('logs/logs.log.json')
+    file = open('logs/log.json')
     logs = json.loads(file.read())
     logs = sorted(logs.items(), reverse=True)
     file.close()

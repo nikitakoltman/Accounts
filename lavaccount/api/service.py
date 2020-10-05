@@ -1,10 +1,10 @@
 import functools
 import json
-import logging as log
 import threading
 import traceback
 import urllib.request
 from datetime import datetime
+from loguru import logger as log
 
 from configs.config import EMAIL_HOST_USER
 from django.contrib.auth.hashers import check_password
@@ -158,6 +158,12 @@ def get_client_host(request) -> str:  # WARNING: Функция не испол�
 
 def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:
     """ Создает новый аккаунт """
+    if Account.objects.count() >= 100:
+        return {
+            'status': 'error',
+            'message': 'account limit reached'
+        }
+
     account = Account.objects.create(
         user=user,
         site=site,
@@ -195,12 +201,12 @@ def change_info_account(site: str, description: str, new_login: str, new_passwor
         account.site = site
         account.description = description
 
-        if new_login is None:
+        if new_login == '':
             account.login = account.login
         else:
             account.login = new_login
 
-        if new_password is None:
+        if new_password == '':
             account.password = account.password
         else:
             account.password = new_password
@@ -253,21 +259,16 @@ def change_or_create_master_password(sites: str, descriptions: str, logins: str,
     }
 
 
-def check_username_and_email(username: str, email: str) -> dict:
-    """ Проверяет существование имени и почты в БД """
+def check_username(username: str) -> dict:
+    """ Проверяет существование имени в БД """
     is_exist_username = False
-    is_exist_email = False
 
     if User.objects.filter(username=username).exists():
         is_exist_username = True
 
-    if User.objects.filter(email=email).exists():
-        is_exist_email = True
-
     return {
         'status': 'success',
-        'is_exist_username': is_exist_username,
-        'is_exist_email': is_exist_email
+        'is_exist_username': is_exist_username
     }
 
 
@@ -285,19 +286,15 @@ def base_view(function):
 
     @functools.wraps(function)
     def wrapper(request):
-        # Если запрос был не ajax, а например по прямой ссылке...
-        if not request.is_ajax():
-            return HttpResponse(status=404)
-
         try:
             with transaction.atomic():
                 return function(request)
         except Exception as err:
-            if DEBUG:
-                log.error(traceback.format_exc())
-                error_response(err)
-            else:
-                write_error_to_log_file(traceback.format_exc())
+            #if DEBUG:
+            log.error(traceback.format_exc())
+            #else:
+            write_error_to_log_file(traceback.format_exc())
+            error_response(err)
 
     return wrapper
 
@@ -327,7 +324,22 @@ def error_response(exception: Exception) -> json_response:
 
 def write_error_to_log_file(traceback_format_exc: str) -> None:
     """ Запись исключения в файл """
-    with open('../log.txt', 'a') as f:
-        f.write(
-            f'ERROR | {datetime.now().strftime("%d.%m.%Y %H:%M:%S")} | {traceback_format_exc} \n\n'
-        )
+    try:
+        file = open('logs/logs.log.json')
+        text = json.loads(file.read())
+        file.close()
+        with open('logs/logs.log.json', 'w+') as f:
+            text.update({
+                len(text): {'type': 'ERROR', 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}
+            })
+            f.write(
+                json.dumps(text, indent=4)
+            )
+    except FileNotFoundError:
+        f = open('logs/logs.log.json', 'x')
+        text = json.loads('{}')
+        text.update({
+            len(text): {'type': 'ERROR', 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}
+        })
+        f.write(json.dumps(text, indent=4))
+        f.close()

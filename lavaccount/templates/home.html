@@ -11,7 +11,7 @@
 <script type="text/javascript" src="{% static 'js/home.js' %}?ver={{ static_version }}"></script>
 {% endblock %}
 {% block content %}
-<div class="container account_container">
+<div class="container account_container" {% if not request.user.profile.is_active_email and request.user.is_authenticated %}style="margin-top: 20px;"{% endif %}>
     <div align="center" style="margin-top: 10px;">
         <button id="btn_create_account_modal" data-toggle="modal" data-target="#CreateAccountModal" class="btn btn-primary">Добавить аккаунт</button>
         <button id="btn_master_password_modal" data-toggle="modal" data-target="#MasterPasswordModal" class="btn btn-primary">Мастер пароль</button>
@@ -20,7 +20,7 @@
     <table id="Accounts_table" class="tablesorter table-hover">
         <thead>
             <tr>
-                <th></th>
+                <th style="display: table-column;"></th>
                 <th>Сайт</th>
                 <th>Описание</th>
             </tr>

@@ -79,8 +79,16 @@ $(function() {
                     $('#in-site').val('');
                     $('#in-description').val('');
                     // Памятка: поле логина и пароля очищаются всегда при закрытии модального окна
-                } else {
-                    swal('Ошибка', res['result']);
+                } else if (result['status'] == 'error') {
+                    if (result['message'] == 'account limit reached') {
+                        swal('Ошибка', 'Достигнут лимит в 100 аккаунтов');
+                    }
+                    else {
+                        swal('Ошибка', result['message']);
+                    }
+                }
+                else {
+                    swal('Ошибка', result['result']);
                 }
 
                 preload_hide();

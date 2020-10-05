@@ -48,10 +48,10 @@
     border-radius: 3px;
     box-shadow: 0 1px 3px #000000b8;
     position: absolute;
-    left: 100px;
+    left: 45px;
     color: white;
     width: fit-content;
-    margin-top: -10px;
+    margin-top: -20px;
     padding: 5px 15px 5px;
 }
 
@@ -71,9 +71,5 @@
 @media (max-width: 991px) {
     .lk-block_info {
         margin-right: 5px;
-    }
-
-    .footer-confirm_email {
-        bottom: auto;
     }
 }

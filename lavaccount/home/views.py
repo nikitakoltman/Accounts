@@ -1,6 +1,7 @@
 import datetime
 import locale
 import re
+import json
 
 from api import service
 from api.models import Account, MasterPassword, LoginHistory
@@ -13,6 +14,8 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 from lavaccount.settings import static_version
 
+from loguru import logger as log
+
 from .forms import RegisterForm, MasterPasswordResetForm, EmailChangeForm, LoginForm
 
 # Русская локализация для даты
@@ -23,29 +26,63 @@ locale.setlocale(locale.LC_ALL, "")
 def email(request):
     context = {
         'username': request.user.username,
-        'token': service.generate_token()
+        'protocol': 'https',
+        'domain': 'lavaccount.ru',
+        'uid': 'MQ%5B0-9A-Za-z_%5',
+        'token': '-z%5D%7B1,13%7D-%5B0-9A-Za-z%5D%',
+        'email': service.hiding_email(request.user.email)
     }
-    return render(request, 'email/page_to_confirm_email.html', context)
+    # registration_email_confirm_email
+    # email_change_notification_to_old_email
+    # email_change_email
+    return render(request, 'email/registration_email_confirm_email.html', context)
 
 
+@service.base_view
 def index(request):
     """ Главная страница """
-    if not request.user.is_authenticated:
-        return render(request, 'landing.html')
-
     context = {
-        'accounts': Account.objects.filter(user=request.user),
-        'master_password': service.get_master_password(user=request.user),
         'static_version': static_version
     }
+    #Account.objects.get(user='22222')
+
+    if not request.user.is_authenticated:
+        return render(request, 'landing.html', context)
+
+    context.update({
+        'accounts': Account.objects.filter(user=request.user),
+        'master_password': service.get_master_password(user=request.user)
+    })
     return render(request, 'home.html', context)
+
+
+@service.base_view
+def logs(request):
+    """ Страница с отображением последних логов """
+    if not request.user.is_superuser:
+        return HttpResponseNotFound()
+
+    file = open('logs/logs.log.json')
+    logs = json.loads(file.read())
+    logs = sorted(logs.items(), reverse=True)
+    file.close()
+
+    context = {
+        'logs': logs,
+        'static_version': static_version
+    }
+    return render(request, 'logs.html', context)
 
 
 def noscript(request):
     """ Страница отображаемая если пользователь отключит javascript """
-    return render(request, 'noscript.html')
+    context = {
+        'static_version': static_version
+    }
+    return render(request, 'noscript.html', context)
 
 
+@service.base_view
 def lk(request):
     """ Личный кабинет пользователя """
     login_history = LoginHistory.objects.filter(user=request.user).order_by('-date')
@@ -53,13 +90,13 @@ def lk(request):
     today = datetime.datetime.today()
     for lh in login_history:
         if lh.date.day == today.day:
-            string = f'Сегодня в {lh.date.hour}:{lh.date.minute}'
+            string = f'Сегодня в {lh.date.hour}:{lh.date.strftime("%M")}'
         elif lh.date.day == today.day - 1:
-            string = f'Вчера в {lh.date.hour}:{lh.date.minute}'
+            string = f'Вчера в {lh.date.hour}:{lh.date.strftime("%M")}'
         elif lh.date.year == today.year:
-            string = lh.date.strftime("%d %B") + f' в {lh.date.hour}:{lh.date.minute}'
+            string = lh.date.strftime("%d %B") + f' в {lh.date.hour}:{lh.date.strftime("%M")}'
         else:
-            string = lh.date.strftime("%d %B %Y") + f' в {lh.date.hour}:{lh.date.minute}'
+            string = lh.date.strftime("%d %B %Y") + f' в {lh.date.hour}:{lh.date.strftime("%M")}'
         lh_date.update({
             lh.id: string
         })
@@ -79,6 +116,7 @@ def get_item_dict(dictionary, key):
     return dictionary.get(key)
 
 
+@service.base_view
 def email_change(request):
     """ Изменить адрес электронной почты """
     context = {
@@ -114,6 +152,7 @@ def email_change(request):
     return render(request, 'email/email_change_form.html', context)
 
 
+@service.base_view
 def email_change_done(request):
     """ Страница которая говорит о том что письмо с
     инструкциями по изменению почтового адреса отправлено """
@@ -124,6 +163,7 @@ def email_change_done(request):
     return render(request, 'email/email_change_done.html', context)
 
 
+@service.base_view
 def email_change_complete(request):
     """ Страница которая говорит о том что
     изменение адреса почты завершено """
@@ -134,6 +174,7 @@ def email_change_complete(request):
     return render(request, 'email/email_change_complete.html', context)
 
 
+@service.base_view
 def confirm_email_done(request):
     """ Страница которая говорит о том что
     отправленно письмо подтверждения почты после регистрации """
@@ -144,6 +185,7 @@ def confirm_email_done(request):
     return render(request, 'email/confirm_email_done.html', context)
 
 
+@service.base_view
 def confirm_email_complete(request):
     """ Страница которая говорит о том что
     пользователь успешно подтвердили почту после регистрации """
@@ -161,6 +203,7 @@ def confirm_email_complete(request):
     return render(request, 'email/confirm_email_complete.html', context)
 
 
+@service.base_view
 def confirm_email(request):
     """ Отправка письма о подтверждении
     почты после регистрации """
@@ -185,6 +228,7 @@ def activate_email(request, uidb64, token):
     return redirect(reverse("confirm_email_complete_url"))
 
 
+@service.base_view
 def master_password_reset(request):
     """ Сброс мастер пароля """
     if not request.user.is_authenticated:
@@ -226,6 +270,10 @@ def master_password_reset(request):
 @service.base_view
 def create_account(request):
     """ Создает аккаунт """
+    # Если запрос был не ajax, а например по прямой ссылке...
+    if not request.is_ajax():
+        return HttpResponse(status=404)
+
     site = request.POST.get('site', None)
     description = request.POST.get('description', None)
     login = request.POST.get('login', None)
@@ -244,6 +292,9 @@ def create_account(request):
 @service.base_view
 def delete_account(request):
     """ Удаляет аккаунт """
+    if not request.is_ajax():
+        return HttpResponse(status=404)
+
     account_id = request.POST.get('account_id', None)
     answer = service.delete_account(account_id)
     return service.json_response(answer)
@@ -252,6 +303,9 @@ def delete_account(request):
 @service.base_view
 def change_info_account(request):
     """ Изменяет информацию об аккаунте """
+    if not request.is_ajax():
+        return HttpResponse(status=404)
+
     site = request.POST.get('site', None)
     description = request.POST.get('description', None)
     new_login = request.POST.get('new_login', None)
@@ -271,6 +325,9 @@ def change_info_account(request):
 @service.base_view
 def change_or_create_master_password(request):
     """ Изменяет мастер пароль """
+    if not request.is_ajax():
+        return HttpResponse(status=404)
+
     sites = request.POST.get('sites', None)
     descriptions = request.POST.get('descriptions', None)
     logins = request.POST.get('logins', None)
@@ -289,18 +346,17 @@ def change_or_create_master_password(request):
 
 
 @service.base_view
-def check_username_and_email(request):
-    """ Проверяет существование имени и почты в БД """
-    username = request.POST.get('username', None)
-    email = request.POST.get('email', None)
+def check_username(request):
+    """ Проверяет существование имени в БД """
+    if not request.is_ajax():
+        return HttpResponse(status=404)
 
-    answer = service.check_username_and_email(
-        username=username,
-        email=email
-    )
+    username = request.POST.get('username', None)
+    answer = service.check_username(username)
     return service.json_response(answer)
 
 
+@service.base_view
 def lav_login(request):
     """ Авторизация пользователей """
     if request.user.is_authenticated:
@@ -337,9 +393,6 @@ def lav_login(request):
 
 def check_if_password_correct(password1: str, password2: str) -> str:
     """ Проверка корректности пароля """
-    print('@@@@@@@@')
-    print(password1)
-    print(password2)
     if password1 != password2:
         return 'broken rule [pass == pass2]'
     if len(password1) < 8:

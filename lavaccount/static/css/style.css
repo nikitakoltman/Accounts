@@ -79,6 +79,12 @@ h2,
 h4,
 strong,
 label,
+td,
+th,
+input,
+button,
+a,
+.auth,
 .popover-title,
 .popover-content,
 .simple-tabs {
@@ -94,10 +100,14 @@ body.modal-open {
 }
 
 .logo {
-    color: #f5ed00 !important;
-    text-shadow: white 0 0 10px;
+    color: #74a9ff !important;
+    text-shadow: #3294e3 0 0 10px;
     font-family: Mali;
     font-size: 1em;
+}
+
+.btn {
+    font-weight: 600;
 }
 
 .logo:hover {
@@ -194,16 +204,15 @@ body.modal-open {
     color: black;
 }
 
-.footer-confirm_email {
+.confirm_email-notification {
     background-color: #cce7ff;
-    position: absolute;
-    bottom: 0;
     width: 100%;
+    margin-bottom: -20px;
 }
 
-.footer-confirm_email p {
+.confirm_email-notification p {
     text-align: center;
-    margin: 10px 0 10px;
+    padding: 10px 0 10px;
 }
 
 #cookie_notification {
@@ -215,9 +224,9 @@ body.modal-open {
 
     display: none;
 
-    width: 900px;
+    width: 500px;
     max-width: 90%;
-    padding: 25px;
+    padding: 10px;
 
     transform: translateX(-50%);
 

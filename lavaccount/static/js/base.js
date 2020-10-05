@@ -34,24 +34,6 @@ $(function() {
         main_show_preload();
     }
 
-    window.generate_random_string = function(length_string) {
-        /* Генератор паролей */
-        let chars = 'qwertyuiopasdfghjklzxcvbnm1234567890!@#$%QWERTYUIOPASDFGHJKLZXCVBNM',
-            word = '';
-        // TODO: Сделать что-то по приличней, сейчас костыль.
-        do {
-            for (let i = 0; i < length_string; i++) {
-                word += chars[Math.round(Math.random() * (chars.length - 1))];
-            }
-            if (word.match(/[a-z][A-Z][0-9]/)) {
-                return word;
-            } else {
-                word = '';
-            }
-        }
-        while (!word.match(/[a-z][A-Z][0-9]/));
-    }
-
     function checkCookies() {
         /* Проверка того, что пользователь закрыл предупреждение об использовании куки */
         let cookieDate = localStorage.getItem('cookieDate');

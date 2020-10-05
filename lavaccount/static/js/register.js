@@ -34,28 +34,23 @@ $(function() {
 
     $('form').on('submit', function() {
         preload_show();
-        let username = $("#id_username").val(),
-            email = $("#id_email").val();
+        let username = $("#id_username").val();
 
         if (!is_form_submit) {
             $.ajax({
-                url: "check_username_and_email/",
+                url: "check_username/",
                 type: "POST",
                 data: {
-                    username: username,
-                    email: email,
+                    username: username
                 },
                 success: function(result) {
                     if (result['status'] == "success") {
-                        let is_exist_username = result['is_exist_username'],
-                            is_exist_email = result['is_exist_email'];
+                        let is_exist_username = result['is_exist_username'];
 
                         if ($('#id_username').val() == '') {
                             swal("Ошибка!", 'Заполните поле "Имя".');
                         } else if (is_exist_username) {
                             swal("Ошибка", 'Введенное имя уже используейтся, введите другое.');
-                        } else if (is_exist_email) {
-                            swal("Ошибка", 'Введенная почта уже используется, введите другую.');
                         } else if (!is_email) {
                             $('#id_email').addClass('input-invalid');
                         } else if (!is_password) {
@@ -79,7 +74,15 @@ $(function() {
 
     $('.js-generate_password').on('touchstart mousedown', function() {
         /* Генерация пароля для поля ввода пароля */
-        let password = generate_random_string(10);
+        let params = {
+            //score: // (number) - Надежность пароля (диапазон 1-4)
+            //reliabilityPercent: // - Надежность пароля в % (диапазон 1-100)
+            letters: 4, // (number) - Количество букв в пароле
+            lettersUpper: 3, // (number) - Количество заглавных букв в пароле
+            numbers: 3, // (number) - Количество цифр в пароле
+            //symbols: // (number) - Количество спец. символов в пароле
+        }
+        let password = PassGenJS.getPassword(params);
         $('#id_password1').val(password);
         swal('Генератор', 'Ваш пароль: ' + password + '\nСтарайтесь избегать хранения паролей на электронных устройствах в открытом виде.');
         check_password_is_correct();
@@ -146,7 +149,7 @@ $(function() {
             is_password = false;
         }
 
-        check_password2();
+        check_password2_is_correct();
 
     }
 

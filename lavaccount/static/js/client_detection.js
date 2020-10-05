@@ -2,7 +2,7 @@
 
 (function (window) {
     {
-        let unknown = 'Unknown'; // let unknown = '-';
+        var unknown = 'Unknown'; // let unknown = '-';
 
         // screen
         /*let screenSize = '';
@@ -13,12 +13,12 @@
         }*/
 
         //browser
-        let nVer = navigator.appVersion;
-        let nAgt = navigator.userAgent;
-        let browser = navigator.appName;
-        let version = '' + parseFloat(navigator.appVersion);
-        let majorVersion = parseInt(navigator.appVersion, 10);
-        let nameOffset, verOffset, ix;
+        var nVer = navigator.appVersion;
+        var nAgt = navigator.userAgent;
+        var browser = navigator.appName;
+        var version = '' + parseFloat(navigator.appVersion);
+        var majorVersion = parseInt(navigator.appVersion, 10);
+        var nameOffset, verOffset, ix;
 
         // Opera
         if ((verOffset = nAgt.indexOf('Opera')) != -1) {
@@ -120,8 +120,8 @@
         }*/
 
         // system
-        let os = unknown;
-        let clientStrings = [
+        var os = unknown;
+        var clientStrings = [
             {s:'Windows 3.11', r:/Win16/},
             {s:'Windows 95', r:/(Windows 95|Win95|Windows_95)/},
             {s:'Windows ME', r:/(Win 9x 4.90|Windows ME)/},
@@ -157,7 +157,7 @@
             }
         }
 
-        let osVersion = unknown;
+        var osVersion = unknown;
 
         if (/Windows/.test(os)) {
             osVersion = /Windows (.*)/.exec(os)[1];

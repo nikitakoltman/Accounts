@@ -3,6 +3,7 @@ import json
 import threading
 import traceback
 import urllib.request
+import zipfile
 from datetime import datetime
 from loguru import logger as log
 

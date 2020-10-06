@@ -378,11 +378,7 @@ def lav_login(request):
 
         if user is not None:
             login(request, user)
-            service.new_login_history(
-                request=request,
-                system=system,
-                browser=browser
-            )
+            service.NewLoginHistory(user, request.META, system, browser).start()
             return redirect(reverse("home_url"))
         else:
             context.update({

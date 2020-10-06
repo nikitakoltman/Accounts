@@ -9,13 +9,23 @@
     #id_password {
         width: 85%;
     }
+
+    .card {
+        width: 305px;
+    }
+
+    @media (max-width: 320px) {
+        .card {
+            width: 275px;
+        }
+    }
 </style>
 {% endblock %}
 {% block content %}
 <div class="container registration-container">
     <div class="row flex nomargin">
         {% load crispy_forms_tags %}
-        <div class="card" style="width: 305px;">
+        <div class="card">
             <div class="card-body">
                 <h4 class="card-title text-center">Авторизация</h4>
                 <form method="post">
@@ -25,7 +35,7 @@
                     <div style="margin-top: 20px;" align="center">
                         <a href="{% url 'password_reset' %}">Забыли пароль?</a>
                     </div>
-                    <button type="button" class="in-password_additional_button js-show_password" style="top: 149px; left: 257px;">
+                    <button type="button" class="in-password_additional_button js-show_password position-login-show_password">
                         <img title="Показать пароль" src="{% static 'img/svg/show-password.svg' %}" alt="show-password" height="30" width="30" />
                     </button>
                 </form>

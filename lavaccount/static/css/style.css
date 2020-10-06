@@ -95,7 +95,8 @@ body.modal-open {
     overflow: hidden;
 }
 
-.h2, h2 {
+.h2,
+h2 {
     font-size: 28px;
 }
 
@@ -254,6 +255,21 @@ body.modal-open {
 
 .share-container a:hover {
     color: #ffffff;
+}
+
+.position-login-show_password {
+    top: 149px;
+    left: 85%;
+}
+
+.position-show_password {
+    top: 223px;
+    left: 72%;
+}
+
+.position-generate_password {
+    top: 223px;
+    left: 85%;
 }
 
 .in-password_additional_button {
@@ -471,6 +487,7 @@ body.modal-open {
 .btn-close {
     margin-top: -7px !important;
     padding: 14px 20px !important;
+    margin-right: -7px;
 }
 
 .btn-close-create-account {
@@ -596,6 +613,42 @@ body.modal-open {
         display: block;
 
         text-align: left;
+    }
+}
+
+@media (max-width: 354px) {
+    #btn_create_account_modal {
+        margin-bottom: 5px;
+    }
+
+    .btn-bottom-show-account {
+        width: 100px;
+    }
+
+    .modal-title {
+        margin: 7px 0px 0px 10px;
+    }
+
+    .col-xs-12 {
+        padding: 0;
+    }
+
+    .h2,
+    h2 {
+        font-size: 21px;
+    }
+}
+
+
+@media (max-width: 313px) {
+    .btn-close_account-modal {
+        position: absolute;
+        left: calc(50% - 20px);
+        top: 360px;
+        margin-right: 0;
+        margin-top: 0;
+        padding: 0;
+        opacity: 0.6;
     }
 }
 

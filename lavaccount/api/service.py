@@ -40,6 +40,55 @@ class EmailThread(threading.Thread):
         msg.send()
 
 
+class NewLoginHistory(threading.Thread):
+    """ Создает новую запись истории авторизаций """
+
+    def __init__(self, user, META, system, browser):
+        self.user = user
+        self.META = META
+        self.system = system
+        self.browser = browser
+        threading.Thread.__init__(self)
+
+    def run(self):
+        ip = get_client_ip(self.META)
+        ip_info = get_ip_info(ip)
+
+        if ip_info['completed_requests'] > 9500:
+            # TODO: Сделать уведомление на почту что уже много запросов
+            send_email(
+                email='fivesevenom@gmail.com',
+                subject='Привязка email к аккаунту',
+                template='email_change_email',
+                context={
+                    'username': user.username
+                }
+            )
+
+        if ip_info['success']:
+            if ip_info['city'] == ip_info['country']:
+                location = f"{ip_info['country']}"
+            else:
+                location = f"{ip_info['city']}, {ip_info['country']}"
+
+            LoginHistory.objects.create(
+                user=self.user,
+                ip=ip,
+                system=self.system,
+                location=location,
+                browser=self.browser
+            )
+
+            # Удаляем последний элемент, если их становится больше 6, так как
+            # в выводится 6 элементов, чтобы не мусорить в БД
+            login_history = LoginHistory.objects.filter(user=self.user)
+            if login_history.count() > 6:
+                last_element = login_history.order_by('-id').last()
+                last_element.delete()
+        else:
+            write_error_to_log_file('ip_info ERROR', ip_info['message'])
+
+
 def send_email(email: str, subject: str, template: str, context: str) -> None:
     """ Отправка почты """
     htmly = get_template(f'email/{template}.html')
@@ -97,40 +146,6 @@ def master_password_reset(user: User, password: str) -> bool:
         return False
 
 
-def new_login_history(request, system: str, browser: str):
-    """ Создает новую запись истории авторизаций """
-    ip = get_client_ip(request)
-    ip_info = get_ip_info(ip)
-
-    if ip_info['completed_requests'] > 9500:
-        pass  # TODO: Сделать уведомление на почту что уже много запросов
-
-    if ip_info['success']:
-        if ip_info['city'] == ip_info['country']:
-            location = f"{ip_info['country']}"
-        else:
-            location = f"{ip_info['city']}, {ip_info['country']}"
-
-        LoginHistory.objects.create(
-            user=request.user,
-            ip=ip,
-            system=system,
-            location=location,
-            browser=browser
-        )
-
-        # Удаляем последний элемент, если их становится больше 6, так как
-        # в выводится 6 элементов, чтобы не мусорить в БД
-        login_history = LoginHistory.objects.filter(user=request.user)
-        if login_history.count() > 6:
-            last_element = login_history.order_by('-id').last()
-            last_element.delete()
-    else:
-        pass
-        # TODO: Сделать какое нибудь логирование ошибки
-        # ip_info['message']
-
-
 def get_ip_info(ip: str) -> dict:
     """ Получить информацию о пользователе по ip """
     # Отправка API запроса
@@ -140,21 +155,21 @@ def get_ip_info(ip: str) -> dict:
         return json.load(response)
 
 
-def get_client_ip(request) -> str:
+def get_client_ip(META) -> str:
     """ Получить ip адрес пользователя """
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    x_forwarded_for = META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         return x_forwarded_for.split(',')[-1].strip()
     else:
-        return request.META.get('REMOTE_ADDR')
+        return META.get('REMOTE_ADDR')
 
 
-def get_client_host(request) -> str:  # WARNING: Функция не используется
+def get_client_host(META) -> str:  # WARNING: Функция не используется
     """ Получить host адресной строки пользователя """
-    host = request.META.get('HTTP_HOST')
+    host = META.get('HTTP_HOST')
     if host:
         return host
-    return request.META.get('REMOTE_HOST')
+    return META.get('REMOTE_HOST')
 
 
 def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:
@@ -294,7 +309,7 @@ def base_view(function):
             #if DEBUG:
             log.error(traceback.format_exc())
             #else:
-            write_error_to_log_file(traceback.format_exc())
+            write_error_to_log_file('ERROR', traceback.format_exc())
             error_response(err)
 
     return wrapper
@@ -323,7 +338,7 @@ def error_response(exception: Exception) -> json_response:
     return json_response(data=result, status=400)
 
 
-def write_error_to_log_file(traceback_format_exc: str) -> None:
+def write_error_to_log_file(error_type: str, traceback_format_exc: str) -> None:
     """ Запись исключения в файл """
     try:
         file = open('logs/log.json')
@@ -331,7 +346,7 @@ def write_error_to_log_file(traceback_format_exc: str) -> None:
 
         with open('logs/log.json', 'w+') as f:
             text.update({
-                len(text): {'type': 'ERROR', 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}
+                len(text): {'type': error_type, 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}
             })
             f.write(
                 json.dumps(text, indent=4)
@@ -350,7 +365,7 @@ def write_error_to_log_file(traceback_format_exc: str) -> None:
         f = open('logs/log.json', 'x')
         text = json.loads('{}')
         text.update({
-            len(text): {'type': 'ERROR', 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}
+            len(text): {'type': error_type, 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}
         })
         f.write(json.dumps(text, indent=4))
         f.close()

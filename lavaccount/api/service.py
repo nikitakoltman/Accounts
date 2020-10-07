@@ -19,10 +19,12 @@ from django.utils.encoding import force_bytes
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.utils.http import urlsafe_base64_encode
-from lavaccount.settings import DEBUG
+from lavaccount.settings import DEBUG, SITE_PROTOCOL
 
-from .models import Account, MasterPassword, LoginHistory
+from .models import Account, MasterPassword, LoginHistory, SiteSetting
 from .tokens import account_activation_token
+from django.urls import reverse
+from django.shortcuts import redirect
 
 
 class EmailThread(threading.Thread):
@@ -41,7 +43,7 @@ class EmailThread(threading.Thread):
 
 
 class NewLoginHistory(threading.Thread):
-    """ Создает новую запись истории авторизаций """
+    """ Создает новую запись истории авторизаций в новом потоке """
 
     def __init__(self, user, META, system, browser):
         self.user = user
@@ -54,20 +56,23 @@ class NewLoginHistory(threading.Thread):
         ip = get_client_ip(self.META)
         ip_info = get_ip_info(ip)
 
-        if ip_info['completed_requests'] > 9500:
+        if ip_info['completed_requests'] == 9500:
             # TODO: Сделать уведомление на почту что уже много запросов
+            current_site = Site.objects.get_current()
             send_email(
                 email='fivesevenom@gmail.com',
-                subject='Привязка email к аккаунту',
-                template='email_change_email',
+                subject='Переполнение запросов ipwhois.io',
+                template='notification_ip_info_completed_requests_to_admin',
                 context={
-                    'username': user.username
+                    'username': user.username,
+                    'protocol': SITE_PROTOCOL,
+                    'domain': current_site.domain,
                 }
             )
 
         if ip_info['success']:
             if ip_info['city'] == ip_info['country']:
-                location = f"{ip_info['country']}"
+                location = ip_info['country']
             else:
                 location = f"{ip_info['city']}, {ip_info['country']}"
 
@@ -107,7 +112,7 @@ def confirm_email(user: User, email: str, subject: str, template: str) -> None:
         template=template,
         context={
             'username': user.username,
-            'protocol': 'http',
+            'protocol': SITE_PROTOCOL,
             'domain': current_site.domain,
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             'token': account_activation_token.make_token(user)
@@ -170,6 +175,29 @@ def get_client_host(META) -> str:  # WARNING: Функция не использ
     if host:
         return host
     return META.get('REMOTE_HOST')
+
+
+def site_in_service_switch(checked: str) -> dict:
+    """ Создает новый аккаунт """
+    try:
+        setting = SiteSetting.objects.get(name='site_in_service')
+        if checked == 'true':
+            setting.value = 'true'
+        else:
+            setting.value = 'false'
+
+        setting.save()
+        value = setting.value
+
+        return {
+            'status': 'success',
+            'checked': value
+        }
+    except SiteSetting.DoesNotExist:
+        return {
+            'status': 'error',
+            'result': 'SiteSetting.DoesNotExist'
+        }
 
 
 def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:
@@ -298,18 +326,23 @@ def get_master_password(user: User) -> str:
 
 
 def base_view(function):
-    """ Декоратор для вьюшек, проверяет ajax и обрабатывает исключения """
+    """ Декоратор для вьюшек, обрабатывает исключения """
 
     @functools.wraps(function)
-    def wrapper(request):
+    def wrapper(request, *args, **kwargs):
         try:
             with transaction.atomic():
-                return function(request)
+                if not request.user.is_superuser and SITE_IN_SERVICE:
+                    return redirect(reverse("site_in_service_url"))
+                return function(request, *args, **kwargs)
         except Exception as err:
-            #if DEBUG:
-            log.error(traceback.format_exc())
-            #else:
+            if DEBUG:
+                log.error(traceback.format_exc())
             write_error_to_log_file('ERROR', traceback.format_exc())
+            # TODO: Проверить как отрабатывает error_response
+            # Возможно сделать переадрисацию на страницу где говорится
+            # что произошла ошибка, либо возвращать html где будет
+            # говориться что произошла ошибка
             error_response(err)
 
     return wrapper

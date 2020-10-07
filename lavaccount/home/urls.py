@@ -9,7 +9,9 @@ urlpatterns = [
     path('logs/', views.logs, name='logs_url'),
     path('login/', views.lav_login, name="lav_login"),
     path('register/', views.RegisterView.as_view(), name="register_url"),
+    path('site_in_service/', views.site_in_service, name="site_in_service_url"),
 
+    path('lk/site_in_service_switch/', views.site_in_service_switch),
     path('create_account/', views.create_account),
     path('delete_account/', views.delete_account),
     path('change_info_account/', views.change_info_account),

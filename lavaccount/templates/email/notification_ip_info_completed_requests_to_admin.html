@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Изменение email</title>
+    <title>Переполнение запросов ipwhois.io</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 {% load static %}
@@ -27,20 +27,7 @@
                                 </tr>
                                 <tr>
                                     <td style="padding: 20px 0 10px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
-                                        Вы подали заявку на привязку адреса {{ email }} к Вашему аккаунту на сайте <a href="{{ protocol }}://{{ domain }}" style="color: #153643;" target="_blank"><font color="#153643">{{ domain }}</font></a>.
-										Если Вы этого не делали, проигнорируйте это письмо.
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
-                                        Чтобы завершить привязку, нажмите кнопку "Привязать".
-                                        <div>
-                                            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ protocol }}://{{ domain }}{% url 'activate_email' uidb64=uid token=token %}" style="height:40px;v-text-anchor:middle;width:130px;" arcsize="50%" strokecolor="#2e6da4" fillcolor="#337ab7">
-                                                <w:anchorlock />
-                                                <center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Привязать</center>
-                                            </v:roundrect>
-                                            <a href="{{ protocol }}://{{ domain }}{% url 'activate_email' uidb64=uid token=token %}" style="background-color:#337ab7;border:1px solid #2e6da4;border-radius:20px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:40px;text-align:center;text-decoration:none;width:130px;-webkit-text-size-adjust:none;mso-hide:all;">Привязать</a>
-                                        </div>
+                                        Запросов по получению информации по ip на сайте <a href="https://ipwhois.io/">ipwhois.io</a> перевалило за 9500, переключите систему получения информации, так как на ipwhois.app ограничение в 10000 запросов.
                                     </td>
                                 </tr>
                             </table>

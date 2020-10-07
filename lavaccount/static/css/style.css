@@ -104,7 +104,7 @@ h2 {
     color: #74a9ff !important;
     text-shadow: #3294e3 0 0 10px;
     font-family: Mali;
-    font-size: 1em;
+    font-size: 28px;
 }
 
 .btn {
@@ -112,6 +112,17 @@ h2 {
 }
 
 .logo:hover {
+    color: white !important;
+}
+
+.logo_site-close {
+    color: #ff0000 !important;
+    text-shadow: #ff3333 0 0 10px;
+    font-weight: 800;
+    font-size: 22px;
+}
+
+.logo_site-close:hover {
     color: white !important;
 }
 

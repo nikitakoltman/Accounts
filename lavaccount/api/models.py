@@ -69,6 +69,19 @@ class LoginHistory(models.Model):
         verbose_name_plural = 'Истории входа в систему'
 
 
+class SiteSetting(models.Model):
+    """ Настройки сайта """
+    name = models.CharField('Название', max_length=255)
+    value = models.CharField('Значение', max_length=255)
+
+    def __str__(self):
+        return f'{self.name} ({self.value})'
+
+    class Meta:
+        verbose_name = 'Настройка сайта'
+        verbose_name_plural = 'Настройки сайта'
+
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

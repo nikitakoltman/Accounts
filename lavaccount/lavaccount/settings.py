@@ -30,9 +30,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-SITE_ID = 1
+SITE_ID = 2
 
-static_version = config.static_version
+# Почта поддержки
+SUPPORT_EMAIL = config.SUPPORT_EMAIL
+
+STATIC_VERSION = config.STATIC_VERSION
+SITE_PROTOCOL = 'https'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -11,8 +11,10 @@ from django.contrib.sites.models import Site
 from django.shortcuts import redirect, render
 from django.template.defaulttags import register
 from django.urls import reverse
+from django.http import HttpResponseNotFound
 from django.views.generic import TemplateView
-from lavaccount.settings import static_version
+from lavaccount.settings import STATIC_VERSION, SITE_PROTOCOL
+from api.models import SiteSetting
 
 from loguru import logger as log
 
@@ -22,29 +24,57 @@ from .forms import RegisterForm, MasterPasswordResetForm, EmailChangeForm, Login
 locale.setlocale(locale.LC_ALL, "")
 
 
-# TODO: Удалить
+@service.base_view
 def email(request):
+    """ Текстирование шаблона для почты """
     context = {
         'username': request.user.username,
-        'protocol': 'https',
+        'protocol': SITE_PROTOCOL,
         'domain': 'lavaccount.ru',
         'uid': 'MQ%5B0-9A-Za-z_%5',
         'token': '-z%5D%7B1,13%7D-%5B0-9A-Za-z%5D%',
         'email': service.hiding_email(request.user.email)
     }
-    # registration_email_confirm_email
-    # email_change_notification_to_old_email
-    # email_change_email
-    return render(request, 'email/registration_email_confirm_email.html', context)
+
+    # Шаблоны
+    templates = [
+        'registration_email_confirm_email',
+        'email_change_notification_to_old_email',
+        'email_change_email',
+        'notification_ip_info_completed_requests_to_admin'
+    ]
+
+    return render(request, 'email/notification_ip_info_completed_requests_to_admin.html', context)
+
+
+@service.base_view
+def site_in_service(request):
+    """ Уведомление для пользователя о том что
+    сайт закрыт на технической обслуживание """
+
+    ### НЕ УСТАНАВЛИВАТЬ ДЕКАРАТОР @service.base_view на это
+    ### представление потому что будет бесконечное перенаправление ###
+    site_in_service = SiteSetting.objects.get(name='site_in_service').value
+
+    if not site_in_service:
+        return redirect(reverse("home_url"))
+
+    context = {
+        'title': 'Сайт закрыт на техническое обслуживание',
+        'site_in_service': site_in_service,
+        'static_version': STATIC_VERSION
+    }
+
+    return render(request, 'site_in_service.html', context)
 
 
 @service.base_view
 def index(request):
     """ Главная страница """
     context = {
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
-    #Account.objects.get(user='22222')
 
     if not request.user.is_authenticated:
         return render(request, 'landing.html', context)
@@ -69,15 +99,18 @@ def logs(request):
 
     context = {
         'logs': logs,
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
     return render(request, 'logs.html', context)
 
 
+@service.base_view
 def noscript(request):
     """ Страница отображаемая если пользователь отключит javascript """
     context = {
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
     return render(request, 'noscript.html', context)
 
@@ -105,7 +138,8 @@ def lk(request):
         'title': 'Личный кабинет',
         'login_history': login_history,
         'lh_date': lh_date,
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
     return render(request, 'lk.html', context)
 
@@ -122,7 +156,8 @@ def email_change(request):
     context = {
         'title': 'Изменить почтовый адрес',
         'form': EmailChangeForm,
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
 
     if request.method == 'POST':
@@ -158,7 +193,8 @@ def email_change_done(request):
     инструкциями по изменению почтового адреса отправлено """
     context = {
         'title': 'Письмо с инструкциями по изменению почтового адреса отправлено',
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
     return render(request, 'email/email_change_done.html', context)
 
@@ -169,7 +205,8 @@ def email_change_complete(request):
     изменение адреса почты завершено """
     context = {
         'title': 'Изменение адреса почты завершено',
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
     return render(request, 'email/email_change_complete.html', context)
 
@@ -180,7 +217,8 @@ def confirm_email_done(request):
     отправленно письмо подтверждения почты после регистрации """
     context = {
         'title': 'Письмо отправленно',
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
     return render(request, 'email/confirm_email_done.html', context)
 
@@ -198,7 +236,8 @@ def confirm_email_complete(request):
     context = {
         'title': 'Подтверждение почты',
         'valid': valid,
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
     return render(request, 'email/confirm_email_complete.html', context)
 
@@ -218,6 +257,7 @@ def confirm_email(request):
     return redirect(reverse("confirm_email_done_url"))
 
 
+@service.base_view
 def activate_email(request, uidb64, token):
     """ Активация почты """
     if not request.user.is_authenticated:
@@ -238,7 +278,8 @@ def master_password_reset(request):
         'title': 'Сброс мастер пароля',
         'form': MasterPasswordResetForm,
         'form_message': 'None',
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
 
     try:
@@ -268,11 +309,22 @@ def master_password_reset(request):
 
 
 @service.base_view
-def create_account(request):
-    """ Создает аккаунт """
+def site_in_service_switch(request):
+    """ Закрыть сайт на техническое обслуживание """
     # Если запрос был не ajax, а например по прямой ссылке...
     if not request.is_ajax():
-        return HttpResponse(status=404)
+        return HttpResponseNotFound()
+
+    checked = request.POST.get('checked', None)
+    answer = service.site_in_service_switch(checked)
+    return service.json_response(answer)
+
+
+@service.base_view
+def create_account(request):
+    """ Создает аккаунт """
+    if not request.is_ajax():
+        return HttpResponseNotFound()
 
     site = request.POST.get('site', None)
     description = request.POST.get('description', None)
@@ -293,7 +345,7 @@ def create_account(request):
 def delete_account(request):
     """ Удаляет аккаунт """
     if not request.is_ajax():
-        return HttpResponse(status=404)
+        return HttpResponseNotFound()
 
     account_id = request.POST.get('account_id', None)
     answer = service.delete_account(account_id)
@@ -304,7 +356,7 @@ def delete_account(request):
 def change_info_account(request):
     """ Изменяет информацию об аккаунте """
     if not request.is_ajax():
-        return HttpResponse(status=404)
+        return HttpResponseNotFound()
 
     site = request.POST.get('site', None)
     description = request.POST.get('description', None)
@@ -326,7 +378,7 @@ def change_info_account(request):
 def change_or_create_master_password(request):
     """ Изменяет мастер пароль """
     if not request.is_ajax():
-        return HttpResponse(status=404)
+        return HttpResponseNotFound()
 
     sites = request.POST.get('sites', None)
     descriptions = request.POST.get('descriptions', None)
@@ -349,7 +401,7 @@ def change_or_create_master_password(request):
 def check_username(request):
     """ Проверяет существование имени в БД """
     if not request.is_ajax():
-        return HttpResponse(status=404)
+        return HttpResponseNotFound()
 
     username = request.POST.get('username', None)
     answer = service.check_username(username)
@@ -365,7 +417,8 @@ def lav_login(request):
     context = {
         'form': LoginForm,
         'form_message': 'None',
-        'static_version': static_version
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
     }
 
     if request.method == 'POST':
@@ -407,6 +460,7 @@ class RegisterView(TemplateView):
     """ Регистрация пользователей """
     template_name = "registration/register.html"
 
+    @service.base_view
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect(reverse("home_url"))
@@ -414,7 +468,8 @@ class RegisterView(TemplateView):
         context = {
             'form': RegisterForm,
             'form_message': 'None',
-            'static_version': static_version
+            'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+            'static_version': STATIC_VERSION
         }
 
         if request.method == 'POST':

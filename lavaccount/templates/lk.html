@@ -4,6 +4,7 @@
 {% block addons_head %}
 <link rel="stylesheet" href="{% static 'css/support.css' %}?ver={{ static_version }}" />
 <link rel="stylesheet" href="{% static 'css/lk.css' %}?ver={{ static_version }}" />
+<script type="text/javascript" src="{% static 'js/ajax_setup.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/lk.js' %}?ver={{ static_version }}"></script>
 {% endblock %}
 {% block content %}
@@ -25,6 +26,11 @@
                                 <button class="simple-tabs" data-nav-tab="true" data-tabs-id="3">
                                     <p align="center">История авторизаций</p>
                                 </button>
+                                {% if request.user.is_superuser %}
+                                <button class="simple-tabs" data-nav-tab="true" data-tabs-id="4">
+                                    <p align="center">Настройки сайта</p>
+                                </button>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-8 lk-block lk-block_info">
@@ -102,6 +108,15 @@
                                     </div>
                                     {% endfor %}
                                 </div>
+                                {% if request.user.is_superuser %}
+                                <div class="js-swiper-tabs" data-tabs="4">
+                                    <strong>Настройки сайта</strong>
+                                    <div class="container">
+                                        <input type="checkbox" id="toggle-button" class="toggle-button">
+                                        <label for="toggle-button" class="toggle-button_text">Закрыть сайт</label>
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -112,4 +127,55 @@
     </main>
 </div>
 <input type="hidden" id="form_message" value="{{ form_message }}">
+{% if request.user.is_superuser %}
+<script type="text/javascript">
+$(function() {
+    {% if site_in_service == 'true' %}
+    $('#toggle-button').attr('checked', 'checked');
+    {% endif %}
+
+    $('#toggle-button').on('change', function() {
+        if (!$(this).attr('checked')) {
+            site_in_service_switch(this, 'true');
+        } else {
+            site_in_service_switch(this, 'false');
+        }
+    });
+
+    function site_in_service_switch(switch_obj, toggle_checked) {
+        preload_show();
+        $.ajax({
+            url: 'site_in_service_switch/',
+            type: 'POST',
+            data: {
+                checked: toggle_checked
+            },
+            success: function(result) {
+                let account_id = result['account_id'];
+
+                if (result['status'] == 'success') {
+                    if (result['checked'] == 'true') {
+                        switch_obj.setAttribute("checked", "checked");
+                        $('.navbar-brand').removeClass('logo');
+                        $('.navbar-brand').addClass('logo_site-close');
+                        $('.navbar-brand').text('Сайт закрыт');
+                    } else {
+                        switch_obj.removeAttribute("checked");
+                        $('.navbar-brand').removeClass('logo_site-close');
+                        $('.navbar-brand').addClass('logo');
+                        $('.navbar-brand').text('LavAccount');
+                    }
+                } else if (result['result'] == 'SiteSetting.DoesNotExist') {
+                    swal('Ошибка', 'Настройка не найдена');
+                } else {
+                    swal('Ошибка', result['result']);
+                }
+
+                preload_hide();
+            }
+        });
+    }
+});
+</script>
+{% endif %}
 {% endblock %}

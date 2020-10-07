@@ -1,8 +1,12 @@
 DJANGO_SECRET_KEY = 'your django secret key'
 
-static_version = 1
+# Находится ли сайт на техническом обслуживании
+SITE_IN_SERVICE = False
 
-static_versions = {
+SUPPORT_EMAIL = 'support@site.ru'
+
+STATIC_VERSION = 1
+STATIC_VERSIONS = {
     'for_examle.css': 1,
     'for_examle.min.js': 1
 }

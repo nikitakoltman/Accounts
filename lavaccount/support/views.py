@@ -1,8 +1,8 @@
-from django.shortcuts import render
-from lavaccount.settings import STATIC_VERSION, SITE_PROTOCOL, SUPPORT_EMAIL
+from api.models import SiteSetting
 from api.service import base_view
 from django.contrib.sites.models import Site
-from api.models import SiteSetting
+from django.shortcuts import render
+from lavaccount.settings import STATIC_VERSION, SITE_PROTOCOL, SUPPORT_EMAIL
 
 
 @base_view
@@ -37,7 +37,7 @@ def privacy(request):
     current_site = Site.objects.get_current()
     context = {
         'face': 'Колтманом Никитой Николаевичем',
-        'protocol': f'{ SITE_PROTOCOL }://',
+        'protocol': f'{SITE_PROTOCOL}://',
         'domain': current_site.domain,
         'email': SUPPORT_EMAIL,
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,

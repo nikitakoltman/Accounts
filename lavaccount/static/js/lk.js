@@ -12,10 +12,10 @@ $(function() {
     $(".js-auth-location").hover(
         /* Показать ip адрес при наведении на локацию */
         function() {
-            $('.auth-ip[number="' + $(this).attr('number') + '"]').show();
+            $('.auth-ip[data-number="' + $(this).attr('data-number') + '"]').show();
         },
         function() {
-            $('.auth-ip[number="' + $(this).attr('number') + '"]').hide();
+            $('.auth-ip[data-number="' + $(this).attr('data-number') + '"]').hide();
         }
     );
 

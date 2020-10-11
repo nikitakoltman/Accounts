@@ -31,7 +31,7 @@ $(function() {
         $('#in-old_password').attr('disabled', 'disabled').css('display', 'none');
         $('label[for="in-old_password"]').css('display', 'none');
         $('.modal-body-master-password').css('height', '175px');
-        $('#MasterPasswordModal').find('.modal-title').text('Создать мастер пароль');
+        $('#btn-send_master_password').text('Создать');
         // Открываем модальное окно изменения пароля
         $('#MasterPasswordModal').modal('show');
     }
@@ -80,18 +80,27 @@ $(function() {
                     $('#in-description').val('');
                     // Памятка: поле логина и пароля очищаются всегда при закрытии модального окна
                 } else if (result['status'] == 'error') {
-                    if (result['message'] == 'account limit reached') {
+                    if (result['message'] == 'accountlimitreached') {
                         swal('Ошибка', 'Достигнут лимит в 100 аккаунтов');
-                    }
-                    else {
+                    } else {
                         swal('Ошибка', result['message']);
                     }
-                }
-                else {
+                } else {
                     swal('Ошибка', result['result']);
                 }
 
                 preload_hide();
+            },
+            error: function(jqXHR, text, error) {
+                if (error == 'Forbidden') {
+                    swal(
+                        'Ошибка 403',
+                        'Этот сайт требует наличия файла cookie CSRF при отправке форм.' +
+                        ' Если вы настроили свой браузер так, чтобы он не сохранял файлы cookie,' +
+                        ' включите их снова, по крайней мере, для этого сайта.'
+                    )
+                    preload_hide();
+                }
             }
         });
     }
@@ -113,10 +122,25 @@ $(function() {
                     // Закрываем модальное окно удаления аккаунта
                     $('#AccountModal').modal('hide');
                 } else {
-                    swal('Ошибка', result['result']);
+                    if (result['result'] == 'doesnotexist') {
+                        swal('Ошибка', 'Аккаунт не найден');
+                    } else {
+                        swal('Ошибка', result['result']);
+                    }
                 }
 
                 preload_hide();
+            },
+            error: function(jqXHR, text, error) {
+                if (error == 'Forbidden') {
+                    swal(
+                        'Ошибка 403',
+                        'Этот сайт требует наличия файла cookie CSRF при отправке форм.' +
+                        ' Если вы настроили свой браузер так, чтобы он не сохранял файлы cookie,' +
+                        ' включите их снова, по крайней мере, для этого сайта.'
+                    )
+                    preload_hide();
+                }
             }
         });
     }
@@ -175,10 +199,25 @@ $(function() {
                     // Скрываем модальное окно просмотра аккаунта
                     $('#AccountModal').modal('hide');
                 } else {
-                    swal('Ошибка', result['result']);
+                    if (result['result'] == 'doesnotexist') {
+                        swal('Ошибка', 'Аккаунт не найден');
+                    } else {
+                        swal('Ошибка', result['result']);
+                    }
                 }
 
                 preload_hide();
+            },
+            error: function(jqXHR, text, error) {
+                if (error == 'Forbidden') {
+                    swal(
+                        'Ошибка 403',
+                        'Этот сайт требует наличия файла cookie CSRF при отправке форм.' +
+                        ' Если вы настроили свой браузер так, чтобы он не сохранял файлы cookie,' +
+                        ' включите их снова, по крайней мере, для этого сайта.'
+                    )
+                    preload_hide();
+                }
             }
         });
     }
@@ -230,6 +269,17 @@ $(function() {
                     swal('Ошибка', result['result']);
                 }
             },
+            error: function(jqXHR, text, error) {
+                if (error == 'Forbidden') {
+                    swal(
+                        'Ошибка 403',
+                        'Этот сайт требует наличия файла cookie CSRF при отправке форм.' +
+                        ' Если вы настроили свой браузер так, чтобы он не сохранял файлы cookie,' +
+                        ' включите их снова, по крайней мере, для этого сайта.'
+                    )
+                    preload_hide();
+                }
+            }
         });
     }
 
@@ -355,6 +405,86 @@ $(function() {
         }
     });
 
+    let is_new_password = false,
+        is_repeat_new_password = false;
+
+    $('#in-new_password').on('input', function() {
+        check_new_password();
+    }).focus(function() {
+        $('#password_info').show();
+    }).blur(function() {
+        $('#password_info').hide();
+    });
+
+    $('#in-repeat_new_password').on('input', function() {
+        check_repeat_new_password();
+    });
+
+    function check_new_password() {
+        let password = $('#in-new_password').val(),
+
+            is_length = false,
+            is_letter = false,
+            is_capital = false,
+            is_number = false;
+
+        if (password.length < 8) {
+            $('#length').removeClass('valid').addClass('invalid');
+            is_length = false;
+        } else {
+            $('#length').removeClass('invalid').addClass('valid');
+            is_length = true;
+        }
+
+        if (password.match(/[a-z]/)) {
+            $('#letter').removeClass('invalid').addClass('valid');
+            is_letter = true;
+        } else {
+            $('#letter').removeClass('valid').addClass('invalid');
+            is_letter = false;
+        }
+
+        if (password.match(/[A-Z]/)) {
+            $('#capital').removeClass('invalid').addClass('valid');
+            is_capital = true;
+        } else {
+            $('#capital').removeClass('valid').addClass('invalid');
+            is_capital = false;
+        }
+
+        if (password.match(/[0-9]/)) {
+            $('#number').removeClass('invalid').addClass('valid');
+            is_number = true;
+        } else {
+            $('#number').removeClass('valid').addClass('invalid');
+            is_number = false;
+        }
+
+        if (is_length && is_letter && is_capital && is_number) {
+            $('#in-new_password').removeClass('input-invalid');
+            is_new_password = true;
+        } else {
+            $('#in-new_password').addClass('input-invalid');
+            is_new_password = false;
+        }
+
+        check_repeat_new_password();
+
+    }
+
+    function check_repeat_new_password() {
+        let password = $('#in-new_password').val(),
+            password2 = $('#in-repeat_new_password').val();
+
+        if (password == password2) {
+            $('#in-repeat_new_password').removeClass('input-invalid');
+            is_repeat_new_password = true;
+        } else {
+            $('#in-repeat_new_password').addClass('input-invalid');
+            is_repeat_new_password = false;
+        }
+    }
+
     $('#btn-send_master_password').on('click', function() {
         /* Событие нажатия на кнопку "Изменить" в модальном окне изменения мастер пароля */
         if (
@@ -372,7 +502,7 @@ $(function() {
             swal('Пароли не совпадают');
         } else if (master_password != $('#in-old_password').val() && !$('#in-old_password').attr('disabled')) {
             swal('Не правильный старый пароль');
-        } else {
+        } else if (is_new_password && is_repeat_new_password) {
             change_or_create_master_password($('#in-repeat_new_password').val());
         }
     });
@@ -446,7 +576,7 @@ $(function() {
 
     $('#MasterPasswordModal').on('hide.bs.modal', function() {
         /* Событие закрытия модального окна изменения мастер пароля */
-        if (master_password == 'DoesNotExist') {
+        if (master_password == 'doesnotexist') {
             $('.js-reload_master_password_modal').show();
         }
     });
@@ -519,35 +649,35 @@ $(function() {
     });
 
     $('#modal-btn-password')
-    /* Долгое нажатие кнопки "Пароль" клавишей мыши или сенсором телефона в модальном окне просмотра аккаунта */
-    .on('touchend mouseup', (function() {
-        /* Событие отжатия клавиши или сенсора */
-        // Очищаем таймер
-        clearTimeout(press_timer);
-    }))
-    .on('touchstart mousedown', (function() {
-        /* Событие нажатия клавиши или сенсора */
-        // Устанавливаем таймер
-        press_timer = window.setTimeout(function() {
-            // Запрещаем копирование пароля в буфер обмена так как показываем пароль на экране
-            is_allow_copy = false;
-            show_or_copy_login_or_password(_password);
-        }, 500); // 500 миллисекунд
-    }));
+        /* Долгое нажатие кнопки "Пароль" клавишей мыши или сенсором телефона в модальном окне просмотра аккаунта */
+        .on('touchend mouseup', (function() {
+            /* Событие отжатия клавиши или сенсора */
+            // Очищаем таймер
+            clearTimeout(press_timer);
+        }))
+        .on('touchstart mousedown', (function() {
+            /* Событие нажатия клавиши или сенсора */
+            // Устанавливаем таймер
+            press_timer = window.setTimeout(function() {
+                // Запрещаем копирование пароля в буфер обмена так как показываем пароль на экране
+                is_allow_copy = false;
+                show_or_copy_login_or_password(_password);
+            }, 500); // 500 миллисекунд
+        }));
 
     $('#modal-btn-login')
-    /* Долгое нажатие кнопки "Пароль" клавишей мыши или сенсором телефона в модальном окне просмотра аккаунта */
-    .on('touchend mouseup', (function() {
-        /* Событие отжатия клавиши или сенсора */
-        // Очищаем таймер
-        clearTimeout(press_timer);
-    })).on('touchstart mousedown', (function() {
-        /* Событие нажатия клавиши или сенсора */
-        // Устанавливаем таймер
-        press_timer = window.setTimeout(function() {
-            // Запрещаем копирование логина в буфер обмена так как показываем логин на экране
-            is_allow_copy = false;
-            show_or_copy_login_or_password(_login);
-        }, 500); // 500 миллисекунд
-    }));
+        /* Долгое нажатие кнопки "Пароль" клавишей мыши или сенсором телефона в модальном окне просмотра аккаунта */
+        .on('touchend mouseup', (function() {
+            /* Событие отжатия клавиши или сенсора */
+            // Очищаем таймер
+            clearTimeout(press_timer);
+        })).on('touchstart mousedown', (function() {
+            /* Событие нажатия клавиши или сенсора */
+            // Устанавливаем таймер
+            press_timer = window.setTimeout(function() {
+                // Запрещаем копирование логина в буфер обмена так как показываем логин на экране
+                is_allow_copy = false;
+                show_or_copy_login_or_password(_login);
+            }, 500); // 500 миллисекунд
+        }));
 });

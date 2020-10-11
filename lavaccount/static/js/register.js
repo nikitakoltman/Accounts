@@ -16,7 +16,7 @@ $(function() {
 
         is_form_submit = false;
 
-    $('#id_email').on('keyup', function() {
+    $('#id_email').on('input', function() {
         if ($(this).val().search(pattern_email) == 0) {
             $(this).removeClass('input-invalid');
             is_email = true;
@@ -28,7 +28,7 @@ $(function() {
 
     $('.js-show_password').on('click', function() {
         /* Показать пароль в поле ввода пароля */
-    	password = $('#id_password1');
+        password = $('#id_password1');
         password.attr('type', password.attr('type') === 'password' ? 'text' : 'password');
     });
 
@@ -38,13 +38,13 @@ $(function() {
 
         if (!is_form_submit) {
             $.ajax({
-                url: "check_username/",
-                type: "POST",
+                url: 'check_username/',
+                type: 'POST',
                 data: {
                     username: username
                 },
                 success: function(result) {
-                    if (result['status'] == "success") {
+                    if (result['status'] == 'success') {
                         let is_exist_username = result['is_exist_username'];
 
                         if ($('#id_username').val() == '') {
@@ -63,7 +63,18 @@ $(function() {
                         preload_hide();
                     } else {
                         preload_hide();
-                        swal("Ошибка!", res['result']);
+                        swal('Ошибка!', res['result']);
+                    }
+                },
+                error: function(jqXHR, text, error) {
+                    if (error == 'Forbidden') {
+                        swal(
+                            'Ошибка 403',
+                            'Этот сайт требует наличия файла cookie CSRF при отправке форм.' +
+                            ' Если вы настроили свой браузер так, чтобы он не сохранял файлы cookie,' +
+                            ' включите их снова, по крайней мере, для этого сайта.'
+                        )
+                        preload_hide();
                     }
                 }
             });
@@ -88,7 +99,7 @@ $(function() {
         check_password_is_correct();
     });
 
-    $('#id_password1').on('keyup', function() {
+    $('#id_password1').on('input', function() {
         check_password_is_correct();
     }).focus(function() {
         $('#password_info').show();
@@ -96,7 +107,7 @@ $(function() {
         $('#password_info').hide();
     });
 
-    $('#id_password2').on('keyup change', function() {
+    $('#id_password2').on('input', function() {
         check_password2_is_correct();
     });
 

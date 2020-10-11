@@ -5,7 +5,6 @@ import traceback
 import urllib.request
 import zipfile
 from datetime import datetime
-from loguru import logger as log
 
 from configs.config import EMAIL_HOST_USER
 from django.contrib.auth.hashers import check_password
@@ -13,18 +12,19 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 from django.db import transaction
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse, HttpResponseServerError
+from django.shortcuts import redirect, render
 from django.template.loader import get_template
+from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.utils.http import urlsafe_base64_encode
 from lavaccount.settings import DEBUG, SITE_PROTOCOL
+from loguru import logger as log
 
 from .models import Account, MasterPassword, LoginHistory, SiteSetting
 from .tokens import account_activation_token
-from django.urls import reverse
-from django.shortcuts import redirect
 
 
 class EmailThread(threading.Thread):
@@ -53,11 +53,11 @@ class NewLoginHistory(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
+        ip_system = SiteSetting.objects.get(name='get_ip_info_system').value
         ip = get_client_ip(self.META)
-        ip_info = get_ip_info(ip)
+        ip_info = get_ip_info(ip, ip_system)
 
-        if ip_info['completed_requests'] == 9500:
-            # TODO: Сделать уведомление на почту что уже много запросов
+        if ip_system == 'ipwhois.io' and ip_info['completed_requests'] == 9500:
             current_site = Site.objects.get_current()
             send_email(
                 email='fivesevenom@gmail.com',
@@ -70,28 +70,40 @@ class NewLoginHistory(threading.Thread):
                 }
             )
 
-        if ip_info['success']:
-            if ip_info['city'] == ip_info['country']:
-                location = ip_info['country']
+        if ip_system == 'ipwhois.io':
+            if ip_info['success']:
+                if ip_info['city'] == ip_info['country']:
+                    location = ip_info['country']
+                else:
+                    location = f"{ip_info['city']}, {ip_info['country']}"
+                self.create_login_history(ip, location)
             else:
-                location = f"{ip_info['city']}, {ip_info['country']}"
+                write_error_to_log_file('NewLoginHistory ipwhois.io ERROR', request.user, ip_info)
+        elif ip_system == 'ipinfo.io':
+            try:
+                location = f"{ip_info['city']}, {ip_info['region']}"
+                self.create_login_history(ip, location)
+            except KeyError:
+                write_error_to_log_file('NewLoginHistory ipinfo.io ERROR', request.user, ip_info)
 
-            LoginHistory.objects.create(
-                user=self.user,
-                ip=ip,
-                system=self.system,
-                location=location,
-                browser=self.browser
-            )
+    def create_login_history(self, ip, location):
+        if location is None:
+            location = 'Не определено'
 
-            # Удаляем последний элемент, если их становится больше 6, так как
-            # в выводится 6 элементов, чтобы не мусорить в БД
-            login_history = LoginHistory.objects.filter(user=self.user)
-            if login_history.count() > 6:
-                last_element = login_history.order_by('-id').last()
-                last_element.delete()
-        else:
-            write_error_to_log_file('ip_info ERROR', ip_info['message'])
+        LoginHistory.objects.create(
+            user=self.user,
+            ip=ip,
+            system=self.system,
+            location=location,
+            browser=self.browser
+        )
+
+        # Удаляем последний элемент, если их становится больше 6, так как
+        # в выводится 6 элементов, чтобы не мусорить в БД
+        login_history = LoginHistory.objects.filter(user=self.user)
+        if login_history.count() > 6:
+            last_element = login_history.order_by('-id').last()
+            last_element.delete()
 
 
 def send_email(email: str, subject: str, template: str, context: str) -> None:
@@ -136,7 +148,10 @@ def activate_email(uidb64, token) -> bool:
 
 def hiding_email(email: str) -> str:
     """ Скрывает тремя звездочками часть email адреса """
-    return email[0:2] + '***' + email[email.index('@'):]
+    try:
+        return email[0:2] + '***' + email[email.index('@'):]
+    except:
+        return ''
 
 
 def master_password_reset(user: User, password: str) -> bool:
@@ -151,11 +166,14 @@ def master_password_reset(user: User, password: str) -> bool:
         return False
 
 
-def get_ip_info(ip: str) -> dict:
-    """ Получить информацию о пользователе по ip """
-    # Отправка API запроса
-    objects = 'success,message,type,country,city,completed_requests'
-    url = f'https://ipwhois.app/json/{ip}?objects={objects}&lang=ru'
+def get_ip_info(ip: str, system: str) -> dict:
+    """ Получить информацию о пользователе по ip через API """
+    if system == 'ipwhois.io':
+        objects = 'success,message,type,country,city,completed_requests'
+        url = f'https://ipwhois.app/json/{ip}?objects={objects}&lang=ru'
+    elif system == 'ipinfo.io':
+        url = f'https://ipinfo.io/{ip}?token=845b32c233ddc8'
+
     with urllib.request.urlopen(url) as response:
         return json.load(response)
 
@@ -177,6 +195,25 @@ def get_client_host(META) -> str:  # WARNING: Функция не использ
     return META.get('REMOTE_HOST')
 
 
+def get_ip_info_system_switch(system_name: str) -> dict:
+    """ Изменяет систему получения информации по ip """
+    # ipwhois.io ipinfo.io
+    try:
+        setting = SiteSetting.objects.get(name='get_ip_info_system')
+        setting.value = system_name
+        setting.save()
+
+        return {
+            'status': 'success',
+            'value': setting.value
+        }
+    except SiteSetting.DoesNotExist:
+        return {
+            'status': 'error',
+            'result': 'doesnotexist'
+        }
+
+
 def site_in_service_switch(checked: str) -> dict:
     """ Создает новый аккаунт """
     try:
@@ -187,16 +224,15 @@ def site_in_service_switch(checked: str) -> dict:
             setting.value = 'false'
 
         setting.save()
-        value = setting.value
 
         return {
             'status': 'success',
-            'checked': value
+            'checked': setting.value
         }
     except SiteSetting.DoesNotExist:
         return {
             'status': 'error',
-            'result': 'SiteSetting.DoesNotExist'
+            'result': 'doesnotexist'
         }
 
 
@@ -205,7 +241,7 @@ def create_account(site: str, description: str, login: str, password: str, user:
     if Account.objects.count() >= 100:
         return {
             'status': 'error',
-            'message': 'account limit reached'
+            'message': 'accountlimitreached'
         }
 
     account = Account.objects.create(
@@ -234,7 +270,7 @@ def delete_account(account_id: int) -> dict:
     except Account.DoesNotExist:
         return {
             'status': 'error',
-            'result': 'DoesNotExist'
+            'result': 'doesnotexist'
         }
 
 
@@ -263,7 +299,7 @@ def change_info_account(site: str, description: str, new_login: str, new_passwor
     except Account.DoesNotExist:
         return {
             'status': 'error',
-            'result': 'DoesNotExist'
+            'result': 'doesnotexist'
         }
 
 
@@ -322,7 +358,7 @@ def get_master_password(user: User) -> str:
         master_password = MasterPassword.objects.get(user=user)
         return master_password.password
     except MasterPassword.DoesNotExist:
-        return 'DoesNotExist'
+        return 'doesnotexist'
 
 
 def base_view(function):
@@ -332,18 +368,14 @@ def base_view(function):
     def wrapper(request, *args, **kwargs):
         try:
             with transaction.atomic():
-                if not request.user.is_superuser and SITE_IN_SERVICE:
+                if not request.user.is_staff and SiteSetting.objects.get(name='site_in_service').value == 'true':
                     return redirect(reverse("site_in_service_url"))
                 return function(request, *args, **kwargs)
         except Exception as err:
             if DEBUG:
                 log.error(traceback.format_exc())
-            write_error_to_log_file('ERROR', traceback.format_exc())
-            # TODO: Проверить как отрабатывает error_response
-            # Возможно сделать переадрисацию на страницу где говорится
-            # что произошла ошибка, либо возвращать html где будет
-            # говориться что произошла ошибка
-            error_response(err)
+            write_error_to_log_file('ERROR', request.user, traceback.format_exc())
+            return HttpResponseServerError(render(request, '500.html'))
 
     return wrapper
 
@@ -361,17 +393,7 @@ def json_response(data: dict, status=200) -> JsonResponse:
     )
 
 
-def error_response(exception: Exception) -> json_response:
-    """ Форматирует HTTP ответ с описанием ошибки """
-    result = {
-        'status': 'error',
-        'result': str(exception)
-    }
-
-    return json_response(data=result, status=400)
-
-
-def write_error_to_log_file(error_type: str, traceback_format_exc: str) -> None:
+def write_error_to_log_file(error_type: str, user: User, traceback_format_exc: str) -> None:
     """ Запись исключения в файл """
     try:
         file = open('logs/log.json')
@@ -379,7 +401,8 @@ def write_error_to_log_file(error_type: str, traceback_format_exc: str) -> None:
 
         with open('logs/log.json', 'w+') as f:
             text.update({
-                len(text): {'type': error_type, 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}
+                len(text): {'type': error_type, 'user': str(user), 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'),
+                            'traceback': traceback_format_exc}
             })
             f.write(
                 json.dumps(text, indent=4)
@@ -387,7 +410,8 @@ def write_error_to_log_file(error_type: str, traceback_format_exc: str) -> None:
 
         # Если размер файла больше либо равен 10 мегабайт архивируем логи
         if len(file.read()) >= 10485760:
-            with zipfile.ZipFile('logs/log_json__' + datetime.now().strftime('%d-%m-%Y_%H-%M-%S') + '__.zip', 'w') as arzip:
+            with zipfile.ZipFile('logs/log_json__' + datetime.now().strftime('%d-%m-%Y_%H-%M-%S') + '__.zip',
+                                 'w') as arzip:
                 arzip.write('logs/log.json')
                 f = open('logs/log.json', 'w+')
                 f.write(json.dumps(json.loads('{}'), indent=4))
@@ -398,7 +422,8 @@ def write_error_to_log_file(error_type: str, traceback_format_exc: str) -> None:
         f = open('logs/log.json', 'x')
         text = json.loads('{}')
         text.update({
-            len(text): {'type': error_type, 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'), 'traceback': traceback_format_exc}
+            len(text): {'type': error_type, 'user': str(user), 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'),
+                        'traceback': traceback_format_exc}
         })
         f.write(json.dumps(text, indent=4))
         f.close()

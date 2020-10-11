@@ -47,7 +47,6 @@ body {
 }
 
 header {
-    font-size: 2em;
     margin-bottom: 51px;
 }
 
@@ -77,6 +76,7 @@ button:focus {
 p,
 h2,
 h4,
+h5,
 strong,
 label,
 td,
@@ -98,6 +98,10 @@ body.modal-open {
 .h2,
 h2 {
     font-size: 28px;
+}
+
+.auth {
+    white-space: nowrap;
 }
 
 .logo {
@@ -298,21 +302,17 @@ h2 {
     transform: scale(.9);
 }
 
-.registration-container {
-    margin-top: 56px;
-}
-
 #password_info {
-    font-size: .875em;
+    font-size: 12px;
 
     position: absolute;
-    right: 55px;
-    bottom: 0px;
+    right: 0;
+    bottom: 0;
 
     display: none;
 
-    width: 250px;
-    padding: 15px;
+    width: 190px;
+    padding: 5px;
 
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -320,11 +320,15 @@ h2 {
     box-shadow: 0 1px 3px #ccc;
 }
 
-#password_info h4 {
+#password_info h5 {
     font-weight: normal;
 
     margin: 0 0 10px 0;
     padding: 0;
+}
+
+#password_info ul {
+    padding-left: 15px;
 }
 
 .invalid {
@@ -606,6 +610,37 @@ h2 {
     animation: bottomBubbles ease-in-out .75s forwards;
 }
 
+/* Mobile mode Адаптация интерфейса под мобильный
+
+#EnterKeyModal.modal.fade .modal-dialog_mobile {
+  transform: translate3d(0, 70vh, 0) !important;
+}
+
+#EnterKeyModal.modal.in .modal-dialog_mobile {
+  transform: translate3d(0, 50vh, 0) !important;
+}
+
+.modal {
+    padding: 0 !important;
+}
+
+.btn_reshow_button_mobile {
+    position: fixed;
+    bottom: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+ end Mobile mode */
+
+.main_buttons {
+    margin-top: 10px;
+}
+
+.registration-container {
+    margin-top: 65px;
+}
+
 @media (min-width: 768px) {
     .navbar-nav>li>a {
         padding-top: 10px;
@@ -634,6 +669,10 @@ h2 {
 
     .btn-bottom-show-account {
         width: 100px;
+    }
+
+    .main_buttons button {
+        width: 90%;
     }
 
     .modal-title {

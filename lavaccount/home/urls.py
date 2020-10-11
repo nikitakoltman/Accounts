@@ -11,6 +11,7 @@ urlpatterns = [
     path('register/', views.RegisterView.as_view(), name="register_url"),
     path('site_in_service/', views.site_in_service, name="site_in_service_url"),
 
+    path('lk/get_ip_info_system_switch/', views.get_ip_info_system_switch),
     path('lk/site_in_service_switch/', views.site_in_service_switch),
     path('create_account/', views.create_account),
     path('delete_account/', views.delete_account),
@@ -29,5 +30,6 @@ urlpatterns = [
 
     path('master_password_reset/', views.master_password_reset, name='master_password_reset_url'),
 
-    path('email/', views.email, name='email_url'),  # TODO: удалить
+    # Страница для проверки email шаблонов
+    path('check_email_template/', views.check_email_template, name='check_email_template_url'),
 ]

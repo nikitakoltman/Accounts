@@ -12,7 +12,7 @@
 {% endblock %}
 {% block content %}
 <div class="container account_container" {% if not request.user.profile.is_active_email and request.user.is_authenticated %}style="margin-top: 20px;"{% endif %}>
-    <div align="center" style="margin-top: 10px;">
+    <div align="center" class="main_buttons">
         <button id="btn_create_account_modal" data-toggle="modal" data-target="#CreateAccountModal" class="btn btn-primary">Добавить аккаунт</button>
         <button id="btn_master_password_modal" data-toggle="modal" data-target="#MasterPasswordModal" class="btn btn-primary">Мастер пароль</button>
     </div>
@@ -110,6 +110,15 @@
                 <label for="in-repeat_new_password">Повторите новый пароль</label>
                 <input class="form-control" type="password" id="in-repeat_new_password">
                 <button class="btn btn-primary bubbly-button btn-round btn-send" id="btn-send_master_password">Изменить</button>
+                <div id="password_info" style="bottom: -90px;">
+                    <h5>Пароль должен соответствовать критериям:</h5>
+                    <ul>
+                        <li id="letter">Минимум <strong>одна маленькая буква</strong></li>
+                        <li id="capital">Минимум <strong>одна заглавная буква</strong></li>
+                        <li id="number">Минимум <strong>одна цифра</strong></li>
+                        <li id="length">Быть не менее <strong>8 символов</strong></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

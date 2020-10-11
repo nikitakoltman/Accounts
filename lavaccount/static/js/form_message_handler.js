@@ -25,11 +25,8 @@ $(function() {
                 break;
 
                 // registration/register.html
-            case 'UNIQUE constraint failed: auth_user.username':
+            case 'username error':
                 swal('Ошибка', 'Введенное имя уже используейтся, введите другое.');
-                break;
-            case 'UNIQUE constraint failed: auth_user.email':
-                swal('Ошибка', 'Введенная почта уже используется, введите другую.');
                 break;
             case 'broken rule [pass == pass2]':
                 swal('Ошибка валидации', 'Пароли не совпадают');

@@ -38,6 +38,35 @@ SUPPORT_EMAIL = config.SUPPORT_EMAIL
 STATIC_VERSION = config.STATIC_VERSION
 SITE_PROTOCOL = 'https'
 
+# Защита XSS для старых браузеров
+SECURE_BROWSER_XSS_FILTER = True
+
+# TODO: раскомментировать параметры на продакшене
+
+# Отказывать подключение к доменному имени через небезопасное
+# соединение, в течение определенного периода времени (В секундах)
+###SECURE_HSTS_SECONDS = 30 # Час 3600 # Год 31536000
+# Защита поддоменов
+###SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# Добавить сайт в список предварительной загрузки браузера
+###SECURE_HSTS_PRELOAD = True
+
+# Cookie будут отправляться только через HTTPS,
+# что защитит от перехвата не незашифрованный файл cookie
+###SESSION_COOKIE_SECURE = True
+
+# CSRF cookie будут отправляться только через HTTPS,
+# что защитит от перехвата не незашифрованный файл CSRF cookie
+###CSRF_COOKIE_SECURE = True
+
+# Если True, перенаправляет все запросы, отличные от HTTPS, на HTTPS
+###SECURE_SSL_REDIRECT = True
+
+# Что то про защиту URL, в django 3.1 по дефолту стоит 'same-origin'
+# Эта настройка только для django 3.0 и ниже
+# TODO: При обновлении django на версию 3.1 и выше, эту настройку убрать!
+SECURE_REFERRER_POLICY = 'same-origin'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

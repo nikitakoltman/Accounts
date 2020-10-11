@@ -4,21 +4,21 @@
 {% block content %}
 <div class="container">
     <h2>Логи</h2>
-    <div>
-        {% for key, loginfo in logs %}
-            <div class="horizontal-bottom-line"></div>
-            <p>
+    {% for key, loginfo in logs %}
+    <div data-id="{{ key }}" data-user="{{ loginfo.user }}">
+        <div class="horizontal-bottom-line"></div>
+        <p>
             {% for key, item in loginfo.items %}
-                {% if key == 'traceback' %}
-                    <pre>{{ item }}</pre>
-                {% else %}
-                    <span style="font-weight: 800;">{{ key }}:</span>
-                    {{ item }}
-                {% endif %}
+            {% if key == 'traceback' %}
+            <pre>{{ item }}</pre>
+            {% else %}
+            <span style="font-weight: 800;">{{ key }}:</span>
+            {{ item }}
+            {% endif %}
             {% endfor %}
-            </p>
-        {% endfor %}
+        </p>
     </div>
+    {% endfor %}
     <div class="horizontal-bottom-line"></div>
 </div>
 {% endblock %}

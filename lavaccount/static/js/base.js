@@ -34,22 +34,37 @@ $(function() {
         main_show_preload();
     }
 
+    /*
+    // Адаптация интерфейса под мобильный
+    if (window.innerWidth < 768) {
+        $('header').css('margin-bottom', '0');
+        $('nav').removeClass('navbar-fixed-top').addClass('navbar-fixed-bottom');
+        $('#EnterKeyModal.modal.fade .modal-dialog').addClass('modal-dialog_mobile');
+        $('#EnterKeyModal.modal.in .modal-dialog').addClass('modal-dialog_mobile');
+        $('#cookie_notification').css('bottom', '70px');
+        $('.btn-reshow_modal').addClass('btn_reshow_button_mobile');
+        $('.account_container').css('margin-top', '0');
+        $('footer').append('<div style="height: 60px;"></div>');
+    }*/
+
     function checkCookies() {
-        /* Проверка того, что пользователь закрыл предупреждение об использовании куки */
-        let cookieDate = localStorage.getItem('cookieDate');
-        let cookieNotification = document.getElementById('cookie_notification');
-        let cookieBtn = cookieNotification.querySelector('.cookie_accept');
+        try {
+            /* Проверка того, что пользователь закрыл предупреждение об использовании куки */
+            let cookieDate = localStorage.getItem('cookieDate');
+            let cookieNotification = document.getElementById('cookie_notification');
+            let cookieBtn = cookieNotification.querySelector('.cookie_accept');
 
-        // Если записи про кукисы нет или она просрочена на 1 год, то показываем информацию про кукисы
-        if (!cookieDate || (+cookieDate + 31536000000) < Date.now()) {
-            cookieNotification.classList.add('show');
-        }
+            // Если записи про кукисы нет или она просрочена на 1 год, то показываем информацию про кукисы
+            if (!cookieDate || (+cookieDate + 31536000000) < Date.now()) {
+                cookieNotification.classList.add('show');
+            }
 
-        // При клике на кнопку, в локальное хранилище записывается текущая дата в системе UNIX
-        cookieBtn.addEventListener('click', function() {
-            localStorage.setItem('cookieDate', Date.now());
-            cookieNotification.classList.remove('show');
-        })
+            // При клике на кнопку, в локальное хранилище записывается текущая дата в системе UNIX
+            cookieBtn.addEventListener('click', function() {
+                localStorage.setItem('cookieDate', Date.now());
+                cookieNotification.classList.remove('show');
+            })
+        } catch { }
     }
 
     checkCookies();

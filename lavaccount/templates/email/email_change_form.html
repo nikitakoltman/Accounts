@@ -2,7 +2,6 @@
 {% load static %}
 {% block title %}{{ title }}{% endblock %}
 {% block addons_head %}
-<script type="text/javascript" src="{% static 'js/ajax_setup.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/email_change_form.js' %}?ver={{ static_version }}"></script>
 {% endblock %}
 {% block content %}
@@ -22,7 +21,6 @@
                         </form>
                     </div>
                     <p class="terms_confirm-text">Нажимая на кнопку «Сохранить», вы даете согласие на обработку персональных данных и соглашаетесь c <a href="{% url 'privacy_url' %}" target="_blank">политикой конфиденциальности</a>.</p>
-                    <!--<p>Нажимая кнопку «Сохранить», Вы принимаете пользовательское соглашение и политику конфиденциальности.</p>-->
                 </div>
             </div>
         </section>

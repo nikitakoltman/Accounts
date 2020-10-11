@@ -1,21 +1,20 @@
 import datetime
+import json
 import locale
 import re
-import json
 
 from api import service
 from api.models import Account, MasterPassword, LoginHistory
+from api.models import SiteSetting
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.template.defaulttags import register
 from django.urls import reverse
-from django.http import HttpResponseNotFound
 from django.views.generic import TemplateView
 from lavaccount.settings import STATIC_VERSION, SITE_PROTOCOL
-from api.models import SiteSetting
-
 from loguru import logger as log
 
 from .forms import RegisterForm, MasterPasswordResetForm, EmailChangeForm, LoginForm
@@ -25,8 +24,11 @@ locale.setlocale(locale.LC_ALL, "")
 
 
 @service.base_view
-def email(request):
+def check_email_template(request):
     """ Текстирование шаблона для почты """
+    if not request.user.is_staff:
+        return HttpResponseForbidden(render(request, '403.html'))
+
     context = {
         'username': request.user.username,
         'protocol': SITE_PROTOCOL,
@@ -83,14 +85,15 @@ def index(request):
         'accounts': Account.objects.filter(user=request.user),
         'master_password': service.get_master_password(user=request.user)
     })
+
     return render(request, 'home.html', context)
 
 
 @service.base_view
 def logs(request):
     """ Страница с отображением последних логов """
-    if not request.user.is_superuser:
-        return HttpResponseNotFound()
+    if not request.user.is_staff:
+        return HttpResponseForbidden(render(request, '403.html'))
 
     file = open('logs/log.json')
     logs = json.loads(file.read())
@@ -139,6 +142,7 @@ def lk(request):
         'login_history': login_history,
         'lh_date': lh_date,
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'get_ip_info_system': SiteSetting.objects.get(name='get_ip_info_system').value,
         'static_version': STATIC_VERSION
     }
     return render(request, 'lk.html', context)
@@ -278,53 +282,55 @@ def master_password_reset(request):
         'title': 'Сброс мастер пароля',
         'form': MasterPasswordResetForm,
         'form_message': 'None',
+        'master_password': False,
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }
 
-    try:
-        is_master_password = False
-
-        if MasterPassword.objects.filter(user=request.user).exists():
-            is_master_password = True
-
+    if MasterPassword.objects.filter(user=request.user).exists():
         context.update({
-            'master_password': is_master_password
+            'master_password': True
         })
 
-        if request.method == 'POST':
-            password = request.POST.get('password')
+    if request.method == 'POST':
+        password = request.POST.get('password')
 
-            if service.master_password_reset(request.user, password):
-                return redirect(reverse("home_url"))
-            else:
-                context.update({
-                    'form_message': 'Password is not valid'
-                })
-    except Exception as err:
-        context.update({
-            'form_message': err
-        })
+        if service.master_password_reset(request.user, password):
+            return redirect(reverse("home_url"))
+        else:
+            context.update({
+                'form_message': 'Password is not valid'
+            })
     return render(request, 'registration/master_password_reset.html', context)
+
+
+@service.base_view
+def get_ip_info_system_switch(request):
+    """ Закрыть сайт на техническое обслуживание """
+    if request.is_ajax() and request.user.is_staff:
+        system_name = request.POST.get('system_name', None)
+        answer = service.get_ip_info_system_switch(system_name)
+        return service.json_response(answer)
+    else:
+        return HttpResponseForbidden(render(request, '403.html'))
 
 
 @service.base_view
 def site_in_service_switch(request):
     """ Закрыть сайт на техническое обслуживание """
-    # Если запрос был не ajax, а например по прямой ссылке...
-    if not request.is_ajax():
-        return HttpResponseNotFound()
-
-    checked = request.POST.get('checked', None)
-    answer = service.site_in_service_switch(checked)
-    return service.json_response(answer)
+    if request.is_ajax() and request.user.is_staff:
+        checked = request.POST.get('checked', None)
+        answer = service.site_in_service_switch(checked)
+        return service.json_response(answer)
+    else:
+        return HttpResponseForbidden(render(request, '403.html'))
 
 
 @service.base_view
 def create_account(request):
     """ Создает аккаунт """
     if not request.is_ajax():
-        return HttpResponseNotFound()
+        return HttpResponseForbidden(render(request, '403.html'))
 
     site = request.POST.get('site', None)
     description = request.POST.get('description', None)
@@ -345,7 +351,7 @@ def create_account(request):
 def delete_account(request):
     """ Удаляет аккаунт """
     if not request.is_ajax():
-        return HttpResponseNotFound()
+        return HttpResponseForbidden(render(request, '403.html'))
 
     account_id = request.POST.get('account_id', None)
     answer = service.delete_account(account_id)
@@ -356,7 +362,7 @@ def delete_account(request):
 def change_info_account(request):
     """ Изменяет информацию об аккаунте """
     if not request.is_ajax():
-        return HttpResponseNotFound()
+        return HttpResponseForbidden(render(request, '403.html'))
 
     site = request.POST.get('site', None)
     description = request.POST.get('description', None)
@@ -378,7 +384,7 @@ def change_info_account(request):
 def change_or_create_master_password(request):
     """ Изменяет мастер пароль """
     if not request.is_ajax():
-        return HttpResponseNotFound()
+        return HttpResponseForbidden(render(request, '403.html'))
 
     sites = request.POST.get('sites', None)
     descriptions = request.POST.get('descriptions', None)
@@ -401,7 +407,7 @@ def change_or_create_master_password(request):
 def check_username(request):
     """ Проверяет существование имени в БД """
     if not request.is_ajax():
-        return HttpResponseNotFound()
+        return HttpResponseForbidden(render(request, '403.html'))
 
     username = request.POST.get('username', None)
     answer = service.check_username(username)
@@ -422,10 +428,10 @@ def lav_login(request):
     }
 
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        system = request.POST.get('system')
-        browser = request.POST.get('browser')
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        system = request.POST.get('system', None)
+        browser = request.POST.get('browser', None)
 
         user = authenticate(request, username=username, password=password)
 
@@ -458,53 +464,59 @@ def check_if_password_correct(password1: str, password2: str) -> str:
 
 class RegisterView(TemplateView):
     """ Регистрация пользователей """
-    template_name = "registration/register.html"
 
-    @service.base_view
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect(reverse("home_url"))
+        return lav_register(request, "registration/register.html", *args, **kwargs)
 
-        context = {
-            'form': RegisterForm,
-            'form_message': 'None',
-            'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
-            'static_version': STATIC_VERSION
-        }
 
-        if request.method == 'POST':
-            username = request.POST.get('username')
-            email = request.POST.get('email')
-            password1 = request.POST.get('password1')
-            password2 = request.POST.get('password2')
+@service.base_view
+def lav_register(request, template_name, *args, **kwargs):
+    if request.user.is_authenticated:
+        return redirect(reverse("home_url"))
 
-            answer = check_if_password_correct(password1, password2)
-            if answer == 'success':
-                try:
-                    user = User.objects.create_user(
-                        username=username,
-                        email=email,
-                        password=password1
-                    )
+    context = {
+        'form': RegisterForm,
+        'form_message': 'None',
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
+    }
 
-                    service.confirm_email(
-                        user=user,
-                        email=email,
-                        subject='Добро пожаловать в LavAccount',
-                        template='registration_email_confirm_email'
-                    )
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
 
-                    return redirect(reverse("lav_login"))
-                except Exception as err:
+        answer = check_if_password_correct(password1, password2)
+        if answer == 'success':
+            try:
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password1
+                )
+
+                service.confirm_email(
+                    user=user,
+                    email=email,
+                    subject='Добро пожаловать в LavAccount',
+                    template='registration_email_confirm_email'
+                )
+
+                return redirect(reverse("lav_login"))
+            except Exception as err:
+                if str(err) == 'UNIQUE constraint failed: auth_user.username':
                     context.update({
-                        'form_message': err,
+                        'form_message': 'username error',
                         'username': username,
                         'email': email
                     })
-            else:
-                context.update({
-                    'form_message': answer,
-                    'username': username,
-                    'email': email
-                })
-        return render(request, self.template_name, context)
+                else:
+                    raise
+        else:
+            context.update({
+                'form_message': answer,
+                'username': username,
+                'email': email
+            })
+    return render(request, template_name, context)

@@ -12,7 +12,7 @@ $(function() {
 		}
 	});
 
-	$('#id_new_password1').on('keyup', function() {
+	$('#id_new_password1').on('input', function() {
         check_password();
     }).focus(function() {
         $('#password_info').show();
@@ -20,7 +20,7 @@ $(function() {
         $('#password_info').hide();
     });
 
-    $('#id_new_password2').on('keyup change', function() {
+    $('#id_new_password2').on('input', function() {
         check_password2();
     });
 

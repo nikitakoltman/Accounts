@@ -36,20 +36,27 @@
                                 <div class="js-swiper-tabs" data-tabs="1" align="center">
                                     <strong>Профиль</strong>
                                     <div class="col-xs-12 col-sm-6">
-                                        <div class="card">
+                                        <div class="card" style="width: 280px;">
                                             <div class="card-body">
                                                 <strong>Ваши данные</strong>
                                                 <div align="center">
                                                     <p>Здравствуйте, <span style="font-weight: bold;">{{ request.user.username }}</span>
                                                     </p>
                                                 </div>
-                                                <p>Ваш почтовый адрес: <span style="font-weight: bold;">{{ request.user.email }}</span>
+                                                <p>Ваш почтовый адрес:
+                                                    <span style="font-weight: bold;">
+                                                        {% if request.user.email %}
+                                                        {{ request.user.email }}
+                                                        {% else %}
+                                                        Не указан
+                                                        {% endif %}
+                                                    </span>
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-6">
-                                        <div class="card">
+                                        <div class="card" style="width: 280px;">
                                             <div class="card-body">
                                                 <strong>Действия</strong>
                                                 <div style="margin-bottom: 5px;">

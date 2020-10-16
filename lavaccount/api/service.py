@@ -20,7 +20,7 @@ from django.utils.encoding import force_bytes
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.utils.http import urlsafe_base64_encode
-from lavaccount.settings import DEBUG, SITE_PROTOCOL
+from lavaccount.settings import DEBUG, SITE_PROTOCOL, STATIC_VERSION
 from loguru import logger as log
 
 from .models import Account, MasterPassword, LoginHistory, SiteSetting
@@ -108,7 +108,7 @@ class NewLoginHistory(threading.Thread):
 
 def send_email(email: str, subject: str, template: str, context: str) -> None:
     """ Отправка почты """
-    htmly = get_template(f'email/{template}.html')
+    htmly = get_template(f'{template}')
     html_content = htmly.render(context)
 
     EmailThread(subject, html_content, [email]).start()
@@ -140,6 +140,12 @@ def activate_email(uidb64, token) -> bool:
     except(TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
     if user is not None and account_activation_token.check_token(user, token):
+        old_users = User.objects.filter(email=user.email)
+        for old_user in old_users:
+            if not old_user.username == user.username:
+                old_user.email = ''
+                old_user.profile.is_active_email = False
+                old_user.save()
         user.profile.is_active_email = True
         user.save()
         return True
@@ -238,7 +244,7 @@ def site_in_service_switch(checked: str) -> dict:
 
 def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:
     """ Создает новый аккаунт """
-    if Account.objects.count() >= 100:
+    if Account.objects.count() >= 200:
         return {
             'status': 'error',
             'message': 'accountlimitreached'
@@ -369,7 +375,11 @@ def base_view(function):
         try:
             with transaction.atomic():
                 if not request.user.is_staff and SiteSetting.objects.get(name='site_in_service').value == 'true':
-                    return redirect(reverse("site_in_service_url"))
+                    context = {
+                        'title': 'Сайт закрыт на техническое обслуживание',
+                        'static_version': STATIC_VERSION
+                    }
+                    return render(request, 'site_in_service.html', context)
                 return function(request, *args, **kwargs)
         except Exception as err:
             if DEBUG:

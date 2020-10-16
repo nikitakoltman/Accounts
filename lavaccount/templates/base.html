@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" http-equiv="X-UA-Compatible" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="description" content="Описание страницы. Не менее 160 символов." />
-    <meta name="keywords" content="Здесь указываем список ключевых слов, разделенные запятой." />
+    <meta name="keywords" content="облачное, хранение, аккаунтов, бесплатный, менеджер, паролей, удобный, безопасный, веб, приложение" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="LavAccount" />
     <meta name="twitter:description" content="Веб приложение для храниения аккаунтов" />
@@ -57,6 +57,7 @@
     <script src="{% static 'js/addons/bootstrap-tour.min.js' %}"></script>
     <script src="{% static 'js/addons/jquery.easing.min.js' %}"></script>
     <script src="{% static 'js/addons/sweet-alert.min.js' %}"></script>
+    <script src="{% static 'js/addons/SmoothScroll.js' %}"></script>
     <script src="{% static 'js/base.js' %}?ver={{ static_version }}"></script>
     <title>{% block title %}{% endblock %}</title>
     {% block addons_head %}{% endblock %}
@@ -70,28 +71,13 @@
 <body>
     {% block preload %}
     <div id="page-preload" class="preload">
-        <div class="windows8">
-            <div class="wBall" id="wBall_1">
-                <div class="wInnerBall"></div>
-            </div>
-            <div class="wBall" id="wBall_2">
-                <div class="wInnerBall"></div>
-            </div>
-            <div class="wBall" id="wBall_3">
-                <div class="wInnerBall"></div>
-            </div>
-            <div class="wBall" id="wBall_4">
-                <div class="wInnerBall"></div>
-            </div>
-            <div class="wBall" id="wBall_5">
-                <div class="wInnerBall"></div>
-            </div>
-        </div>
+        <div class="loader"></div>
     </div>
     {% endblock %}
-    <header>
+    <header class="container">
         <nav class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-header">
+            <div class="container">
+                <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
@@ -106,7 +92,6 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right account-nav">
-                    {% if request.user.is_authenticated %}
                     {% if request.user.is_staff %}
                     <li>
                         <a href="{% url 'logs_url' %}">
@@ -120,13 +105,14 @@
                     </li>
                     {% endif %}
                     <li>
-                        <a href="{% url 'donation_url' %}">
-                            <p>Пожертвования</p>
-                        </a>
-                    </li>
-                    <li>
                         <a href="{% url 'support_url' %}">
                             <p>Помощь</p>
+                        </a>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'donation_url' %}">
+                            <p>Пожертвования</p>
                         </a>
                     </li>
                     <li>
@@ -152,12 +138,19 @@
                     {% endif %}
                 </ul>
             </div>
+            </div>
         </nav>
     </header>
     {% if not request.user.profile.is_active_email and request.user.is_authenticated %}
+    {% if request.user.email %}
     <div class="confirm_email-notification">
         <p>Вам нужно подтвердить почту. Мы уже отправили вам письмо с инструкциями. Если письмо не пришло то нажмите <a href="{% url 'confirm_email_url' %}">здесь</a> для повторной отправки письма.</p>
     </div>
+    {% else %}
+    <div class="confirm_email-notification">
+        <p>У вас не указана почта, привязать почту к учетной записи можно <a href="{% url 'email_change_url' %}">здесь</a>.</p>
+    </div>
+    {% endif %}
     {% endif %}
     {% block content %}{% endblock %}
     <footer>
@@ -176,8 +169,12 @@
             <p>Для улучшения работы сайта мы используем файлы cookie. Продолжая работу с сайтом, Вы разрешаете использование cookie-файлов.</p>
             <div class="button-close cookie_accept"><i></i></div>
         </div>
+        {% if request.user.is_staff %}
         <!--<div class="ads"></div> Реклама-->
+        <!--<div class="button-close"><i></i></div>-->
+        {% endif %}
     </footer>
+    <a href="#" class="scrollup">Наверх</a>
     <input type="hidden" id="data-master_password" value="{{ master_password }}">
     <script>
     document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')

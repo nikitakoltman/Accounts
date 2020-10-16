@@ -35,8 +35,46 @@ SITE_ID = 2
 # Почта поддержки
 SUPPORT_EMAIL = config.SUPPORT_EMAIL
 
-STATIC_VERSION = config.STATIC_VERSION
+STATIC_VERSION = 1
+STATIC_VERSIONS = {
+    'bootstrap-tour.min.css': 1,
+    'bootstrap.min.css': 1,
+    'sweet-alert.min.css': 1,
+
+    'lk.css': 1,
+    'style.css': 1,
+    'support.css': 1,
+    'table-theme-blue.css': 1,
+
+    'bootstrap-tour.min.js': 1,
+    'bootstrap.min.js': 1,
+    'crypto-js.min.js': 1,
+    'jquery-3.5.1.min.js': 1,
+    'jquery.easing.min.js': 1,
+    'jquery.tablesorter.min.js': 1,
+    'PassGenJS.min.js': 1,
+    'sweet-alert.min.js': 1,
+
+    'ajax_setup.js': 1,
+    'base.js': 1,
+    'bubbly_animation.js': 1,
+    'client_detection.js': 1,
+    'email_change_form.js': 1,
+    'form_message_handler.js': 1,
+    'home.js': 1,
+    'landing.js': 1,
+    'lk.js': 1,
+    'login.js': 1,
+    'password_field_validation.js': 1,
+    'register.js': 1,
+    'tour.js': 1,
+
+    'browserconfig.xml': 1,
+    'manifest.json': 1
+}
 SITE_PROTOCOL = 'https'
+
+SESSION_COOKIE_SAMESITE = 'Strict' # 'Lax'
 
 # Защита XSS для старых браузеров
 SECURE_BROWSER_XSS_FILTER = True
@@ -61,11 +99,6 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # Если True, перенаправляет все запросы, отличные от HTTPS, на HTTPS
 ###SECURE_SSL_REDIRECT = True
-
-# Что то про защиту URL, в django 3.1 по дефолту стоит 'same-origin'
-# Эта настройка только для django 3.0 и ниже
-# TODO: При обновлении django на версию 3.1 и выше, эту настройку убрать!
-SECURE_REFERRER_POLICY = 'same-origin'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

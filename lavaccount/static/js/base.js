@@ -3,18 +3,12 @@
 $(function() {
     window.main_show_preload = function() {
         /* Показать главный прелоад */
-        $('.windows8').removeClass('preload-done');
-        $('.windows8').css({ display: '' });
         $('#page-preload').removeClass('preload-done');
     }
 
     window.main_hide_preload = function() {
         /* Скрыть главный прелоад */
         $('#page-preload').addClass('preload-done');
-        $('.windows8').addClass('preload-done');
-        setTimeout(function() {
-            $('.windows8').css({ display: 'none' });
-        }, 1000);
     }
 
     window.preload_show = function() {
@@ -26,7 +20,9 @@ $(function() {
     window.preload_hide = function() {
         /* Скрыть прелоад */
         main_hide_preload();
-        $('#page-preload').css('background', '#000000');
+        setTimeout(function() {
+            $('#page-preload').css('background', '#000000');
+        }, 500);
     }
 
     window.onbeforeunload = function() {
@@ -34,6 +30,18 @@ $(function() {
         main_show_preload();
     }
 
+    $(window).scroll(function() {
+        if ($(this).scrollTop() > 100) {
+            $('.scrollup').fadeIn();
+        } else {
+            $('.scrollup').fadeOut();
+        }
+    });
+
+    $('.scrollup').click(function() {
+        $("html, body").animate({ scrollTop: 0 }, 600);
+        return false;
+    });
     /*
     // Адаптация интерфейса под мобильный
     if (window.innerWidth < 768) {
@@ -64,7 +72,7 @@ $(function() {
                 localStorage.setItem('cookieDate', Date.now());
                 cookieNotification.classList.remove('show');
             })
-        } catch { }
+        } catch {}
     }
 
     checkCookies();

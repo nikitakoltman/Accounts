@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.index, name='home_url'),
@@ -9,7 +10,6 @@ urlpatterns = [
     path('logs/', views.logs, name='logs_url'),
     path('login/', views.lav_login, name="lav_login"),
     path('register/', views.RegisterView.as_view(), name="register_url"),
-    path('site_in_service/', views.site_in_service, name="site_in_service_url"),
 
     path('lk/get_ip_info_system_switch/', views.get_ip_info_system_switch),
     path('lk/site_in_service_switch/', views.site_in_service_switch),
@@ -21,6 +21,8 @@ urlpatterns = [
 
     path('email_change/', views.email_change, name='email_change_url'),
     path('email_change/done/', views.email_change_done, name='email_change_done_url'),
+
+    path('accounts/password_reset/', views.LavPasswordResetView.as_view(html_email_template_name='registration/password_reset_email.html')),
 
     path('confirm_email/', views.confirm_email, name='confirm_email_url'),
     path('confirm_email/done/', views.confirm_email_done, name='confirm_email_done_url'),

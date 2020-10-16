@@ -8,6 +8,7 @@ from lavaccount.settings import STATIC_VERSION, SITE_PROTOCOL, SUPPORT_EMAIL
 @base_view
 def support(request):
     context = {
+        'title': 'Помощь и поддержка',
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }
@@ -17,6 +18,7 @@ def support(request):
 @base_view
 def donation(request):
     context = {
+        'title': 'Пожертвования',
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }
@@ -26,6 +28,7 @@ def donation(request):
 @base_view
 def protection(request):
     context = {
+        'title': 'Защита данных',
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }
@@ -36,6 +39,7 @@ def protection(request):
 def privacy(request):
     current_site = Site.objects.get_current()
     context = {
+        'title': 'Политика конфиденциальности',
         'face': 'Колтманом Никитой Николаевичем',
         'protocol': f'{SITE_PROTOCOL}://',
         'domain': current_site.domain,
@@ -49,6 +53,7 @@ def privacy(request):
 @base_view
 def terms(request):
     context = {
+        'title': 'Пользовательское соглашение',
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }

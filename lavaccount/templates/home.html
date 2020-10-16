@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Аккаунты{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 {% block addons_head %}
 <link rel="stylesheet" href="{% static 'css/table-theme-blue.css' %}?ver={{ static_version }}">
 <script type="text/javascript" src="{% static 'js/addons/jquery.tablesorter.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/addons/crypto-js.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/bubbly_animation.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/ajax_setup.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/tour.js' %}?ver={{ static_version }}"></script>
+<script type="text/javascript" src="{% static 'js/addons/crypto-js.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/lav_crypto.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/home.js' %}?ver={{ static_version }}"></script>
 {% endblock %}
 {% block content %}
@@ -110,7 +111,7 @@
                 <label for="in-repeat_new_password">Повторите новый пароль</label>
                 <input class="form-control" type="password" id="in-repeat_new_password">
                 <button class="btn btn-primary bubbly-button btn-round btn-send" id="btn-send_master_password">Изменить</button>
-                <div id="password_info" style="bottom: -90px;">
+                <div id="password_info" style="bottom: -68px;">
                     <h5>Пароль должен соответствовать критериям:</h5>
                     <ul>
                         <li id="letter">Минимум <strong>одна маленькая буква</strong></li>
@@ -127,7 +128,7 @@
     <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header modal-header-create-account">
-                <h4 class="modal-title">Авторизация</h4>
+                <h4 class="modal-title">Аутентификация</h4>
                 <button type="button" class="close btn-close btn-close-create-account" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
             <div class="modal-body modal-body-enter-password">

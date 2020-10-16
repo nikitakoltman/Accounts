@@ -17,7 +17,10 @@ from django.views.generic import TemplateView
 from lavaccount.settings import STATIC_VERSION, SITE_PROTOCOL
 from loguru import logger as log
 
-from .forms import RegisterForm, MasterPasswordResetForm, EmailChangeForm, LoginForm
+from .forms import RegisterForm, MasterPasswordResetForm, EmailChangeForm, LavAuthenticationForm, LavPasswordResetForm
+
+from django.contrib.auth.views import PasswordResetView
+
 
 # Русская локализация для даты
 locale.setlocale(locale.LC_ALL, "")
@@ -50,35 +53,18 @@ def check_email_template(request):
 
 
 @service.base_view
-def site_in_service(request):
-    """ Уведомление для пользователя о том что
-    сайт закрыт на технической обслуживание """
-
-    ### НЕ УСТАНАВЛИВАТЬ ДЕКАРАТОР @service.base_view на это
-    ### представление потому что будет бесконечное перенаправление ###
-    site_in_service = SiteSetting.objects.get(name='site_in_service').value
-
-    if not site_in_service:
-        return redirect(reverse("home_url"))
-
-    context = {
-        'title': 'Сайт закрыт на техническое обслуживание',
-        'site_in_service': site_in_service,
-        'static_version': STATIC_VERSION
-    }
-
-    return render(request, 'site_in_service.html', context)
-
-
-@service.base_view
 def index(request):
     """ Главная страница """
     context = {
+        'title': 'LavAccount',
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }
 
     if not request.user.is_authenticated:
+        context.update({
+            'title': 'Менеджер паролей LavAccount: хранение аккаунтов в облаке'
+        })
         return render(request, 'landing.html', context)
 
     context.update({
@@ -101,6 +87,7 @@ def logs(request):
     file.close()
 
     context = {
+        'title': 'Логи',
         'logs': logs,
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
@@ -172,12 +159,12 @@ def email_change(request):
             user=user,
             email=email,
             subject='Привязка email к аккаунту',
-            template='email_change_email'
+            template='email/email_change_email.html'
         )
         service.send_email(
             email=user.email,
             subject='Привязка email к аккаунту',
-            template='email_change_notification_to_old_email',
+            template='email/email_change_notification_to_old_email.html',
             context={
                 'email': service.hiding_email(email),
                 'username': user.username,
@@ -256,7 +243,7 @@ def confirm_email(request):
         user=request.user,
         email=request.user.email,
         subject='Добро пожаловать в LavAccount',
-        template='registration_email_confirm_email'
+        template='email/registration_email_confirm_email.html'
     )
     return redirect(reverse("confirm_email_done_url"))
 
@@ -421,7 +408,8 @@ def lav_login(request):
         return redirect(reverse("home_url"))
 
     context = {
-        'form': LoginForm,
+        'title': 'Авторизация',
+        'form': LavAuthenticationForm,
         'form_message': 'None',
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
@@ -462,19 +450,24 @@ def check_if_password_correct(password1: str, password2: str) -> str:
         return 'success'
 
 
+class LavPasswordResetView(PasswordResetView):
+    form_class = LavPasswordResetForm
+
+
 class RegisterView(TemplateView):
     """ Регистрация пользователей """
 
     def dispatch(self, request, *args, **kwargs):
-        return lav_register(request, "registration/register.html", *args, **kwargs)
+        return lav_register(request, *args, **kwargs)
 
 
 @service.base_view
-def lav_register(request, template_name, *args, **kwargs):
+def lav_register(request, *args, **kwargs):
     if request.user.is_authenticated:
         return redirect(reverse("home_url"))
 
     context = {
+        'title': 'Регистрация',
         'form': RegisterForm,
         'form_message': 'None',
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
@@ -500,7 +493,7 @@ def lav_register(request, template_name, *args, **kwargs):
                     user=user,
                     email=email,
                     subject='Добро пожаловать в LavAccount',
-                    template='registration_email_confirm_email'
+                    template='email/registration_email_confirm_email.html'
                 )
 
                 return redirect(reverse("lav_login"))
@@ -519,4 +512,4 @@ def lav_register(request, template_name, *args, **kwargs):
                 'username': username,
                 'email': email
             })
-    return render(request, template_name, context)
+    return render(request, 'registration/register.html', context)

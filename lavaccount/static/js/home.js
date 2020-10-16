@@ -22,11 +22,11 @@ $(function() {
     $('#data-master_password').val('');
     $('#data-training_completed').val('');
 
-    if (master_password != 'DoesNotExist') {
+    if (master_password != 'doesnotexist') {
         // Открываем модальное окно ввода ключа/мастер пароля
         $('#EnterKeyModal').modal('show');
     } else {
-        /* При первом посещении страницы, а также исходя из результата "DoesNotExist", мастер пароля в базе не существует, поэтому... */
+        /* При первом посещении страницы, а также исходя из результата "doesnotexist", мастер пароля в базе не существует, поэтому... */
         // Отключаем поле ввода старого пароля в модальном окне изменения пароля
         $('#in-old_password').attr('disabled', 'disabled').css('display', 'none');
         $('label[for="in-old_password"]').css('display', 'none');
@@ -225,62 +225,67 @@ $(function() {
     function change_or_create_master_password(new_master_password) {
         /* Изменить или создать мастер пароль */
         preload_show();
+        setTimeout(function() {
+            const hash = enMP(new_master_password);
+            const master_password_key = hash.key;
+            const result = hash.result;
 
-        let sites = {},
-            descriptions = {},
-            logins = {},
-            passwords = {},
-            tds = $('td');
+            let sites = {},
+                descriptions = {},
+                logins = {},
+                passwords = {},
+                tds = $('td');
 
-        if (tds.length > 0) {
-            // Если таблица не пустая, то проходим циклом по ее элементам
-            tds.each(function(index, td) {
-                let account_id = td.getAttribute('data-id');
-                if (td.className == 'td-site') {
-                    // Шифруем строку из ячейки и присваиваем ее массиву под индексом ее id в базе данных
-                    sites[account_id] = encrypt(td.innerHTML, new_master_password);
-                } else if (td.className == 'td-description') {
-                    descriptions[account_id] = encrypt(td.innerHTML, new_master_password);
-                } else if (td.className == 'td-login td-hide') {
-                    // Тоже самое, только предварительно расшировать, потому что логин хранится в ячейке в зашифрованном виде
-                    logins[account_id] = encrypt(decrypt(td.innerHTML, master_password), new_master_password);
-                } else if (td.className == 'td-password td-hide') {
-                    // Тоже самое, только предварительно расшировать, потому что пароль хранится в ячейке в зашифрованном виде
-                    passwords[account_id] = encrypt(decrypt(td.innerHTML, master_password), new_master_password);
+            if (tds.length > 0) {
+                // Если таблица не пустая, то проходим циклом по ее элементам
+                tds.each(function(index, td) {
+                    let account_id = td.getAttribute('data-id');
+                    if (td.className == 'td-site') {
+                        // Шифруем строку из ячейки и присваиваем ее массиву под индексом ее id в базе данных
+                        sites[account_id] = encrypt(td.innerHTML, master_password_key);
+                    } else if (td.className == 'td-description') {
+                        descriptions[account_id] = encrypt(td.innerHTML, master_password_key);
+                    } else if (td.className == 'td-login td-hide') {
+                        // Тоже самое, только предварительно расшировать, потому что логин хранится в ячейке в зашифрованном виде
+                        logins[account_id] = encrypt(decrypt(td.innerHTML, master_password), master_password_key);
+                    } else if (td.className == 'td-password td-hide') {
+                        // Тоже самое, только предварительно расшировать, потому что пароль хранится в ячейке в зашифрованном виде
+                        passwords[account_id] = encrypt(decrypt(td.innerHTML, master_password), master_password_key);
+                    }
+                });
+            }
+
+            $.ajax({
+                url: 'change_or_create_master_password/',
+                type: 'POST',
+                data: {
+                    sites: JSON.stringify(sites),
+                    descriptions: JSON.stringify(descriptions),
+                    logins: JSON.stringify(logins),
+                    passwords: JSON.stringify(passwords),
+                    new_master_password: result
+                },
+                success: function(result) {
+                    preload_hide();
+                    if (result['status'] == 'success') {
+                        reload();
+                    } else {
+                        swal('Ошибка', result['result']);
+                    }
+                },
+                error: function(jqXHR, text, error) {
+                    if (error == 'Forbidden') {
+                        swal(
+                            'Ошибка 403',
+                            'Этот сайт требует наличия файла cookie CSRF при отправке форм.' +
+                            ' Если вы настроили свой браузер так, чтобы он не сохранял файлы cookie,' +
+                            ' включите их снова, по крайней мере, для этого сайта.'
+                        )
+                        preload_hide();
+                    }
                 }
             });
-        }
-
-        $.ajax({
-            url: 'change_or_create_master_password/',
-            type: 'POST',
-            data: {
-                sites: JSON.stringify(sites),
-                descriptions: JSON.stringify(descriptions),
-                logins: JSON.stringify(logins),
-                passwords: JSON.stringify(passwords),
-                new_master_password: encrypt(new_master_password, new_master_password),
-            },
-            success: function(result) {
-                preload_hide();
-                if (result['status'] == 'success') {
-                    reload();
-                } else {
-                    swal('Ошибка', result['result']);
-                }
-            },
-            error: function(jqXHR, text, error) {
-                if (error == 'Forbidden') {
-                    swal(
-                        'Ошибка 403',
-                        'Этот сайт требует наличия файла cookie CSRF при отправке форм.' +
-                        ' Если вы настроили свой браузер так, чтобы он не сохранял файлы cookie,' +
-                        ' включите их снова, по крайней мере, для этого сайта.'
-                    )
-                    preload_hide();
-                }
-            }
-        });
+        }, 600);
     }
 
     function authorization() {
@@ -294,23 +299,28 @@ $(function() {
             $('#EnterKeyModal').modal('show');
         } else {
             // Расшифровываем полученый пароль введенным ключем
-            key = decrypt(master_password, key);
+            preload_show();
+            setTimeout(function() {
+                key = deMP(master_password, key);
 
-            if (key == '') {
-                // Если расшифровка не дала результата, то чистим input ввода ключа
-                $('#in-enter_master_password').val('');
-                // Переводим фокус на input
-                $('#in-enter_master_password').focus();
-                // Повторяем запрос ключа
-                $('#EnterKeyModal').modal('show');
-            } else {
-                // Присваиваем ключ/мастер пароль глобальной переменной "Мастер пароль"
-                master_password = key;
-                // Даем разрешение на загрузку таблицы/страницы
-                is_allow_show_page = true;
-                // Скрываем модальное окно ввода пароля
-                $('#EnterKeyModal').modal('hide');
-            }
+                if (key == '') {
+                    // Если расшифровка не дала результата, то чистим input ввода ключа
+                    $('#in-enter_master_password').val('');
+                    // Переводим фокус на input
+                    $('#in-enter_master_password').focus();
+                    // Повторяем запрос ключа
+                    $('#EnterKeyModal').modal('show');
+                } else {
+                    // Присваиваем ключ/мастер пароль глобальной переменной "Мастер пароль"
+                    master_password = key;
+                    // Даем разрешение на загрузку таблицы/страницы
+                    is_allow_show_page = true;
+                    // Скрываем модальное окно ввода пароля
+                    $('#EnterKeyModal').modal('hide');
+                }
+
+                preload_hide();
+            }, 600);
         }
     }
 
@@ -362,26 +372,6 @@ $(function() {
         $tmp.val(text).select();
         document.execCommand('copy');
         $tmp.remove();
-    }
-
-    function encrypt(str, key) {
-        /* Шифрование строки */
-        return CryptoJS.AES.encrypt(str, key).toString();
-    }
-
-    function decrypt(str, key) {
-        /* Дешифрование строки */
-        try {
-            return CryptoJS.AES.decrypt(str, key).toString(CryptoJS.enc.Utf8);
-        } catch (e) {
-            if (e.message == 'Malformed UTF-8 data') {
-                // Если были искажены данные
-                return '';
-            } else {
-                swal('Ошибка', 'Не удалось дешифровать строку');
-                throw e;
-            }
-        }
     }
 
     $('#btn-enter_master_password').on('click', function() {

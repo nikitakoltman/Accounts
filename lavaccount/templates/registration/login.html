@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Авторизация{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 {% block addons_head %}
 <script type="text/javascript" src="{% static 'js/client_detection.js' %}?ver={{ static_version }}"></script>
 <script type="text/javascript" src="{% static 'js/login.js' %}?ver={{ static_version }}"></script>
@@ -27,7 +27,7 @@
         {% load crispy_forms_tags %}
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title text-center">Авторизация</h4>
+                <h4 class="card-title text-center">{{ title }}</h4>
                 <form method="post">
                     {% csrf_token %}
                     {{ form|crispy }}

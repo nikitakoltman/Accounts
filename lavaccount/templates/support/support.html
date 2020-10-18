@@ -3,6 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 {% block addons_head %}
 <link rel="stylesheet" href="{% static 'css/support.css' %}?ver={{ static_version }}" />
+<script defer src="{% static 'js/support.js' %}?ver={{ static_version }}"></script>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -71,25 +72,4 @@
         <div class="horizontal-bottom-line"></div>
     </main>
 </div>
-<script>
-$(function() {
-    $('.simple-tabs').on('click', function() {
-        $('.swiper-container div').removeClass('active');
-        $('.swiper-container div[data-tabs="' + $(this).attr('data-tabs-id') + '"]').addClass('active');
-    });
-
-    $('.simple-tabs').on('click', function() {
-        let tab_id = $(this).attr('data-tabs-id');
-
-        $('html, body').animate({
-            scrollTop: $('.swiper-container').offset().top - 60
-        }, {
-            duration: 370, // по умолчанию «400»
-            easing: "linear" // по умолчанию «swing»
-        });
-
-        return false;
-    });
-});
-</script>
 {% endblock %}

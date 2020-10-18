@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.index, name='home_url'),
     path('lk/', views.lk, name='lk_url'),
     path('noscript/', views.noscript, name='noscript_url'),
+    path('offline/', views.offline, name='offline_url'),
     path('logs/', views.logs, name='logs_url'),
     path('login/', views.lav_login, name="lav_login"),
     path('register/', views.RegisterView.as_view(), name="register_url"),

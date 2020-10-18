@@ -42,6 +42,7 @@ $(function() {
         $("html, body").animate({ scrollTop: 0 }, 600);
         return false;
     });
+
     /*
     // Адаптация интерфейса под мобильный
     if (window.innerWidth < 768) {
@@ -53,7 +54,8 @@ $(function() {
         $('.btn-reshow_modal').addClass('btn_reshow_button_mobile');
         $('.account_container').css('margin-top', '0');
         $('footer').append('<div style="height: 60px;"></div>');
-    }*/
+    }
+    */
 
     function checkCookies() {
         try {

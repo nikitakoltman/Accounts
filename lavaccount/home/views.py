@@ -99,10 +99,22 @@ def logs(request):
 def noscript(request):
     """ Страница отображаемая если пользователь отключит javascript """
     context = {
+        'title': 'Включите javascript!',
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }
     return render(request, 'noscript.html', context)
+
+
+@service.base_view
+def offline(request):
+    """ Страница отображаемая если пользователь не подключен к интернету """
+    context = {
+        'title': 'Не удалось подключиться к LavAccount',
+        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
+        'static_version': STATIC_VERSION
+    }
+    return render(request, 'offline.html', context)
 
 
 @service.base_view

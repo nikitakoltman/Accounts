@@ -3,13 +3,13 @@
 {% block title %}{{ title }}{% endblock %}
 {% block addons_head %}
 <link rel="stylesheet" href="{% static 'css/table-theme-blue.css' %}?ver={{ static_version }}">
-<script type="text/javascript" src="{% static 'js/addons/jquery.tablesorter.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/bubbly_animation.js' %}?ver={{ static_version }}"></script>
-<script type="text/javascript" src="{% static 'js/ajax_setup.js' %}?ver={{ static_version }}"></script>
-<script type="text/javascript" src="{% static 'js/tour.js' %}?ver={{ static_version }}"></script>
-<script type="text/javascript" src="{% static 'js/addons/crypto-js.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/lav_crypto.js' %}?ver={{ static_version }}"></script>
-<script type="text/javascript" src="{% static 'js/home.js' %}?ver={{ static_version }}"></script>
+<script defer type="text/javascript" src="{% static 'js/addons/jquery.tablesorter.min.js' %}"></script>
+<script defer type="text/javascript" src="{% static 'js/bubbly_animation.js' %}?ver={{ static_version }}"></script>
+<script defer type="text/javascript" src="{% static 'js/ajax_setup.js' %}?ver={{ static_version }}"></script>
+<script defer type="text/javascript" src="{% static 'js/tour.js' %}?ver={{ static_version }}"></script>
+<script defer type="text/javascript" src="{% static 'js/addons/crypto-js.min.js' %}"></script>
+<script defer type="text/javascript" src="{% static 'js/lav_crypto.js' %}?ver={{ static_version }}"></script>
+<script defer type="text/javascript" src="{% static 'js/home.js' %}?ver={{ static_version }}"></script>
 {% endblock %}
 {% block content %}
 <div class="container account_container" {% if not request.user.profile.is_active_email and request.user.is_authenticated %}style="margin-top: 20px;"{% endif %}>

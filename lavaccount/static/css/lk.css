@@ -11,6 +11,11 @@
     margin: 5px;
     text-align: center;
     width: calc(100% - 20px * 3);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.simple-tabs:hover {
+    border-color: rgba(0, 0, 0, 0.425);
 }
 
 .swiper-container {

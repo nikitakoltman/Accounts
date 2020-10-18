@@ -52,13 +52,13 @@
     <link rel="stylesheet" href="{% static 'css/addons/bootstrap-tour.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/addons/sweet-alert.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}?ver={{ static_version }}" />
-    <script src="{% static 'js/addons/jquery-3.5.1.min.js' %}"></script>
-    <script src="{% static 'js/addons/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/addons/bootstrap-tour.min.js' %}"></script>
-    <script src="{% static 'js/addons/jquery.easing.min.js' %}"></script>
-    <script src="{% static 'js/addons/sweet-alert.min.js' %}"></script>
-    <script src="{% static 'js/addons/SmoothScroll.js' %}"></script>
-    <script src="{% static 'js/base.js' %}?ver={{ static_version }}"></script>
+    <script defer src="{% static 'js/addons/jquery-3.5.1.min.js' %}"></script>
+    <script defer src="{% static 'js/addons/bootstrap.min.js' %}"></script>
+    <script defer src="{% static 'js/addons/bootstrap-tour.min.js' %}"></script>
+    <script defer src="{% static 'js/addons/jquery.easing.min.js' %}"></script>
+    <script defer src="{% static 'js/addons/sweet-alert.min.js' %}"></script>
+    <script defer src="{% static 'js/base.js' %}?ver={{ static_version }}"></script>
+    <script defer async src="{% static 'js/addons/SmoothScroll.js' %}"></script>
     <title>{% block title %}{% endblock %}</title>
     {% block addons_head %}{% endblock %}
     {% block noscript %}
@@ -78,66 +78,89 @@
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                {% if request.user.is_staff and site_in_service == 'true' %}
-                <a class="logo_site-close navbar-brand" href="{% url 'home_url' %}">Сайт закрыт</a>
-                {% else %}
-                <a class="logo navbar-brand" href="{% url 'home_url' %}">LavAccount</a>
-                {% endif %}
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right account-nav">
-                    {% if request.user.is_staff %}
-                    <li>
-                        <a href="{% url 'logs_url' %}">
-                            <p>Логи</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'admin:index' %}">
-                            <p>Админка</p>
-                        </a>
-                    </li>
-                    {% endif %}
-                    <li>
-                        <a href="{% url 'support_url' %}">
-                            <p>Помощь</p>
-                        </a>
-                    </li>
-                    {% if request.user.is_authenticated %}
-                    <li>
-                        <a href="{% url 'donation_url' %}">
-                            <p>Пожертвования</p>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'lk_url' %}">
-                            <p>Кабинет</p>
-                        </a>
-                    </li>
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    {% if request.user.is_staff and site_in_service == 'true' %}
+                    <a class="logo_site-close navbar-brand" href="{% url 'home_url' %}">Сайт закрыт</a>
                     {% else %}
-                    <li>
-                        <div align="center" style="margin-top: 7px;">
-                            <a href="{% url 'lav_login' %}">
-                                <button class="btn btn-primary bubbly-button btn-round">Войти</button>
-                            </a>
-                        </div>
-                    </li>
-                    <li>
-                        <div align="center" style="margin-top: 7px;">
-                            <a href="{% url 'register_url' %}">
-                                <button class="btn btn-primary bubbly-button btn-round" style="width: 200px;">Зарегистрироваться</button>
-                            </a>
-                        </div>
-                    </li>
+                    <a class="logo navbar-brand" href="{% url 'home_url' %}">LavAccount</a>
                     {% endif %}
-                </ul>
-            </div>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right account-nav">
+                        {% if request.user.is_staff %}
+                        <li>
+                            <a href="{% url 'logs_url' %}">
+                                <p>Логи</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'admin:index' %}">
+                                <p>Админка</p>
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">
+                                <p>Прочее <span class="caret"></span></p>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{% url 'support_url' %}">
+                                        <p>Помощь</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'donation_url' %}">
+                                        <p>Пожертвования</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'lk_url' %}">
+                                        <p>Кабинет</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a href="{% url 'support_url' %}">
+                                <p>Помощь</p>
+                            </a>
+                        </li>
+                        {% if request.user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'donation_url' %}">
+                                <p>Пожертвования</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'lk_url' %}">
+                                <p>Кабинет</p>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li style="height: 50px;">
+                            <div align="center" style="margin-top: 7px;">
+                                <a href="{% url 'lav_login' %}">
+                                    <button class="btn btn-primary bubbly-button btn-round">Войти</button>
+                                </a>
+                            </div>
+                        </li>
+                        <li style="height: 50px;">
+                            <div align="center" style="margin-top: 7px;">
+                                <a href="{% url 'register_url' %}">
+                                    <button class="btn btn-primary bubbly-button btn-round" style="width: 200px;">Зарегистрироваться</button>
+                                </a>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
         </nav>
     </header>
@@ -176,9 +199,22 @@
     </footer>
     <a href="#" class="scrollup">Наверх</a>
     <input type="hidden" id="data-master_password" value="{{ master_password }}">
-    <script>
-    document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
+    <script type="text/javascript">
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register("{% url 'service_worker_url' %}").then(function(registration) {
+                // Registration was successful
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, function(err) {
+                // registration failed :(
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
     </script>
+    <!--<sTcript>
+    document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
+    </scriTpt>-->
 </body>
 
 </html>

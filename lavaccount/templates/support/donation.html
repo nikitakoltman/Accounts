@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}{{ title }}{% endblock %}
+{% block addons_head %}
+<script defer src="{% static 'js/donation.js' %}?ver={{ static_version }}"></script>
+{% endblock %}
 {% block content %}
 <div class="container">
     <main>
@@ -87,25 +90,4 @@
         <div class="horizontal-bottom-line"></div>
     </main>
 </div>
-<script type="text/javascript">
-$(function() {
-    $('.input_clear').on('click', function() {
-        $('#sum').val('').focus();
-    });
-
-    $("#sum").on('keypress', function(event) {
-        event = event || window.event;
-        if (event.charCode && event.charCode != 0 && event.charCode != 46 && (event.charCode < 48 || event.charCode > 57))
-            return false;
-    });
-
-    $('form').on('submit', function() {
-        let sum = $('#sum');
-        if (sum.val() == '') {
-            sum.focus();
-            return false;
-        }
-    });
-});
-</script>
 {% endblock %}

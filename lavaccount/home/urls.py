@@ -7,7 +7,6 @@ urlpatterns = [
     path('', views.index, name='home_url'),
     path('lk/', views.lk, name='lk_url'),
     path('noscript/', views.noscript, name='noscript_url'),
-    path('offline/', views.offline, name='offline_url'),
     path('logs/', views.logs, name='logs_url'),
     path('login/', views.lav_login, name="lav_login"),
     path('register/', views.RegisterView.as_view(), name="register_url"),
@@ -17,6 +16,7 @@ urlpatterns = [
     path('create_account/', views.create_account),
     path('delete_account/', views.delete_account),
     path('change_info_account/', views.change_info_account),
+    path('get_master_password/', views.get_master_password),
     path('change_or_create_master_password/', views.change_or_create_master_password),
     path('register/check_username/', views.check_username),
 

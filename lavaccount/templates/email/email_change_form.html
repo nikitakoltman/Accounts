@@ -12,7 +12,7 @@
             <p align="center">Введите новый адрес электронной почты, который вы хотите привязать.</p>
             <div class="row flex nomargin">
                 {% load crispy_forms_tags %}
-                <div class="card" style="width: 250px;">
+                <div class="card email_change_form_card">
                     <div class="card-body">
                         {% load crispy_forms_tags %}
                         <form method="post">{% csrf_token %}

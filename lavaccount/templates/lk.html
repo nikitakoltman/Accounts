@@ -36,15 +36,12 @@
                                 <div class="js-swiper-tabs" data-tabs="1" align="center">
                                     <strong>Профиль</strong>
                                     <div class="col-xs-12 col-sm-6">
-                                        <div class="card" style="width: 280px;">
+                                        <div class="card lk_card">
                                             <div class="card-body">
                                                 <strong>Ваши данные</strong>
-                                                <div align="center">
-                                                    <p>Здравствуйте, <span style="font-weight: bold;">{{ request.user.username }}</span>
-                                                    </p>
-                                                </div>
+                                                <p>Здравствуйте, <span>{{ request.user.username }}</span></p>
                                                 <p>Ваш почтовый адрес:
-                                                    <span style="font-weight: bold;">
+                                                    <span>
                                                         {% if request.user.email %}
                                                         {{ request.user.email }}
                                                         {% else %}
@@ -56,10 +53,10 @@
                                         </div>
                                     </div>
                                     <div class="col-xs-12 col-sm-6">
-                                        <div class="card" style="width: 280px;">
+                                        <div class="card lk_card">
                                             <div class="card-body">
                                                 <strong>Действия</strong>
-                                                <div style="margin-bottom: 5px;">
+                                                <div class="mt-5">
                                                     <a href="{% url 'email_change_url' %}">
                                                         <button type="submit"
                                                                 class="btn btn-primary btn-block bubbly-button default">
@@ -67,7 +64,7 @@
                                                         </button>
                                                     </a>
                                                 </div>
-                                                <div style="margin-bottom: 5px;">
+                                                <div class="mt-5">
                                                     <a href="{% url 'password_change' %}">
                                                         <button type="submit"
                                                                 class="btn btn-primary btn-block bubbly-button default">
@@ -75,7 +72,7 @@
                                                         </button>
                                                     </a>
                                                 </div>
-                                                <div style="margin-bottom: 20px;">
+                                                <div class="mt-5">
                                                     <a href="{% url 'master_password_reset_url' %}">
                                                         <button type="submit"
                                                                 class="btn btn-primary btn-block bubbly-button default">
@@ -83,7 +80,7 @@
                                                         </button>
                                                     </a>
                                                 </div>
-                                                <div>
+                                                <div class="mt-20">
                                                     <a href="{% url 'logout' %}">
                                                         <button type="submit"
                                                                 class="btn btn-primary btn-block bubbly-button default">
@@ -117,8 +114,8 @@
                                             </div>
                                         </div>
                                         <div class="auth-bottom">
-                                            <div class="auth-display">
-                                                {{ lh_date|get_item_dict:history.id }}
+                                            <div class="auth-display js-auth-date">
+                                                {{ history.date|date:"Y-m-d_H:i" }}
                                             </div>
                                             <span class="auth-display">|</span>
                                             <div class="auth-display">
@@ -169,10 +166,9 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <strong>Прочее</strong>
-                                                <div style="margin-top: 10px;">
+                                                <div class="lk_other_admin_card">
                                                     <a href="{% url 'check_email_template_url' %}">
-                                                        <button style="white-space: normal;"
-                                                                class="btn btn-primary btn-block bubbly-button">Страница
+                                                        <button class="btn btn-primary btn-block bubbly-button">Страница
                                                             для
                                                             проверки email шаблонов
                                                         </button>

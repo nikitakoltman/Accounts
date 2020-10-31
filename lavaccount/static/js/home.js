@@ -1,10 +1,12 @@
 /* Главная страница с таблицей аккаунтов */
 
 $(function() {
-    let master_password = $('#data-master_password').val(), // Хранит мастер пароль для расшифровки данных таблицы
+    let master_password = '', // Хранит мастер пароль для расшифровки данных таблицы
         press_timer = 0, // Хранит значение таймера для события долгого нажатия кнопки "Пароль"
         is_allow_copy = true, // Разрешает копирование при долгом нажатии кнопки "Пароль"
         is_allow_show_page = false; // Разрешает отображение страницы
+    
+    get_master_password();
 
     // Константы для функции show_or_copy_login_or_password(type_data)
     const _login = 'login',
@@ -18,22 +20,108 @@ $(function() {
     // Прячем копирайт чтобы не мешал
     $('.footer-urls').hide();
 
-    // Стираем промежуточные значения
-    $('#data-master_password').val('');
-    $('#data-training_completed').val('');
+    function get_master_password() {
+        /* Получение мастер пароля */
+        preload_show();
 
-    if (master_password != 'doesnotexist') {
-        // Открываем модальное окно ввода ключа/мастер пароля
-        $('#EnterKeyModal').modal('show');
-    } else {
-        /* При первом посещении страницы, а также исходя из результата "doesnotexist", мастер пароля в базе не существует, поэтому... */
-        // Отключаем поле ввода старого пароля в модальном окне изменения пароля
-        $('#in-old_password').attr('disabled', 'disabled').css('display', 'none');
-        $('label[for="in-old_password"]').css('display', 'none');
-        $('.modal-body-master-password').css('height', '175px');
-        $('#btn-send_master_password').text('Создать');
-        // Открываем модальное окно изменения пароля
-        $('#MasterPasswordModal').modal('show');
+        $.ajax({
+            url: 'get_master_password/',
+            type: 'GET',
+            success: function(result) {
+                master_password = result['result'];
+                if (master_password != 'doesnotexist') {
+                    // Открываем модальное окно ввода ключа/мастер пароля
+                    $('#EnterKeyModal').modal('show');
+                } else {
+                    /* При первом посещении страницы, а также исходя из результата "doesnotexist", мастер пароля в базе не существует, поэтому... */
+                    // Отключаем поле ввода старого пароля в модальном окне изменения пароля
+                    $('#in-old_password').attr('disabled', 'disabled').css('display', 'none');
+                    $('label[for="in-old_password"]').css('display', 'none');
+                    $('.modal-body-master-password').css('height', '175px');
+                    $('#btn-send_master_password').text('Создать');
+                    // Открываем модальное окно изменения пароля
+                    $('#MasterPasswordModal').modal('show');
+                }
+                preload_hide();
+            },
+            error: function(jqXHR, text, error) {
+                if (error == 'Forbidden') {
+                    swal(
+                        'Ошибка 403',
+                        'Этот сайт требует наличия файла cookie CSRF при отправке форм.' +
+                        ' Если вы настроили свой браузер так, чтобы он не сохранял файлы cookie,' +
+                        ' включите их снова, по крайней мере, для этого сайта.'
+                    )
+                    preload_hide();
+                }
+            }
+        });
+    }
+
+    $('#btn_master_import').on('change', function() {
+        /* Мастер импорт аккаунтов из json файлов */
+        var file = this.files[0],
+        reader = new FileReader;
+  
+        reader.onloadend = function() {
+            var data = JSON.parse(reader.result);
+            for (var i in data) {
+                console.log(data[i]['site']);
+                _create_account(data[i]['site'], data[i]['description'], data[i]['login'], data[i]['password']);
+                sleep(2000);
+            }
+        };
+    
+        reader.readAsText(file);
+    });
+
+    function sleep(miliseconds) {
+        /* Остановить выполнение кода */
+        var currentTime = new Date().getTime();
+        while (currentTime + miliseconds >= new Date().getTime()) {
+        }
+    }
+
+    function _create_account(site, description, login, password) {
+        /* Добавление нового аккаунта в таблице !ТОЛЬКО ДЛЯ МАСТЕР ИМПОРТА! */
+        preload_show();
+        
+        $.ajax({
+            url: 'create_account/',
+            type: 'POST',
+            data: {
+                site: encrypt(site, master_password),
+                description: encrypt(description, master_password),
+                login: encrypt(login, master_password),
+                password: encrypt(password, master_password)
+            },
+            success: function (result) {
+                if (result['status'] == 'success') {
+                    console.log(result['account_id']);
+                } else if (result['status'] == 'error') {
+                    if (result['message'] == 'accountlimitreached') {
+                        swal('Ошибка', 'Достигнут лимит в 200 аккаунтов');
+                    } else {
+                        swal('Ошибка', result['message']);
+                    }
+                } else {
+                    swal('Ошибка', result['result']);
+                }
+    
+                preload_hide();
+            },
+            error: function (jqXHR, text, error) {
+                if (error == 'Forbidden') {
+                    swal(
+                        'Ошибка 403',
+                        'Этот сайт требует наличия файла cookie CSRF при отправке форм.' +
+                        ' Если вы настроили свой браузер так, чтобы он не сохранял файлы cookie,' +
+                        ' включите их снова, по крайней мере, для этого сайта.'
+                    )
+                    preload_hide();
+                }
+            }
+        });
     }
 
     function create_account() {
@@ -81,7 +169,7 @@ $(function() {
                     // Памятка: поле логина и пароля очищаются всегда при закрытии модального окна
                 } else if (result['status'] == 'error') {
                     if (result['message'] == 'accountlimitreached') {
-                        swal('Ошибка', 'Достигнут лимит в 100 аккаунтов');
+                        swal('Ошибка', 'Достигнут лимит в 200 аккаунтов');
                     } else {
                         swal('Ошибка', result['message']);
                     }

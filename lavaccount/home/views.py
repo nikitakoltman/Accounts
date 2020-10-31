@@ -1,7 +1,5 @@
-import datetime
 import json
 import locale
-import re
 
 from api import service
 from api.models import Account, MasterPassword, LoginHistory
@@ -11,14 +9,11 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
-from django.template.defaulttags import register
 from django.urls import reverse
 from django.views.generic import TemplateView
 from lavaccount.settings import STATIC_VERSION, SITE_PROTOCOL
 from loguru import logger as log
-
 from .forms import RegisterForm, MasterPasswordResetForm, EmailChangeForm, LavAuthenticationForm, LavPasswordResetForm
-
 from django.contrib.auth.views import PasswordResetView
 
 
@@ -43,13 +38,13 @@ def check_email_template(request):
 
     # Шаблоны
     templates = [
-        'registration_email_confirm_email',
-        'email_change_notification_to_old_email',
-        'email_change_email',
-        'notification_ip_info_completed_requests_to_admin'
+        'email/registration_email_confirm_email',
+        'email/email_change_notification_to_old_email',
+        'email/email_change_email',
+        'email/notification_ip_info_completed_requests_to_admin'
     ]
 
-    return render(request, 'email/notification_ip_info_completed_requests_to_admin.html', context)
+    return render(request, templates[0], context)
 
 
 @service.base_view
@@ -68,27 +63,26 @@ def index(request):
         return render(request, 'landing.html', context)
 
     context.update({
-        'accounts': Account.objects.filter(user=request.user),
-        'master_password': service.get_master_password(user=request.user)
+        'accounts': Account.objects.filter(user=request.user)
     })
 
     return render(request, 'home.html', context)
 
-
+from operator import itemgetter
 @service.base_view
 def logs(request):
     """ Страница с отображением последних логов """
     if not request.user.is_staff:
         return HttpResponseForbidden(render(request, '403.html'))
 
-    file = open('logs/log.json')
-    logs = json.loads(file.read())
-    logs = sorted(logs.items(), reverse=True)
-    file.close()
+    log_file = open('logs/log.json')
+    json_logs = json.loads(log_file.read())
+    json_logs = sorted(json_logs.items(), key=lambda kv: kv[1]['date'], reverse=True)
+    log_file.close()
 
     context = {
         'title': 'Логи',
-        'logs': logs,
+        'logs': json_logs,
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }
@@ -107,50 +101,16 @@ def noscript(request):
 
 
 @service.base_view
-def offline(request):
-    """ Страница отображаемая если пользователь не подключен к интернету """
-    context = {
-        'title': 'Не удалось подключиться к LavAccount',
-        'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
-        'static_version': STATIC_VERSION
-    }
-    return render(request, 'offline.html', context)
-
-
-@service.base_view
 def lk(request):
     """ Личный кабинет пользователя """
-    login_history = LoginHistory.objects.filter(user=request.user).order_by('-date')
-    lh_date = dict()
-    today = datetime.datetime.today()
-    for lh in login_history:
-        if lh.date.day == today.day:
-            string = f'Сегодня в {lh.date.hour}:{lh.date.strftime("%M")}'
-        elif lh.date.day == today.day - 1:
-            string = f'Вчера в {lh.date.hour}:{lh.date.strftime("%M")}'
-        elif lh.date.year == today.year:
-            string = lh.date.strftime("%d %B") + f' в {lh.date.hour}:{lh.date.strftime("%M")}'
-        else:
-            string = lh.date.strftime("%d %B %Y") + f' в {lh.date.hour}:{lh.date.strftime("%M")}'
-        lh_date.update({
-            lh.id: string
-        })
-
     context = {
         'title': 'Личный кабинет',
-        'login_history': login_history,
-        'lh_date': lh_date,
+        'login_history': LoginHistory.objects.filter(user=request.user).order_by('-date'),
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'get_ip_info_system': SiteSetting.objects.get(name='get_ip_info_system').value,
         'static_version': STATIC_VERSION
     }
     return render(request, 'lk.html', context)
-
-
-@register.filter
-def get_item_dict(dictionary, key):
-    """ Фильтр для шаблона. Получить значение словаря по ключу """
-    return dictionary.get(key)
 
 
 @service.base_view
@@ -296,10 +256,10 @@ def master_password_reset(request):
 
         if service.master_password_reset(request.user, password):
             return redirect(reverse("home_url"))
-        else:
-            context.update({
-                'form_message': 'Password is not valid'
-            })
+
+        context.update({
+            'form_message': 'Password is not valid'
+        })
     return render(request, 'registration/master_password_reset.html', context)
 
 
@@ -310,8 +270,7 @@ def get_ip_info_system_switch(request):
         system_name = request.POST.get('system_name', None)
         answer = service.get_ip_info_system_switch(system_name)
         return service.json_response(answer)
-    else:
-        return HttpResponseForbidden(render(request, '403.html'))
+    return HttpResponseForbidden(render(request, '403.html'))
 
 
 @service.base_view
@@ -321,8 +280,7 @@ def site_in_service_switch(request):
         checked = request.POST.get('checked', None)
         answer = service.site_in_service_switch(checked)
         return service.json_response(answer)
-    else:
-        return HttpResponseForbidden(render(request, '403.html'))
+    return HttpResponseForbidden(render(request, '403.html'))
 
 
 @service.base_view
@@ -333,13 +291,13 @@ def create_account(request):
 
     site = request.POST.get('site', None)
     description = request.POST.get('description', None)
-    login = request.POST.get('login', None)
+    _login = request.POST.get('login', None)
     password = request.POST.get('password', None)
 
     answer = service.create_account(
         site=site,
         description=description,
-        login=login,
+        login=_login,
         password=password,
         user=request.user
     )
@@ -414,6 +372,16 @@ def check_username(request):
 
 
 @service.base_view
+def get_master_password(request):
+    """ Возвращает мастер пароль """
+    if not request.is_ajax():
+        return HttpResponseForbidden(render(request, '403.html'))
+
+    answer = service.get_master_password(user=request.user)
+    return service.json_response(answer)
+
+
+@service.base_view
 def lav_login(request):
     """ Авторизация пользователей """
     if request.user.is_authenticated:
@@ -437,7 +405,8 @@ def lav_login(request):
 
         if user is not None:
             login(request, user)
-            service.NewLoginHistory(user, request.META, system, browser).start()
+            service.NewLoginHistory(
+                user, request.META, system, browser).start()
             return redirect(reverse("home_url"))
         else:
             context.update({
@@ -446,23 +415,8 @@ def lav_login(request):
     return render(request, 'registration/login.html', context)
 
 
-def check_if_password_correct(password1: str, password2: str) -> str:
-    """ Проверка корректности пароля """
-    if password1 != password2:
-        return 'broken rule [pass == pass2]'
-    if len(password1) < 8:
-        return 'broken rule [len > 8]'
-    elif re.search('[a-z]', password1) is None:
-        return 'broken rule [a-z]'
-    elif re.search('[A-Z]', password1) is None:
-        return 'broken rule [A-Z]'
-    elif re.search('[0-9]', password1) is None:
-        return 'broken rule [0-9]'
-    else:
-        return 'success'
-
-
 class LavPasswordResetView(PasswordResetView):
+    """ Переопределение формы сброса пароля для представления """
     form_class = LavPasswordResetForm
 
 
@@ -470,11 +424,12 @@ class RegisterView(TemplateView):
     """ Регистрация пользователей """
 
     def dispatch(self, request, *args, **kwargs):
-        return lav_register(request, *args, **kwargs)
+        return lav_register(request)
 
 
 @service.base_view
-def lav_register(request, *args, **kwargs):
+def lav_register(request):
+    """ Регистрация """
     if request.user.is_authenticated:
         return redirect(reverse("home_url"))
 
@@ -492,7 +447,7 @@ def lav_register(request, *args, **kwargs):
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
 
-        answer = check_if_password_correct(password1, password2)
+        answer = service.check_if_password_correct(password1, password2)
         if answer == 'success':
             try:
                 user = User.objects.create_user(

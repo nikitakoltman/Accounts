@@ -11,7 +11,7 @@
             <h2 align="center">{{ title }}</h2>
             <div class="row">
                 <div class="col-sm-6">
-                    <div class="card" style="margin-bottom: 10px;">
+                    <div class="card donation_card">
                         <div class="card-body">
                             <form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
                                 <input type="hidden" name="receiver" value="410019984608793">
@@ -25,30 +25,30 @@
                                 <input type="hidden" name="need-email" value="false">
                                 <input type="hidden" name="need-phone" value="false">
                                 <input type="hidden" name="need-address" value="false">
-                                <div>
-                                    <p style="font-size: 12px;">Назначение перевода</p>
-                                    <h4 style="font-weight: 800;">На развитие сайта</h4>
+                                <div class="donation_form_title">
+                                    <p>Назначение перевода</p>
+                                    <h4>На развитие сайта</h4>
                                 </div>
                                 <div class="form-group">
-                                    <label style="font-size: 12px; font-weight: unset;" for="sum" class="requiredField">
+                                    <label for="sum" class="requiredField donation_form_label_sum">
                                         Сумма
                                     </label>
                                     <div>
-                                        <input style="width: 150px;" class="form-control" name="sum" value="150" data-type="number" id="sum">
+                                        <input class="form-control donation_form_input_sum" name="sum" value="150" data-type="number" id="sum">
                                         <span class="input_clear" unselectable="on">&nbsp;</span>
                                         <div class="form_radio_group">
                                             <div class="form_radio_group-item">
                                                 <input id="radio-1" type="radio" name="paymentType" value="PC" checked>
-                                                <label for="radio-1"><i class="donate_icon" style="background-image: url(https://money.yandex.ru/b/_/sqJ2MGna3IZGNFXC9k4QOrzUG-c.svg);"></i></label>
+                                                <label for="radio-1"><i class="donate_icon" id="donation_form_radio_yandex_money"></i></label>
                                             </div>
                                             <div class="form_radio_group-item">
                                                 <input id="radio-2" type="radio" name="paymentType" value="AC">
-                                                <label for="radio-2"><i class="donate_icon" style="background-image: url(https://money.yandex.ru/b/_/znDCcGN9U__lRVsmiQ6akvmMXuE.svg);"></i></label>
+                                                <label for="radio-2"><i class="donate_icon" id="donation_form_radio_visa_card"></i></label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div align="center" style="width: 150px;">
+                                <div align="center" class="donation_form_donate_button">
                                     <button type="submit" class="btn btn-primary btn-block bubbly-button">Пожертвовать</button>
                                 </div>
                             </form>
@@ -56,9 +56,9 @@
                     </div>
                 </div>
                 <div class="col-sm-6">
-                    <p>С помощью формы Вы можете пожертвовать проекту немного средств для развития и оплаты услуг хостинг провайдера.</p>
-                    <p>Благодаря вашим пожертвованиям приложение остается бесплатным и доступеным для всех! <span style="font-size: 24px;">😃👍</span></p>
-                    <p>Важны даже самые маленькие пожертвования. <span style="font-size: 24px;">🙏</span></p>
+                    <p>С помощью формы ты можешь пожертвовать проекту немного средств для развития и оплаты услуг хостинг провайдера.</p>
+                    <p>Благодаря пожертвованиям сайт остается бесплатным и доступеным для всех! <span class="span_emoji">😃👍</span></p>
+                    <p>Важны даже самые маленькие пожертвования. <span class="span_emoji">🙏</span></p>
                 </div>
             </div>
         </section>
@@ -66,23 +66,23 @@
             <h2 align="center">Социальная поддержка</h2>
             <div class="row">
                 <div class="col-sm-6">
-                    <p>Вы также можете поддержать нас рассказав об этом сервисе своим друзьям или поделиться ссылкой на нас в социальных сетях.</p>
+                    <p>Ты также можешь поддержать нас, рассказав об этом сайте своим друзьям или поделиться ссылкой в социальных сетях.</p>
                 </div>
                 <div class="col-sm-6 share-container" align="center">
                     <a href="http://vk.com/share.php?url=https://lavaccount.ru/&image=https://lavaccount.ru{% static 'img/png/icon-512x512.png' %}&noparse=true" target="_blank" title="Вконтакте" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
-                        <img class="share-button" src="{% static 'img/svg/social/vk.svg' %}" height="50" width="50" alt="vk" style="box-shadow: 0 2px 25px #4c75a1;border-radius: 50px;">
+                        <img class="share-button" src="{% static 'img/svg/social/vk.svg' %}" height="50" width="50" alt="vk" id="donation_vk">
                     </a>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=https://lavaccount.ru/&picture=https://lavaccount.ru{% static 'img/png/icon-512x512.png' %}" target="_blank" title="Фейсбук" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
-                        <img class="share-button" src="{% static 'img/svg/social/fb.svg' %}" height="50" width="50" alt="facebook" style="box-shadow: 0 2px 25px #4465a2;border-radius: 50px;background: #4465a2;">
+                        <img class="share-button" src="{% static 'img/svg/social/fb.svg' %}" height="50" width="50" alt="facebook" id="donation_facebook">
                     </a>
                     <a href="https://connect.ok.ru/offer?url=https://lavaccount.ru/" target="_blank" title="Одноклассники" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
-                        <img class="share-button" src="{% static 'img/svg/social/ok.svg' %}" height="50" width="50" alt="ok" style="box-shadow: 0 2px 25px #e17e35;border-radius: 30px;">
+                        <img class="share-button" src="{% static 'img/svg/social/ok.svg' %}" height="50" width="50" alt="ok" id="donation_ok">
                     </a>
                     <a href="https://twitter.com/share?url=https://lavaccount.ru/&text=Веб приложение для храниения аккаунтов&hashtags=lavaccount" target="_blank" title="Твиттер" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
-                        <img class="share-button" src="{% static 'img/svg/social/twitter.svg' %}" height="50" width="50" alt="twitter" style="box-shadow: 0 2px 25px #55acee;border-radius: 30px;">
+                        <img class="share-button" src="{% static 'img/svg/social/twitter.svg' %}" height="50" width="50" alt="twitter" id="donation_twitter">
                     </a>
                     <a href="http://connect.mail.ru/share?url=https://lavaccount.ru/&title=LavAccount&description=Веб приложение для храниения аккаунтов&image_url=https://lavaccount.ru{% static 'img/png/icon-512x512.png' %}" target="_blank" title="Мой мир" onclick="window.open(this.href, this.target, 'width=500, height=500, scrollbars=1');return false;">
-                        <img class="share-button" src="{% static 'img/svg/social/mailru.svg' %}" height="50" width="50" alt="mailru" style="background-color: #2166a9;border-radius: 30px;padding: 5px;box-shadow: 0 2px 25px #2166a9">
+                        <img class="share-button" src="{% static 'img/svg/social/mailru.svg' %}" height="50" width="50" alt="mailru" id="donation_mailru">
                     </a>
                 </div>
             </div>

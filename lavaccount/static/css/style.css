@@ -69,7 +69,6 @@ a,
     width: 11px;
 }
 
-
 body {
     padding-right: 0 !important;
 }
@@ -108,6 +107,14 @@ body.modal-open {
 .h2,
 h2 {
     font-size: 28px;
+}
+
+.mt-5 {
+    margin-top: 5px !important;
+}
+
+.mt-20 {
+    margin-top: 20px !important;
 }
 
 .auth {
@@ -525,7 +532,6 @@ h2 {
 }
 
 .form_radio_group-item {
-    display: inline-block;
     float: left;
 }
 
@@ -634,6 +640,180 @@ h2 {
 
 .card-title {
     margin-bottom: .75rem;
+}
+
+.email_change_form_card {
+    width: 250px;
+}
+
+.login_card #id_password {
+    width: 85%;
+}
+
+.login_card {
+    width: 305px;
+}
+
+@media (max-width: 320px) {
+    .login_card {
+        width: 275px;
+    }
+}
+
+.password_change_form_card #password_info {
+    bottom: -50px;
+}
+
+.password_change_form_card #error_1_id_old_password {
+    display: none;
+}
+
+.password_reset_complete_login_button {
+    width: 150px;
+}
+
+.password_reset_form_card {
+    width: 250px;
+}
+
+.register_card #id_password1 {
+    width: 70%;
+}
+
+.register_card {
+    width: 325px;
+}
+
+.register_card #password_info {
+    bottom: 30px;
+}
+
+@media (max-width: 330px) {
+    .register_card {
+        width: 275px;
+    }
+}
+
+.donation_card {
+    margin-bottom: 10px;
+}
+
+.donation_form_title p {
+    font-size: 12px;
+}
+
+.donation_form_title h4 {
+    font-weight: 800;
+}
+
+.donation_form_label_sum {
+    font-size: 12px;
+    font-weight: unset;
+}
+
+.donation_form_input_sum {
+    width: 150px;
+}
+
+#donation_form_radio_yandex_money {
+    background-image: url('/static/img/svg/donation/yandex_money.svg');
+}
+
+#donation_form_radio_visa_card {
+    background-image: url('/static/img/svg/donation/visa_card.svg');
+}
+
+.donation_form_donate_button {
+    width: 150px;
+}
+
+#donation_vk {
+    box-shadow: 0 2px 25px #4c75a1;
+    border-radius: 50px;
+}
+
+#donation_facebook {
+    box-shadow: 0 2px 25px #4465a2;
+    border-radius: 50px;
+    background: #4465a2;
+}
+
+#donation_ok {
+    box-shadow: 0 2px 25px #e17e35;
+    border-radius: 30px;
+}
+
+#donation_twitter {
+    box-shadow: 0 2px 25px #55acee;
+    border-radius: 30px;
+}
+
+#donation_mailru {
+    background-color: #2166a9;
+    border-radius: 30px;
+    padding: 5px;
+    box-shadow: 0 2px 25px #2166a9;
+}
+
+.privacy_bottom_text {
+    word-wrap: break-word;
+}
+
+.base_li_account_buttons {
+    height: 50px;
+}
+
+.base_li_account_buttons div {
+    margin-top: 7px;
+}
+
+.base_li_register_button {
+    width: 200px !important;
+}
+
+.account_table_th_icon {
+    display: contents;
+    font-size: 14px !important;
+}
+
+.modal-header-create-account_delete_button {
+    width: 100px !important;
+}
+
+.modal-body-show-account #modal-login {
+    display: none;
+}
+
+.modal-body-show-account #modal-password {
+    display: none;
+}
+
+.modal-body-master-password #password_info {
+    bottom: -68px;
+}
+
+.logs_span_key {
+    font-weight: 800;
+}
+
+.lk_card {
+    width: 280px;
+}
+
+.lk_card p span {
+    font-weight: bold;
+}
+
+.lk_other_admin_card {
+    margin-top: 10px;
+}
+
+.lk_other_admin_card button {
+    white-space: normal;
+}
+
+.span_emoji {
+    font-size: 24px;
 }
 
 .btn-send {

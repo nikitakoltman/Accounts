@@ -12,16 +12,20 @@
 <script defer type="text/javascript" src="{% static 'js/home.js' %}?ver={{ static_version }}"></script>
 {% endblock %}
 {% block content %}
-<div class="container account_container" {% if not request.user.profile.is_active_email and request.user.is_authenticated %}style="margin-top: 20px;"{% endif %}>
+<div class="container account_container {% if not request.user.profile.is_active_email and request.user.is_authenticated %}mt-20{% endif %}">
     <div align="center" class="main_buttons">
         <button id="btn_create_account_modal" data-toggle="modal" data-target="#CreateAccountModal" class="btn btn-primary">Добавить аккаунт</button>
         <button id="btn_master_password_modal" data-toggle="modal" data-target="#MasterPasswordModal" class="btn btn-primary">Мастер пароль</button>
+        {% if request.user.is_staff %}
+        <!-- Потом удалить -->
+        <input id="btn_master_import" type="file" value="Import" class="btn btn-primary"/>
+        {% endif %}
     </div>
     <input class="form-control" placeholder="Поиск" type="text" id="in-search">
     <table id="Accounts_table" class="tablesorter table-hover">
         <thead>
             <tr>
-                <th style="display: table-column;"></th>
+                <th class="account_table_th_icon">{{ accounts.count }}</th>
                 <th>Сайт</th>
                 <th>Описание</th>
             </tr>
@@ -50,7 +54,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header modal-header-create-account">
-                <button type="button" class="btn btn-danger btn-round" style="width: 100px;" data-site="" data-id="" id="modal-btn-account_delete">Удалить</button>
+                <button type="button" class="btn btn-danger btn-round modal-header-create-account_delete_button" data-site="" data-id="" id="modal-btn-account_delete">Удалить</button>
                 <button class="btn btn-primary bubbly-button btn-round" id="modal-btn-save">Сохранить</button>
                 <button type="button" class="close btn-close btn-close_account-modal" data-dismiss="modal" aria-hidden="true">×</button>
             </div>
@@ -63,8 +67,8 @@
                 <input class="form-control" type="text" id="modal-new_login" placeholder="Введите новый логин">
                 <label for="modal-new_password">Пароль</label>
                 <input class="form-control" type="password" id="modal-new_password" placeholder="Введите новый пароль">
-                <input style="display: none;" id="modal-login">
-                <input style="display: none;" id="modal-password">
+                <input id="modal-login">
+                <input id="modal-password">
             </div>
             <div align="center" class="modal-footer modal-footer-show-account">
                 <div align="center" id="js-tour_show_account_modal_footer_buttons">
@@ -111,7 +115,7 @@
                 <label for="in-repeat_new_password">Повторите новый пароль</label>
                 <input class="form-control" type="password" id="in-repeat_new_password">
                 <button class="btn btn-primary bubbly-button btn-round btn-send" id="btn-send_master_password">Изменить</button>
-                <div id="password_info" style="bottom: -68px;">
+                <div id="password_info">
                     <h5>Пароль должен соответствовать критериям:</h5>
                     <ul>
                         <li id="letter">Минимум <strong>одна маленькая буква</strong></li>
@@ -140,3 +144,4 @@
     </div>
 </div>
 {% endblock %}
+{% block main_hide_preload %}{% endblock %}

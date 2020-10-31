@@ -17,7 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'crispy_forms',
-    'rest_framework',
+    #'rest_framework',
     # 'rest_framework.authtoken',
     # 'djoser',
 
@@ -26,64 +26,17 @@ INSTALLED_APPS = [
     'support.apps.SupportConfig'
 ]
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-
-SITE_ID = 2
-
-# Почта поддержки
-SUPPORT_EMAIL = config.SUPPORT_EMAIL
-
-STATIC_VERSION = 1
-STATIC_VERSIONS = {
-    'bootstrap-tour.min.css': 1,
-    'bootstrap.min.css': 1,
-    'sweet-alert.min.css': 1,
-
-    'lk.css': 1,
-    'style.css': 1,
-    'support.css': 1,
-    'table-theme-blue.css': 1,
-
-    'bootstrap-tour.min.js': 1,
-    'bootstrap.min.js': 1,
-    'crypto-js.min.js': 1,
-    'jquery-3.5.1.min.js': 1,
-    'jquery.easing.min.js': 1,
-    'jquery.tablesorter.min.js': 1,
-    'PassGenJS.min.js': 1,
-    'sweet-alert.min.js': 1,
-
-    'ajax_setup.js': 1,
-    'base.js': 1,
-    'bubbly_animation.js': 1,
-    'client_detection.js': 1,
-    'email_change_form.js': 1,
-    'form_message_handler.js': 1,
-    'home.js': 1,
-    'landing.js': 1,
-    'lk.js': 1,
-    'login.js': 1,
-    'password_field_validation.js': 1,
-    'register.js': 1,
-    'tour.js': 1,
-
-    'browserconfig.xml': 1,
-    'manifest.json': 1
-}
-SITE_PROTOCOL = 'https'
+###SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+###SECURE_SSL_REDIRECT = True
 
 SESSION_COOKIE_SAMESITE = 'Strict' # 'Lax'
 
 # Защита XSS для старых браузеров
 SECURE_BROWSER_XSS_FILTER = True
 
-# TODO: раскомментировать параметры на продакшене
-
 # Отказывать подключение к доменному имени через небезопасное
 # соединение, в течение определенного периода времени (В секундах)
-###SECURE_HSTS_SECONDS = 30 # Час 3600 # Год 31536000
+###SECURE_HSTS_SECONDS = 63072000 # 2 Года 63072000 # Час 3600 # Год 31536000
 # Защита поддоменов
 ###SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # Добавить сайт в список предварительной загрузки браузера
@@ -99,6 +52,39 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # Если True, перенаправляет все запросы, отличные от HTTPS, на HTTPS
 ###SECURE_SSL_REDIRECT = True
+
+# Защита Content-Security-Policy для контента
+CSP_DEFAULT_SRC = ("'none'",)
+CSP_STYLE_SRC = ("'self'",) # "'unsafe-inline'",
+CSP_SCRIPT_SRC = ("'self'",)
+CSP_FONT_SRC = ("'self'",)
+CSP_IMG_SRC = ("'self'",)
+
+## unsafe-inline разрешает встроенный CSS, например <h1 style = "margin-left: 30px;">
+## Эта политика содержит 'unsafe-inline', что опасно в директиве style-src.
+
+
+# Защита Referrer-Policy для контента
+PERMISSIONS_POLICY = {
+    'autoplay': ['none',],
+    'camera': ['none',],
+    'microphone': ['none',],
+    'geolocation': ['none',],
+    'display-capture': ['none',],
+    'payment': ['none',],
+}
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+SITE_ID = 3
+
+# Почта поддержки
+SUPPORT_EMAIL = config.SUPPORT_EMAIL
+
+STATIC_VERSION = 1
+SITE_PROTOCOL = 'https'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

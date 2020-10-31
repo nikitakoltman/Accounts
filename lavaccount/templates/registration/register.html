@@ -6,27 +6,12 @@
 <script defer type="text/javascript" src="{% static 'js/ajax_setup.js' %}?ver={{ static_version }}"></script>
 <script defer type="text/javascript" src="{% static 'js/form_message_handler.js' %}?ver={{ static_version }}"></script>
 <script defer type="text/javascript" src="{% static 'js/register.js' %}?ver={{ static_version }}"></script>
-<style type="text/css">
-    #id_password1 {
-        width: 70%;
-    }
-
-    .card {
-        width: 325px;
-    }
-
-    @media (max-width: 330px) {
-        .card {
-            width: 275px;
-        }
-    }
-</style>
 {% endblock %}
 {% block content %}
 <div class="container registration-container">
     <div class="row flex nomargin">
         {% load crispy_forms_tags %}
-        <div class="card">
+        <div class="card register_card">
             <div class="card-body">
                 <h4 class="card-title text-center">{{ title }}</h4>
                 <form method="post">
@@ -40,7 +25,7 @@
                         <img title="Сгенерировать пароль" src="{% static 'img/svg/lock.svg' %}" alt="show-password" height="30" width="30" />
                     </button>
                 </form>
-                <div id="password_info" style="bottom: 30px;">
+                <div id="password_info">
                     <h5>Критерии пароля:</h5>
                     <ul>
                         <li id="letter">Минимум <strong>одна маленькая буква</strong></li>

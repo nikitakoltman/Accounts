@@ -1,5 +1,7 @@
+import os
 import functools
 import json
+import re
 import threading
 import traceback
 import urllib.request
@@ -20,7 +22,7 @@ from django.utils.encoding import force_bytes
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.utils.http import urlsafe_base64_encode
-from lavaccount.settings import DEBUG, SITE_PROTOCOL, STATIC_VERSION
+from lavaccount.settings import DEBUG, SITE_PROTOCOL, STATIC_VERSION, BASE_DIR
 from loguru import logger as log
 
 from .models import Account, MasterPassword, LoginHistory, SiteSetting
@@ -362,9 +364,31 @@ def get_master_password(user: User) -> str:
     """ Возвращает мастер пароль """
     try:
         master_password = MasterPassword.objects.get(user=user)
-        return master_password.password
+        return {
+            'status': 'success',
+            'result': master_password.password
+        }
     except MasterPassword.DoesNotExist:
-        return 'doesnotexist'
+        return {
+            'status': 'error',
+            'result': 'doesnotexist'
+        }
+
+
+def check_if_password_correct(password1: str, password2: str) -> str:
+    """ Проверка корректности пароля """
+    if password1 != password2:
+        return 'broken rule [pass == pass2]'
+    if len(password1) < 8:
+        return 'broken rule [len > 8]'
+    if re.search('[a-z]', password1) is None:
+        return 'broken rule [a-z]'
+    if re.search('[A-Z]', password1) is None:
+        return 'broken rule [A-Z]'
+    if re.search('[0-9]', password1) is None:
+        return 'broken rule [0-9]'
+
+    return 'success'
 
 
 def base_view(function):
@@ -406,34 +430,46 @@ def json_response(data: dict, status=200) -> JsonResponse:
 def write_error_to_log_file(error_type: str, user: User, traceback_format_exc: str) -> None:
     """ Запись исключения в файл """
     try:
-        file = open('logs/log.json')
-        text = json.loads(file.read())
+        _log_file = open(BASE_DIR + '/logs/log.json')
+        log_file = _log_file.read()
+        _log_file.close()
+        text = json.loads(log_file)
 
-        with open('logs/log.json', 'w+') as f:
+        with open(BASE_DIR + '/logs/log.json', 'w+') as f:
             text.update({
-                len(text): {'type': error_type, 'user': str(user), 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'),
-                            'traceback': traceback_format_exc}
+                len(text): {
+                    'type': error_type,
+                    'user': str(user),
+                    'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'),
+                    'traceback': traceback_format_exc
+                }
             })
             f.write(
                 json.dumps(text, indent=4)
             )
 
         # Если размер файла больше либо равен 10 мегабайт архивируем логи
-        if len(file.read()) >= 10485760:
-            with zipfile.ZipFile('logs/log_json__' + datetime.now().strftime('%d-%m-%Y_%H-%M-%S') + '__.zip',
-                                 'w') as arzip:
-                arzip.write('logs/log.json')
-                f = open('logs/log.json', 'w+')
+        if len(log_file) >= 10485760:
+            with zipfile.ZipFile(
+                BASE_DIR + '/logs/log_json__' + datetime.now().strftime('%d-%m-%Y_%H-%M-%S') + '__.zip',
+                'w') as arzip:
+                arzip.write(BASE_DIR + '/logs/log.json')
+                f = open(BASE_DIR + '/logs/log.json', 'w+')
                 f.write(json.dumps(json.loads('{}'), indent=4))
                 f.close()
-
-        file.close()
     except FileNotFoundError:
-        f = open('logs/log.json', 'x')
+        if not os.path.exists(BASE_DIR + '/logs'):
+            os.mkdir(BASE_DIR + '/logs/')
+
+        f = open(BASE_DIR + '/logs/log.json', 'w')
         text = json.loads('{}')
         text.update({
-            len(text): {'type': error_type, 'user': str(user), 'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'),
-                        'traceback': traceback_format_exc}
+            len(text): {
+                'type': error_type,
+                'user': str(user),
+                'date': datetime.now().strftime('%d.%m.%Y %H:%M:%S'),
+                'traceback': traceback_format_exc
+            }
         })
         f.write(json.dumps(text, indent=4))
         f.close()

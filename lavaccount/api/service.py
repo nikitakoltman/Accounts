@@ -1,6 +1,6 @@
-import os
 import functools
 import json
+import os
 import re
 import threading
 import traceback
@@ -14,18 +14,15 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 from django.db import transaction
-from django.http import JsonResponse, HttpResponseServerError
-from django.shortcuts import redirect, render
+from django.http import HttpResponseServerError, JsonResponse
+from django.shortcuts import render
 from django.template.loader import get_template
-from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.utils.encoding import force_text
-from django.utils.http import urlsafe_base64_decode
-from django.utils.http import urlsafe_base64_encode
-from lavaccount.settings import DEBUG, SITE_PROTOCOL, STATIC_VERSION, BASE_DIR
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from lavaccount.settings import BASE_DIR, DEBUG, SITE_PROTOCOL, STATIC_VERSION
 from loguru import logger as log
 
-from .models import Account, MasterPassword, LoginHistory, SiteSetting
+from .models import Account, LoginHistory, MasterPassword, SiteSetting
 from .tokens import account_activation_token
 
 
@@ -49,15 +46,15 @@ class NewLoginHistory(threading.Thread):
 
     def __init__(self, user, META, system, browser):
         self.user = user
-        self.META = META
+        self.meta = META
         self.system = system
         self.browser = browser
         threading.Thread.__init__(self)
 
     def run(self):
         ip_system = SiteSetting.objects.get(name='get_ip_info_system').value
-        ip = get_client_ip(self.META)
-        ip_info = get_ip_info(ip, ip_system)
+        client_ip = get_client_ip(self.meta)
+        ip_info = get_ip_info(client_ip, ip_system)
 
         if ip_system == 'ipwhois.io' and ip_info['completed_requests'] == 9500:
             current_site = Site.objects.get_current()
@@ -66,7 +63,7 @@ class NewLoginHistory(threading.Thread):
                 subject='Переполнение запросов ipwhois.io',
                 template='notification_ip_info_completed_requests_to_admin',
                 context={
-                    'username': user.username,
+                    'username': self.user.username,
                     'protocol': SITE_PROTOCOL,
                     'domain': current_site.domain,
                 }
@@ -78,23 +75,32 @@ class NewLoginHistory(threading.Thread):
                     location = ip_info['country']
                 else:
                     location = f"{ip_info['city']}, {ip_info['country']}"
-                self.create_login_history(ip, location)
+                self.create_login_history(client_ip, location)
             else:
-                write_error_to_log_file('NewLoginHistory ipwhois.io ERROR', request.user, ip_info)
+                write_error_to_log_file(
+                    'NewLoginHistory ipwhois.io ERROR',
+                    self.user.username,
+                    ip_info
+                )
         elif ip_system == 'ipinfo.io':
             try:
                 location = f"{ip_info['city']}, {ip_info['region']}"
-                self.create_login_history(ip, location)
+                self.create_login_history(client_ip, location)
             except KeyError:
-                write_error_to_log_file('NewLoginHistory ipinfo.io ERROR', request.user, ip_info)
+                write_error_to_log_file(
+                    'NewLoginHistory ipinfo.io ERROR',
+                    self.user.username,
+                    ip_info
+                )
 
-    def create_login_history(self, ip, location):
+    def create_login_history(self, client_ip, location):
+        """ Создает запись истории авторизации """
         if location is None:
             location = 'Не определено'
 
         LoginHistory.objects.create(
             user=self.user,
-            ip=ip,
+            ip=client_ip,
             system=self.system,
             location=location,
             browser=self.browser
@@ -158,7 +164,7 @@ def hiding_email(email: str) -> str:
     """ Скрывает тремя звездочками часть email адреса """
     try:
         return email[0:2] + '***' + email[email.index('@'):]
-    except:
+    except Exception:
         return ''
 
 
@@ -174,33 +180,34 @@ def master_password_reset(user: User, password: str) -> bool:
         return False
 
 
-def get_ip_info(ip: str, system: str) -> dict:
+def get_ip_info(client_ip: str, system: str) -> dict:
     """ Получить информацию о пользователе по ip через API """
     if system == 'ipwhois.io':
         objects = 'success,message,type,country,city,completed_requests'
-        url = f'https://ipwhois.app/json/{ip}?objects={objects}&lang=ru'
+        url = f'https://ipwhois.app/json/{client_ip}?objects={objects}&lang=ru'
     elif system == 'ipinfo.io':
-        url = f'https://ipinfo.io/{ip}?token=845b32c233ddc8'
+        url = f'https://ipinfo.io/{client_ip}?token=845b32c233ddc8'
 
     with urllib.request.urlopen(url) as response:
         return json.load(response)
 
 
-def get_client_ip(META) -> str:
+def get_client_ip(meta) -> str:
     """ Получить ip адрес пользователя """
-    x_forwarded_for = META.get('HTTP_X_FORWARDED_FOR')
+    x_forwarded_for = meta.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         return x_forwarded_for.split(',')[-1].strip()
     else:
-        return META.get('REMOTE_ADDR')
+        return meta.get('REMOTE_ADDR')
 
 
-def get_client_host(META) -> str:  # WARNING: Функция не используется
-    """ Получить host адресной строки пользователя """
-    host = META.get('HTTP_HOST')
-    if host:
-        return host
-    return META.get('REMOTE_HOST')
+def get_logs() -> list:
+    """ Сортировка логов по дате, чем раньше тем выше """
+    log_file = open(BASE_DIR + '/logs/log.json')
+    json_logs = json.loads(log_file.read())
+    json_logs = sorted(json_logs.items(), key=lambda kv: kv[1]['date'], reverse=True)
+    log_file.close()
+    return json_logs
 
 
 def get_ip_info_system_switch(system_name: str) -> dict:
@@ -244,7 +251,8 @@ def site_in_service_switch(checked: str) -> dict:
         }
 
 
-def create_account(site: str, description: str, login: str, password: str, user: User) -> dict:
+def create_account(site: str, description: str,
+                    login: str, password: str, user: User) -> dict:
     """ Создает новый аккаунт """
     if Account.objects.count() >= 200:
         return {
@@ -282,7 +290,8 @@ def delete_account(account_id: int) -> dict:
         }
 
 
-def change_info_account(site: str, description: str, new_login: str, new_password: str, account_id: int) -> dict:
+def change_info_account(site: str, description: str, new_login: str,
+                        new_password: str,account_id: int) -> dict:
     """ Изменяет информацию аккаунта """
     try:
         account = Account.objects.get(id=account_id)
@@ -405,7 +414,7 @@ def base_view(function):
                     }
                     return render(request, 'site_in_service.html', context)
                 return function(request, *args, **kwargs)
-        except Exception as err:
+        except Exception:
             if DEBUG:
                 log.error(traceback.format_exc())
             write_error_to_log_file('ERROR', request.user, traceback.format_exc())
@@ -451,17 +460,19 @@ def write_error_to_log_file(error_type: str, user: User, traceback_format_exc: s
         # Если размер файла больше либо равен 10 мегабайт архивируем логи
         if len(log_file) >= 10485760:
             with zipfile.ZipFile(
-                BASE_DIR + '/logs/log_json__' + datetime.now().strftime('%d-%m-%Y_%H-%M-%S') + '__.zip',
-                'w') as arzip:
+                BASE_DIR +
+                '/logs/log_json__' +
+                datetime.now().strftime('%d-%m-%Y_%H-%M-%S') +
+                '__.zip', 'w') as arzip:
                 arzip.write(BASE_DIR + '/logs/log.json')
-                f = open(BASE_DIR + '/logs/log.json', 'w+')
-                f.write(json.dumps(json.loads('{}'), indent=4))
-                f.close()
+                log_file = open(BASE_DIR + '/logs/log.json', 'w+')
+                log_file.write(json.dumps(json.loads('{}'), indent=4))
+                log_file.close()
     except FileNotFoundError:
         if not os.path.exists(BASE_DIR + '/logs'):
             os.mkdir(BASE_DIR + '/logs/')
 
-        f = open(BASE_DIR + '/logs/log.json', 'w')
+        log_file = open(BASE_DIR + '/logs/log.json', 'w')
         text = json.loads('{}')
         text.update({
             len(text): {
@@ -471,5 +482,5 @@ def write_error_to_log_file(error_type: str, user: User, traceback_format_exc: s
                 'traceback': traceback_format_exc
             }
         })
-        f.write(json.dumps(text, indent=4))
-        f.close()
+        log_file.write(json.dumps(text, indent=4))
+        log_file.close()

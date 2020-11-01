@@ -1,21 +1,21 @@
-import json
 import locale
 
 from api import service
-from api.models import Account, MasterPassword, LoginHistory
-from api.models import SiteSetting
+from api.models import Account, LoginHistory, MasterPassword, SiteSetting
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from django.contrib.auth.views import PasswordResetView
 from django.contrib.sites.models import Site
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import TemplateView
-from lavaccount.settings import STATIC_VERSION, SITE_PROTOCOL
+from lavaccount.settings import SITE_PROTOCOL, STATIC_VERSION
 from loguru import logger as log
-from .forms import RegisterForm, MasterPasswordResetForm, EmailChangeForm, LavAuthenticationForm, LavPasswordResetForm
-from django.contrib.auth.views import PasswordResetView
 
+from .forms import (EmailChangeForm, LavAuthenticationForm,
+                    LavPasswordResetForm, MasterPasswordResetForm,
+                    RegisterForm)
 
 # Русская локализация для даты
 locale.setlocale(locale.LC_ALL, "")
@@ -68,21 +68,16 @@ def index(request):
 
     return render(request, 'home.html', context)
 
-from operator import itemgetter
+
 @service.base_view
 def logs(request):
     """ Страница с отображением последних логов """
     if not request.user.is_staff:
         return HttpResponseForbidden(render(request, '403.html'))
 
-    log_file = open('logs/log.json')
-    json_logs = json.loads(log_file.read())
-    json_logs = sorted(json_logs.items(), key=lambda kv: kv[1]['date'], reverse=True)
-    log_file.close()
-
     context = {
         'title': 'Логи',
-        'logs': json_logs,
+        'logs': service.get_logs(),
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }

@@ -1,0 +1,8 @@
+В django 3.1.2:
+    \env\lib\python3.6\site-packages\django\db\backends\mysql\base.py:
+        35: # if version < (1, 4, 0): # Editing: Nikita Koltman 01.11.2020 02:25
+        36: if version < (1, 3, 10):
+    \env\lib\python3.6\site-packages\django\db\backends\mysql\introspection.py:
+        27: # FIELD_TYPE.JSON: 'JSONField', # Editing: Nikita Koltman 01.11.2020 02:25
+        59: # if description.has_json_constraint: # Editing: Nikita Koltman 01.11.2020 02:25
+        60: # return 'JSONField' # Editing: Nikita Koltman 01.11.2020 02:25

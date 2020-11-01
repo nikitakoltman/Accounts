@@ -728,23 +728,27 @@ h2 {
 }
 
 #donation_vk {
-    box-shadow: 0 2px 25px #4c75a1;
+    -webkit-box-shadow: 0 2px 25px #4c75a1;
+            box-shadow: 0 2px 25px #4c75a1;
     border-radius: 50px;
 }
 
 #donation_facebook {
-    box-shadow: 0 2px 25px #4465a2;
+    -webkit-box-shadow: 0 2px 25px #4465a2;
+            box-shadow: 0 2px 25px #4465a2;
     border-radius: 50px;
     background: #4465a2;
 }
 
 #donation_ok {
-    box-shadow: 0 2px 25px #e17e35;
+    -webkit-box-shadow: 0 2px 25px #e17e35;
+            box-shadow: 0 2px 25px #e17e35;
     border-radius: 30px;
 }
 
 #donation_twitter {
-    box-shadow: 0 2px 25px #55acee;
+    -webkit-box-shadow: 0 2px 25px #55acee;
+            box-shadow: 0 2px 25px #55acee;
     border-radius: 30px;
 }
 
@@ -752,7 +756,8 @@ h2 {
     background-color: #2166a9;
     border-radius: 30px;
     padding: 5px;
-    box-shadow: 0 2px 25px #2166a9;
+    -webkit-box-shadow: 0 2px 25px #2166a9;
+            box-shadow: 0 2px 25px #2166a9;
 }
 
 .privacy_bottom_text {

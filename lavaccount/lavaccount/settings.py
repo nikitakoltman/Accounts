@@ -1,5 +1,5 @@
 import os
-
+from datetime import timedelta
 from configs import config
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -17,9 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'crispy_forms',
-    #'rest_framework',
-    # 'rest_framework.authtoken',
-    # 'djoser',
+    'axes',
 
     'home.apps.HomeConfig',
     'api.apps.ApiConfig',
@@ -29,14 +27,14 @@ INSTALLED_APPS = [
 ###SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ###SECURE_SSL_REDIRECT = True
 
-SESSION_COOKIE_SAMESITE = 'Strict' # 'Lax'
+SESSION_COOKIE_SAMESITE = 'Strict'  # 'Lax'
 
 # Защита XSS для старых браузеров
 SECURE_BROWSER_XSS_FILTER = True
 
 # Отказывать подключение к доменному имени через небезопасное
 # соединение, в течение определенного периода времени (В секундах)
-###SECURE_HSTS_SECONDS = 63072000 # 2 Года 63072000 # Час 3600 # Год 31536000
+# SECURE_HSTS_SECONDS = 63072000 # 2 Года 63072000 # Час 3600 # Год 31536000
 # Защита поддоменов
 ###SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # Добавить сайт в список предварительной загрузки браузера
@@ -55,23 +53,23 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # Защита Content-Security-Policy для контента
 CSP_DEFAULT_SRC = ("'none'",)
-CSP_STYLE_SRC = ("'self'",) # "'unsafe-inline'",
+CSP_STYLE_SRC = ("'self'",)  # "'unsafe-inline'",
 CSP_SCRIPT_SRC = ("'self'",)
 CSP_FONT_SRC = ("'self'",)
 CSP_IMG_SRC = ("'self'",)
 
-## unsafe-inline разрешает встроенный CSS, например <h1 style = "margin-left: 30px;">
-## Эта политика содержит 'unsafe-inline', что опасно в директиве style-src.
+# unsafe-inline разрешает встроенный CSS, например <h1 style = "margin-left: 30px;">
+# Эта политика содержит 'unsafe-inline', что опасно в директиве style-src.
 
 
 # Защита Referrer-Policy для контента
 PERMISSIONS_POLICY = {
-    'autoplay': ['none',],
-    'camera': ['none',],
-    'microphone': ['none',],
-    'geolocation': ['none',],
-    'display-capture': ['none',],
-    'payment': ['none',],
+    'autoplay': ['none', ],
+    'camera': ['none', ],
+    'microphone': ['none', ],
+    'geolocation': ['none', ],
+    'display-capture': ['none', ],
+    'payment': ['none', ],
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -94,7 +92,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'axes.middleware.AxesMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 70
+AXES_COOLOFF_TIME = timedelta(hours=2)
+AXES_LOCKOUT_TEMPLATE = 'ban.html'
 
 ROOT_URLCONF = 'lavaccount.urls'
 
@@ -161,50 +170,3 @@ EMAIL_HOST = config.EMAIL_HOST
 EMAIL_HOST_USER = config.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = config.EMAIL_HOST_PASSWORD
 EMAIL_PORT = config.EMAIL_PORT
-
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Для тестов в консоль
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework.authentication.SessionAuthentication',
-#         'rest_framework.authentication.TokenAuthentication',
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES': (
-#         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-#     ),
-# }
-
-# DJOSER = {
-#     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-#     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-#     'ACTIVATION_URL': '#/activate/{uid}/{token}',
-#     'SEND_ACTIVATION_EMAIL': True,
-#     'SERIALIZERS': {},
-# }
-
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-#     'ROTATE_REFRESH_TOKENS': False,
-#     'BLACKLIST_AFTER_ROTATION': True,
-
-#     'ALGORITHM': 'HS256',
-#     'SIGNING_KEY': config.DJANGO_SECRET_KEY,
-#     'VERIFYING_KEY': None,
-#     'AUDIENCE': None,
-#     'ISSUER': None,
-
-#     'AUTH_HEADER_TYPES': ('JWT',),
-#     'USER_ID_FIELD': 'id',
-#     'USER_ID_CLAIM': 'user_id',
-
-#     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-#     'TOKEN_TYPE_CLAIM': 'token_type',
-
-#     'JTI_CLAIM': 'jti',
-
-#     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-#     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
-#     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
-# }

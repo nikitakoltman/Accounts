@@ -13,6 +13,7 @@ urlpatterns = [
 
     path('lk/get_ip_info_system_switch/', views.get_ip_info_system_switch),
     path('lk/site_in_service_switch/', views.site_in_service_switch),
+    path('donation_notification/', views.donation_notification),
     path('create_account/', views.create_account),
     path('delete_account/', views.delete_account),
     path('change_info_account/', views.change_info_account),

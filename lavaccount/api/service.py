@@ -1,4 +1,5 @@
 import functools
+import hashlib
 import json
 import os
 import re
@@ -19,10 +20,13 @@ from django.shortcuts import render
 from django.template.loader import get_template
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from lavaccount.settings import BASE_DIR, DEBUG, SITE_PROTOCOL, STATIC_VERSION
+from lavaccount.settings import (BASE_DIR, DEBUG,
+                                 DONATION_NOTIFICATION_SECRET_KEY,
+                                 SITE_PROTOCOL, STATIC_VERSION)
 from loguru import logger as log
 
-from .models import Account, LoginHistory, MasterPassword, SiteSetting
+from .models import (Account, Donation, LoginHistory, MasterPassword,
+                     SiteSetting)
 from .tokens import account_activation_token
 
 
@@ -168,6 +172,41 @@ def hiding_email(email: str) -> str:
         return ''
 
 
+def calculate_hash(data: dict) -> str:
+    """ Вычисляет хеш для проверки платежа """
+    text = '{0}&{1}&{2}&{3}&{4}&{5}&{6}&{7}&{8}'.format(
+        data.get('notification_type', ''),
+        data.get('operation_id', ''),
+        data.get('amount', ''),
+        data.get('currency', ''),
+        data.get('datetime', ''),
+        data.get('sender', ''),
+        data.get('codepro', ''),
+        DONATION_NOTIFICATION_SECRET_KEY,
+        data.get('label', '')
+    )
+
+    hash_object = hashlib.sha1(text.encode('utf-8'))
+    hexd = hash_object.hexdigest()
+    return hexd
+
+
+def create_donation(info: dict) -> bool:
+    """ Создает пожертвование """
+    donate_hash = calculate_hash(info)
+
+    if donate_hash == info.get('sha1_hash', ''):
+        try:
+            Donation.objects.create(
+                user=User.objects.get(id=info.get('label', '')),
+                data=json.dumps(info)
+            )
+            return True
+        except ValueError:
+            return False
+    return False
+
+
 def master_password_reset(user: User, password: str) -> bool:
     """ Сброс мастер пароля """
     if check_password(password, user.password):
@@ -176,8 +215,7 @@ def master_password_reset(user: User, password: str) -> bool:
         accounts = Account.objects.filter(user=user)
         accounts.delete()
         return True
-    else:
-        return False
+    return False
 
 
 def get_ip_info(client_ip: str, system: str) -> dict:

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Account, MasterPassword, Profile, LoginHistory, SiteSetting
+from .models import Account, MasterPassword, Profile, LoginHistory, SiteSetting, Donation
 
 
 class AccountAdmin(admin.ModelAdmin):
@@ -43,3 +43,4 @@ admin.site.register(MasterPassword, MasterPasswordAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(LoginHistory, LoginHistoryAdmin)
 admin.site.register(SiteSetting, SiteSettingAdmin)
+admin.site.register(Donation)

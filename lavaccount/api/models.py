@@ -82,6 +82,20 @@ class SiteSetting(models.Model):
         verbose_name_plural = 'Настройки сайта'
 
 
+class Donation(models.Model):
+    """ Пожертвования """
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField('Создано', auto_now=False, auto_now_add=True)
+    data = models.TextField('Данные платежа')
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Пожертвование'
+        verbose_name_plural = 'Пожертвования'
+
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

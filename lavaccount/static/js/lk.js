@@ -45,6 +45,29 @@ $(function() {
     // Активируем раздел
     $('.js-swiper-tabs[data-tabs="' + tab + '"]').addClass('active');
 
+    $('.js-donate').each(function() {
+        let notification_type = $(this).find('.js-donate-notification_type');
+        let withdraw_amount = $(this).find('.js-donate-withdraw_amount');
+        let codepro = $(this).find('.js-donate-codepro');
+        let json_date = JSON.parse($(this).find('input').val());
+
+        $(this).find('input').val('');
+
+        if (json_date['notification_type'] == 'p2p-incoming') {
+            notification_type.text('Яндекс деньги');
+        } else {
+            notification_type.text('Банковская карта');
+        }
+
+        if (json_date['codepro'] == 'false') {
+            codepro.text('Платеж подтвержден');
+        } else {
+            codepro.text('Платеж не подтвержден');
+        }
+
+        withdraw_amount.text(json_date['withdraw_amount'] + ' ₽');
+    });
+
     function formatDate(format_date, format_string)
     {
         let yyyy = format_date.getFullYear();
@@ -89,7 +112,7 @@ $(function() {
 
         if (current_date.format('dd') == date.format('dd')) {
             string = 'Сегодня в ' + date.format('HH:ii');
-        } else if (current_date.format('dd') == (parseInt(date.format('dd')) - 1).toString()) {
+        } else if (parseInt(date.format('dd')) == (parseInt(current_date.format('dd')) - 1)) {
             string = 'Вчера в ' + date.format('HH:ii');
         } else if (current_date.format('yyyy') == date.format('yyyy')) {
             string = date.format('dd.mm') + ' в ' + date.format('HH:ii');

@@ -195,27 +195,6 @@
             <p>Для улучшения работы сайта мы используем файлы cookie. Продолжая работу с сайтом, Вы разрешаете использование cookie-файлов.</p>
             <div class="button-close cookie_accept"><i></i></div>
         </div>
-        {% if request.user.is_staff %}
-        <!--<div class="ads"></div> Реклама-->
-        <!--<div class="button-close"><i></i></div>-->
-        <!--<input type="hidden" id="data-master_password" value="{{ master_password }}">-->
-        <!--<script type="text/javascript">
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register("{1% url 'service_worker_url' %1}").then(function(registration) {
-                    // Registration was successful
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, function(err) {
-                    // registration failed :(
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
-        </script>-->
-        <!--<sTcript>
-        document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')
-        </scriTpt>-->
-        {% endif %}
     </footer>
     <a href="#" class="scrollup">Наверх</a>
 </body>

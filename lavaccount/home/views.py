@@ -1,14 +1,16 @@
 import locale
 
 from api import service
-from api.models import Account, LoginHistory, MasterPassword, SiteSetting
+from api.models import (Account, Donation, LoginHistory, MasterPassword,
+                        SiteSetting)
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.sites.models import Site
-from django.http import HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from lavaccount.settings import SITE_PROTOCOL, STATIC_VERSION
 from loguru import logger as log
@@ -95,12 +97,24 @@ def noscript(request):
     return render(request, 'noscript.html', context)
 
 
+@csrf_exempt
+@service.base_view
+def donation_notification(request):
+    """ Уведомление о получении пожертвования """
+    if request.method == 'POST':
+        if service.create_donation(request.POST.dict()):
+            return HttpResponse(status=200)
+        return HttpResponse(status=500)
+    return HttpResponseForbidden(render(request, '403.html'))
+
+
 @service.base_view
 def lk(request):
     """ Личный кабинет пользователя """
     context = {
         'title': 'Личный кабинет',
         'login_history': LoginHistory.objects.filter(user=request.user).order_by('-date'),
+        'donation': Donation.objects.filter(user=request.user).order_by('-timestamp'),
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'get_ip_info_system': SiteSetting.objects.get(name='get_ip_info_system').value,
         'static_version': STATIC_VERSION

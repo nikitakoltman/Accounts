@@ -414,13 +414,14 @@ def lav_login(request):
 
         if user is not None:
             login(request, user)
-            service.NewLoginHistory(
-                user, request.META, system, browser).start()
+            nlh_thread = service.NewLoginHistory(user, request.META, system, browser)
+            nlh_thread.start()
+            nlh_thread.join(1.0)
             return redirect(reverse("home_url"))
-        else:
-            context.update({
-                'form_message': 'Login error'
-            })
+
+        context.update({
+            'form_message': 'Login error'
+        })
     return render(request, 'registration/login.html', context)
 
 

@@ -148,7 +148,7 @@ $(function() {
                 if (result['status'] == 'success') {
                     let tr = '<tr data-toggle="modal" data-target="#AccountModal" data-id="' + account_id + '">' +
                         '<td class="td-favicon"><img data-id="' + account_id + '" class="favicon-sites" height="16" width="16" alt="icon" ' +
-                        'src="http://favicon.yandex.net/favicon/' + site + '"></td>' +
+                        'src="https://favicon.yandex.net/favicon/' + site + '"></td>' +
                         '<td class="td-site" data-id="' + account_id + '">' + site + '</td>' +
                         '<td class="td-description" data-id="' + account_id + '">' + description + '</td>' +
                         '<td class="td-login td-hide" data-id="' + account_id + '">' + login + '</td>' +
@@ -157,10 +157,8 @@ $(function() {
 
                     // Добавляем в конец таблицы только что созданную запись аккаунта
                     $('tbody').append(tr);
-                    // Вызов сортировки два раза, так как вызов один раз приведет
-                    // к обратной сортировке алфавита (от Я до А) а нужно от А до Я
-                    sort_table();
-                    sort_table();
+                    // Сортируем таблицу
+                    $("table").trigger("sorton", [ [[1,0]] ]);
                     // Закрываем модальное окно создания аккаунта
                     $('#CreateAccountModal').modal('hide');
                     // Чистим поля
@@ -267,7 +265,7 @@ $(function() {
                     // Ищем в таблице аккаунт который изменяли
                     let tr = $('tr[data-id="' + account_id + '"]');
                     // Обновляем значения в таблице
-                    tr.find('.td-favicon').find('img').attr('src', 'http://favicon.yandex.net/favicon/' + site);
+                    tr.find('.td-favicon').find('img').attr('src', 'https://favicon.yandex.net/favicon/' + site);
                     tr.find('.td-site').text(site);
                     tr.find('.td-description').text(description);
                     if (new_login != '') {
@@ -282,8 +280,8 @@ $(function() {
                         // Чистим поле ввода пароля
                         $('#modal-new_password').val('');
                     }
-                    sort_table();
-                    sort_table();
+                    // Сортируем таблицу
+                    $("table").trigger("sorton", [ [[1,0]] ]);
                     // Скрываем модальное окно просмотра аккаунта
                     $('#AccountModal').modal('hide');
                 } else {
@@ -409,19 +407,6 @@ $(function() {
 
                 preload_hide();
             }, 600);
-        }
-    }
-
-    function sort_table() {
-        /* Сортировка таблицы */
-        if ($('tr').length > 1) {
-            // Если таблица не пустая, то сортируем
-            $('#Accounts_table').tablesorter({
-                sortList: [
-                    // Сортируем по первому столбцу, по алфавиту
-                    [1, 0]
-                ]
-            });
         }
     }
 
@@ -671,12 +656,21 @@ $(function() {
                         td.innerHTML = decrypt(td.innerHTML, master_password);
                     }
                 });
-                sort_table();
+
+                if ($('tr').length > 1) {
+                    // Если таблица не пустая, то конфигурируем
+                    $('#Accounts_table').tablesorter({
+                        sortList: [
+                            // Сортируем по первому столбцу, по алфавиту
+                            [1, 0]
+                        ]
+                    });
+                }
             }
 
             // Скачиваем иконку для каждого сайта в таблице
             $('.favicon-sites').each(function() {
-                $(this).attr('src', 'http://favicon.yandex.net/favicon/' + $('.td-site[data-id="' + $(this).attr('data-id') + '"]').text())
+                $(this).attr('src', 'https://favicon.yandex.net/favicon/' + $('.td-site[data-id="' + $(this).attr('data-id') + '"]').text())
             });
 
             // Показываем ранее спрятанный копирайт

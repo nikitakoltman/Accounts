@@ -778,7 +778,12 @@ h2 {
 
 .account_table_th_icon {
     display: contents;
-    font-size: 14px !important;
+    font-size: 16px !important;
+}
+
+.account_table_th_icon div {
+    margin-left: 3px;
+    margin-top: 3px;
 }
 
 .modal-header-create-account_delete_button {

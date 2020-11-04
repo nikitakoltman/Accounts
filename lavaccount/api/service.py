@@ -22,7 +22,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from lavaccount.settings import (BASE_DIR, DEBUG,
                                  DONATION_NOTIFICATION_SECRET_KEY,
-                                 SITE_PROTOCOL, STATIC_VERSION)
+                                 SITE_PROTOCOL, STATIC_VERSION, SUPPORT_EMAIL)
 from loguru import logger as log
 
 from .models import (Account, Donation, LoginHistory, MasterPassword,
@@ -61,9 +61,15 @@ class NewLoginHistory(threading.Thread):
         ip_info = get_ip_info(client_ip, ip_system)
 
         if ip_system == 'ipwhois.io' and ip_info['completed_requests'] == 9500:
+            to_email = ''
+            try:
+                to_email = User.objects.get(username='admin').email
+            except User.DoesNotExist:
+                to_email = SUPPORT_EMAIL
+
             current_site = Site.objects.get_current()
             send_email(
-                email='fivesevenom@gmail.com',
+                email=to_email,
                 subject='Переполнение запросов ipwhois.io',
                 template='notification_ip_info_completed_requests_to_admin',
                 context={

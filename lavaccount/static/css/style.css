@@ -500,7 +500,7 @@ h2 {
 }
 
 .input_clear {
-    background-image: url(data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%3E%3Cpolygon%20points%3D%2210%2C0.7%209.3%2C0%205%2C4.3%200.7%2C0%200%2C0.7%204.3%2C5%200%2C9.3%200.7%2C10%205%2C5.7%209.3%2C10%2010%2C9.3%205.7%2C5%22%2F%3E%3C%2Fsvg%3E);
+    background-image: url('/static/img/svg/donation/clear_input.svg');
     width: 28px;
     height: 36px;
     position: absolute;

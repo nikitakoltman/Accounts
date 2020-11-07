@@ -9,7 +9,6 @@ import urllib.request
 import zipfile
 from datetime import datetime
 
-from configs.config import EMAIL_HOST_USER
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -40,7 +39,7 @@ class EmailThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        msg = EmailMessage(self.subject, self.html_content, EMAIL_HOST_USER, self.recipient_list)
+        msg = EmailMessage(self.subject, self.html_content, os.getenv("EMAIL_HOST_USER"), self.recipient_list)
         msg.content_subtype = "html"
         msg.send()
 
@@ -129,7 +128,11 @@ def send_email(email: str, subject: str, template: str, context: str) -> None:
     htmly = get_template(f'{template}')
     html_content = htmly.render(context)
 
-    EmailThread(subject, html_content, [email]).start()
+    #EmailThread(subject, html_content, [email]).start()
+    log.info('send')
+    email_thread = EmailThread(subject, html_content, [email])
+    email_thread.start()
+    email_thread.join()
 
 
 def confirm_email(user: User, email: str, subject: str, template: str) -> None:

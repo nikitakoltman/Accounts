@@ -5,3 +5,4 @@ six==1.15.0
 django-csp==3.7
 django-feature-policy==3.5.0
 django-axes==5.8.0
+python-dotenv==0.15.0

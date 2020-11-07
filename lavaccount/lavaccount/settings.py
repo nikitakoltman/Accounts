@@ -1,9 +1,12 @@
 import os
 from datetime import timedelta
-from configs import config
+
+from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = config.DJANGO_SECRET_KEY
+load_dotenv(dotenv_path=BASE_DIR + '/lavaccount/.env')
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
@@ -24,10 +27,23 @@ INSTALLED_APPS = [
     'support.apps.SupportConfig'
 ]
 
+STATIC_VERSION = 1
+SITE_ID = 3
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+SITE_PROTOCOL = 'https'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Почта поддержки
+SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL")
+
+DONATION_NOTIFICATION_SECRET_KEY = os.getenv("DONATION_NOTIFICATION_SECRET_KEY")
+
 ###SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ###SECURE_SSL_REDIRECT = True
 
-SESSION_COOKIE_SAMESITE = 'Lax' #'Strict' #'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'  # 'Strict' #'Lax'
 
 # Защита XSS для старых браузеров
 SECURE_BROWSER_XSS_FILTER = True
@@ -71,20 +87,6 @@ PERMISSIONS_POLICY = {
     'display-capture': ['none', ],
     'payment': ['none', ],
 }
-
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-
-SITE_ID = 3
-
-# Почта поддержки
-SUPPORT_EMAIL = config.SUPPORT_EMAIL
-
-DONATION_NOTIFICATION_SECRET_KEY = config.DONATION_NOTIFICATION_SECRET_KEY
-
-STATIC_VERSION = 1
-SITE_PROTOCOL = 'https'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -167,8 +169,10 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
-EMAIL_USE_TLS = config.EMAIL_USE_TLS
-EMAIL_HOST = config.EMAIL_HOST
-EMAIL_HOST_USER = config.EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = config.EMAIL_HOST_PASSWORD
-EMAIL_PORT = config.EMAIL_PORT
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

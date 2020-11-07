@@ -2,7 +2,9 @@ from api.models import SiteSetting
 from api.service import base_view
 from django.contrib.sites.models import Site
 from django.shortcuts import render
-from lavaccount.settings import STATIC_VERSION, SITE_PROTOCOL, SUPPORT_EMAIL, YANDEX_MONEY_WALLET_NUMBER, YANDEX_MONEY_DEFAULT_SUM
+from lavaccount.settings import (SITE_PROTOCOL, STATIC_VERSION, SUPPORT_EMAIL,
+                                 YANDEX_MONEY_DEFAULT_SUM,
+                                 YANDEX_MONEY_WALLET_NUMBER)
 
 
 @base_view

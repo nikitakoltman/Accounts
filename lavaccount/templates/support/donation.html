@@ -14,7 +14,7 @@
                     <div class="card donation_card">
                         <div class="card-body">
                             <form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
-                                <input type="hidden" name="receiver" value="410019984608793">
+                                <input type="hidden" name="receiver" value="{{ wallet_number }}">
                                 <input type="hidden" name="formcomment" value="LavAccount, пожертвование на развитие.">
                                 <input type="hidden" name="short-dest" value="LavAccount, пожертвование на развитие.">
                                 <input type="hidden" name="label" value="{{ request.user.id }}">
@@ -34,7 +34,7 @@
                                         Сумма
                                     </label>
                                     <div>
-                                        <input class="form-control donation_form_input_sum" name="sum" value="150" data-type="number" id="sum">
+                                        <input class="form-control donation_form_input_sum" name="sum" value="{{ default_sum }}" data-type="number" id="sum">
                                         <span class="input_clear" unselectable="on">&nbsp;</span>
                                         <div class="form_radio_group">
                                             <div class="form_radio_group-item">

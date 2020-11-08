@@ -21,7 +21,8 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from lavaccount.settings import (BASE_DIR, DEBUG,
                                  DONATION_NOTIFICATION_SECRET_KEY,
-                                 SITE_PROTOCOL, STATIC_VERSION, SUPPORT_EMAIL)
+                                 IPINFO_IO_TOKEN, SITE_PROTOCOL,
+                                 STATIC_VERSION, SUPPORT_EMAIL)
 from loguru import logger as log
 
 from .models import (Account, Donation, LoginHistory, MasterPassword,
@@ -233,7 +234,7 @@ def get_ip_info(client_ip: str, system: str) -> dict:
         objects = 'success,message,type,country,city,completed_requests'
         url = f'https://ipwhois.app/json/{client_ip}?objects={objects}&lang=ru'
     elif system == 'ipinfo.io':
-        url = f'https://ipinfo.io/{client_ip}?token=845b32c233ddc8'
+        url = f'https://ipinfo.io/{client_ip}?token={IPINFO_IO_TOKEN}'
 
     with urllib.request.urlopen(url) as response:
         return json.load(response)
@@ -249,12 +250,20 @@ def get_client_ip(meta) -> str:
 
 
 def get_logs() -> list:
+    """ Возвращает логи """
+    logs = read_log_file(BASE_DIR + '/logs/log.json')
+    return sorted_logs(logs)
+
+
+def read_log_file(path: str) -> json:
+    """ Читает файл с логами и возвращает json """
+    with open(path) as f:
+        return json.loads(f.read())
+
+
+def sorted_logs(logs: json) -> list:
     """ Сортировка логов по дате, чем раньше тем выше """
-    log_file = open(BASE_DIR + '/logs/log.json')
-    json_logs = json.loads(log_file.read())
-    json_logs = sorted(json_logs.items(), key=lambda kv: kv[1]['date'], reverse=True)
-    log_file.close()
-    return json_logs
+    return sorted(logs.items(), key=lambda kv: kv[1]['date'], reverse=True)
 
 
 def get_ip_info_system_switch(system_name: str) -> dict:
@@ -277,7 +286,7 @@ def get_ip_info_system_switch(system_name: str) -> dict:
 
 
 def site_in_service_switch(checked: str) -> dict:
-    """ Создает новый аккаунт """
+    """ Изменяет состояние сайта ('true' - Закрыт / 'false' - Открыт) """
     try:
         setting = SiteSetting.objects.get(name='site_in_service')
         if checked == 'true':
@@ -517,7 +526,7 @@ def write_error_to_log_file(error_type: str, user: User, traceback_format_exc: s
                 log_file.close()
     except FileNotFoundError:
         if not os.path.exists(BASE_DIR + '/logs'):
-            os.mkdir(BASE_DIR + '/logs/')
+            os.mkdir(BASE_DIR + '/logs')
 
         log_file = open(BASE_DIR + '/logs/log.json', 'w')
         text = json.loads('{}')

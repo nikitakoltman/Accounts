@@ -9,7 +9,6 @@ $(function() {
 
     let pattern_email = /^[a-z0-9_-]+@[a-z0-9-]+\.([a-z]{1,6}\.)?[a-z]{2,6}$/i,
 
-        is_username = false,
         is_email = false,
         is_password = false,
         is_password2 = false,

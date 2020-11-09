@@ -5,8 +5,6 @@ $(function() {
     });
 
     $('.simple-tabs').on('click', function() {
-        let tab_id = $(this).attr('data-tabs-id');
-
         $('html, body').animate({
             scrollTop: $('.swiper-container').offset().top - 60
         }, {

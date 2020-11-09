@@ -313,6 +313,11 @@ h2 {
 
 .share-container a:hover {
     color: #ffffff;
+    text-decoration: none;
+}
+
+.share-container a:focus {
+    text-decoration: none;
 }
 
 .position-login-show_password {

@@ -129,11 +129,9 @@ def send_email(email: str, subject: str, template: str, context: str) -> None:
     htmly = get_template(f'{template}')
     html_content = htmly.render(context)
 
-    #EmailThread(subject, html_content, [email]).start()
-    log.info('send')
     email_thread = EmailThread(subject, html_content, [email])
     email_thread.start()
-    email_thread.join()
+    email_thread.join(1.0)
 
 
 def confirm_email(user: User, email: str, subject: str, template: str) -> None:
@@ -252,13 +250,19 @@ def get_client_ip(meta) -> str:
 def get_logs() -> list:
     """ Возвращает логи """
     logs = read_log_file(BASE_DIR + '/logs/log.json')
-    return sorted_logs(logs)
+    if logs != '{}':
+        return sorted_logs(logs)
+    else:
+        return json.loads(logs)
 
 
 def read_log_file(path: str) -> json:
     """ Читает файл с логами и возвращает json """
-    with open(path) as f:
-        return json.loads(f.read())
+    try:
+        with open(path) as f:
+            return json.loads(f.read())
+    except FileNotFoundError:
+        return '{}'
 
 
 def sorted_logs(logs: json) -> list:

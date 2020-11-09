@@ -1,11 +1,11 @@
 /* Главная страница с таблицей аккаунтов */
 
-$(function() {
+$(function () {
     let master_password = '', // Хранит мастер пароль для расшифровки данных таблицы
         press_timer = 0, // Хранит значение таймера для события долгого нажатия кнопки "Пароль"
         is_allow_copy = true, // Разрешает копирование при долгом нажатии кнопки "Пароль"
         is_allow_show_page = false; // Разрешает отображение страницы
-    
+
     get_master_password();
 
     // Константы для функции show_or_copy_login_or_password(type_data)
@@ -27,7 +27,7 @@ $(function() {
         $.ajax({
             url: 'get_master_password/',
             type: 'GET',
-            success: function(result) {
+            success: function (result) {
                 master_password = result['result'];
                 if (master_password != 'doesnotexist') {
                     // Открываем модальное окно ввода ключа/мастер пароля
@@ -44,7 +44,7 @@ $(function() {
                 }
                 preload_hide();
             },
-            error: function(jqXHR, text, error) {
+            error: function (jqXHR, text, error) {
                 if (error == 'Forbidden') {
                     swal(
                         'Ошибка 403',
@@ -58,12 +58,12 @@ $(function() {
         });
     }
 
-    $('#btn_master_import').on('change', function() {
+    $('#btn_master_import').on('change', function () {
         /* Мастер импорт аккаунтов из json файлов */
         var file = this.files[0],
-        reader = new FileReader;
-  
-        reader.onloadend = function() {
+            reader = new FileReader;
+
+        reader.onloadend = function () {
             var data = JSON.parse(reader.result);
             for (var i in data) {
                 console.log(data[i]['site']);
@@ -71,7 +71,7 @@ $(function() {
                 sleep(2000);
             }
         };
-    
+
         reader.readAsText(file);
     });
 
@@ -85,7 +85,7 @@ $(function() {
     function _create_account(site, description, login, password) {
         /* Добавление нового аккаунта в таблице !ТОЛЬКО ДЛЯ МАСТЕР ИМПОРТА! */
         preload_show();
-        
+
         $.ajax({
             url: 'create_account/',
             type: 'POST',
@@ -107,7 +107,7 @@ $(function() {
                 } else {
                     swal('Ошибка', result['result']);
                 }
-    
+
                 preload_hide();
             },
             error: function (jqXHR, text, error) {
@@ -142,7 +142,7 @@ $(function() {
                 login: login,
                 password: password,
             },
-            success: function(result) {
+            success: function (result) {
                 let account_id = result['account_id'];
 
                 if (result['status'] == 'success') {
@@ -158,7 +158,7 @@ $(function() {
                     // Добавляем в конец таблицы только что созданную запись аккаунта
                     $('tbody').append(tr);
                     // Сортируем таблицу
-                    $("table").trigger("sorton", [ [[1,0]] ]);
+                    $("table").trigger("sorton", [[[1, 0]]]);
                     // Закрываем модальное окно создания аккаунта
                     $('#CreateAccountModal').modal('hide');
                     // Чистим поля
@@ -177,7 +177,7 @@ $(function() {
 
                 preload_hide();
             },
-            error: function(jqXHR, text, error) {
+            error: function (jqXHR, text, error) {
                 if (error == 'Forbidden') {
                     swal(
                         'Ошибка 403',
@@ -201,7 +201,7 @@ $(function() {
             data: {
                 account_id: account_id,
             },
-            success: function(result) {
+            success: function (result) {
                 if (result['status'] == 'success') {
                     // Скрываем запись из таблицы
                     $('tr[data-id="' + account_id + '"]').hide();
@@ -217,7 +217,7 @@ $(function() {
 
                 preload_hide();
             },
-            error: function(jqXHR, text, error) {
+            error: function (jqXHR, text, error) {
                 if (error == 'Forbidden') {
                     swal(
                         'Ошибка 403',
@@ -260,7 +260,7 @@ $(function() {
                 new_password: new_password,
                 account_id: account_id
             },
-            success: function(result) {
+            success: function (result) {
                 if (result['status'] == 'success') {
                     // Ищем в таблице аккаунт который изменяли
                     let tr = $('tr[data-id="' + account_id + '"]');
@@ -281,7 +281,7 @@ $(function() {
                         $('#modal-new_password').val('');
                     }
                     // Сортируем таблицу
-                    $("table").trigger("sorton", [ [[1,0]] ]);
+                    $("table").trigger("sorton", [[[1, 0]]]);
                     // Скрываем модальное окно просмотра аккаунта
                     $('#AccountModal').modal('hide');
                 } else {
@@ -294,7 +294,7 @@ $(function() {
 
                 preload_hide();
             },
-            error: function(jqXHR, text, error) {
+            error: function (jqXHR, text, error) {
                 if (error == 'Forbidden') {
                     swal(
                         'Ошибка 403',
@@ -311,7 +311,7 @@ $(function() {
     function change_or_create_master_password(new_master_password) {
         /* Изменить или создать мастер пароль */
         preload_show();
-        setTimeout(function() {
+        setTimeout(function () {
             const hash = enMP(new_master_password);
             const master_password_key = hash.key;
             const result = hash.result;
@@ -324,7 +324,7 @@ $(function() {
 
             if (tds.length > 0) {
                 // Если таблица не пустая, то проходим циклом по ее элементам
-                tds.each(function(index, td) {
+                tds.each(function (index, td) {
                     let account_id = td.getAttribute('data-id');
                     if (td.className == 'td-site') {
                         // Шифруем строку из ячейки и присваиваем ее массиву под индексом ее id в базе данных
@@ -351,7 +351,7 @@ $(function() {
                     passwords: JSON.stringify(passwords),
                     new_master_password: result
                 },
-                success: function(result) {
+                success: function (result) {
                     preload_hide();
                     if (result['status'] == 'success') {
                         reload();
@@ -359,7 +359,7 @@ $(function() {
                         swal('Ошибка', result['result']);
                     }
                 },
-                error: function(jqXHR, text, error) {
+                error: function (jqXHR, text, error) {
                     if (error == 'Forbidden') {
                         swal(
                             'Ошибка 403',
@@ -386,7 +386,7 @@ $(function() {
         } else {
             // Расшифровываем полученый пароль введенным ключем
             preload_show();
-            setTimeout(function() {
+            setTimeout(function () {
                 key = deMP(master_password, key);
 
                 if (key == '') {
@@ -447,13 +447,13 @@ $(function() {
         $tmp.remove();
     }
 
-    $('#btn-enter_master_password').on('click', function() {
+    $('#btn-enter_master_password').on('click', function () {
         /* Собитие нажатия кнопки "Войти" в модальном окне авторизации */
         // Проходим авторизацию
         authorization();
     });
 
-    $('#btn-send_account').on('click', function() {
+    $('#btn-send_account').on('click', function () {
         /* Событие нажатия на кнопку "Добавить" в модальном окне добавления нового аккаунта */
         if ($('#in-site').val() == '') {
             swal('Заполните поле "Сайт"');
@@ -471,15 +471,15 @@ $(function() {
     let is_new_password = false,
         is_repeat_new_password = false;
 
-    $('#in-new_password').on('input', function() {
+    $('#in-new_password').on('input', function () {
         check_new_password();
-    }).focus(function() {
+    }).focus(function () {
         $('#password_info').show();
-    }).blur(function() {
+    }).blur(function () {
         $('#password_info').hide();
     });
 
-    $('#in-repeat_new_password').on('input', function() {
+    $('#in-repeat_new_password').on('input', function () {
         check_repeat_new_password();
     });
 
@@ -548,7 +548,7 @@ $(function() {
         }
     }
 
-    $('#btn-send_master_password').on('click', function() {
+    function send_master_password() {
         /* Событие нажатия на кнопку "Изменить" в модальном окне изменения мастер пароля */
         if (
             ($('#in-old_password').val() == '' && !$('#in-old_password').attr('disabled')) ||
@@ -568,26 +568,38 @@ $(function() {
         } else if (is_new_password && is_repeat_new_password) {
             change_or_create_master_password($('#in-repeat_new_password').val());
         }
+    }
+
+    $('#btn-send_master_password').on('click', function () {
+        send_master_password();
     });
 
-    $('#modal-btn-account_delete').on('click', function() {
+    $('.modal-body-master-password input').on('keypress', function (e) {
+        /* Событие нажатия клавиши (Ввод текста в поле создания/изменения мастер пароля) */
+        if (e.keyCode == 13) {
+            // Если нажата клавиша "Enter"
+            send_master_password();
+        }
+    });
+
+    $('#modal-btn-account_delete').on('click', function () {
         /* Событие нажатия на кнопку "Удалить" в модальном окне просмотра аккаунта */
         swal({
-                title: 'Вы уверены?',
-                text: 'Эту запись потом не восстановить!',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#DD6B55',
-                confirmButtonText: 'Да, удалить это!'
-            },
-            function() {
+            title: 'Вы уверены?',
+            text: 'Эту запись потом не восстановить!',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Да, удалить это!'
+        },
+            function () {
                 // Если была нажата кнопка "Да, удалить это!", то удаляем аккаунт
                 delete_account($('#modal-btn-account_delete').attr('data-id'));
             }
         );
     });
 
-    $('#modal-btn-save').on('click', function() {
+    $('#modal-btn-save').on('click', function () {
         /* Событие нажатия кнопки "Сохранить" в модальном окне просмотра аккаунта */
         if ($('#modal-site').val() == '') {
             swal('Заполните поле "Сайт"');
@@ -598,17 +610,17 @@ $(function() {
         }
     });
 
-    $('#modal-btn-login').on('click', function() {
+    $('#modal-btn-login').on('click', function () {
         /* Событие нажатия кнопки "Логин" в модальном окне просмотра аккаунта */
         show_or_copy_login_or_password(_login);
     });
 
-    $('#modal-btn-password').on('click', function() {
+    $('#modal-btn-password').on('click', function () {
         /* Событие нажатия кнопки "Пароль" в модальном окне просмотра аккаунта */
         show_or_copy_login_or_password(_password);
     });
 
-    $('#AccountModal').on('show.bs.modal', function(e) {
+    $('#AccountModal').on('show.bs.modal', function (e) {
         /* Событие перед открытием модального окна просмотра аккаунта */
         let account_id = $(e.relatedTarget).attr('data-id'),
             site = $('.td-site[data-id="' + account_id + '"]').text(),
@@ -626,31 +638,31 @@ $(function() {
         $('#modal-btn-account_delete').attr('data-site', site);
     });
 
-    $('#AccountModal').on('shown.bs.modal', function(e) {
+    $('#AccountModal').on('shown.bs.modal', function (e) {
         /* Событие после открытия модального окна просмотра аккаунта */
         account_modal_tour();
     });
 
-    $('#EnterKeyModal').on('shown.bs.modal', function() {
+    $('#EnterKeyModal').on('shown.bs.modal', function () {
         /* Событие после открытия модального окна ввода ключа/мастер пароля */
         // Ставим фокус на поле ввода мастер пароля
         $('#in-enter_master_password').focus();
     });
 
-    $('#MasterPasswordModal').on('hide.bs.modal', function() {
+    $('#MasterPasswordModal').on('hide.bs.modal', function () {
         /* Событие закрытия модального окна изменения мастер пароля */
         if (master_password == 'doesnotexist') {
             $('.js-reload_master_password_modal').show();
         }
     });
 
-    $('#EnterKeyModal').on('hide.bs.modal', function() {
+    $('#EnterKeyModal').on('hide.bs.modal', function () {
         /* Событие закрытия модального окна ввода ключа/мастер пароля */
         if (is_allow_show_page) {
             let tds = $('td');
             if (tds.length > 0) {
                 // Если таблицы не пустая, то проходим циклом по всем ячейкам
-                tds.each(function(index, td) {
+                tds.each(function (index, td) {
                     if (td.className != 'td-login td-hide' && td.className != 'td-password td-hide' && td.className != 'td-favicon') {
                         // Расшифровываем ячейки, кроме ячеек логина, пароля и иконки
                         td.innerHTML = decrypt(td.innerHTML, master_password);
@@ -669,7 +681,7 @@ $(function() {
             }
 
             // Скачиваем иконку для каждого сайта в таблице
-            $('.favicon-sites').each(function() {
+            $('.favicon-sites').each(function () {
                 $(this).attr('src', 'https://favicon.yandex.net/favicon/' + $('.td-site[data-id="' + $(this).attr('data-id') + '"]').text())
             });
 
@@ -692,13 +704,13 @@ $(function() {
         }
     });
 
-    $('#CreateAccountModal').on('hidden.bs.modal', function() {
+    $('#CreateAccountModal').on('hidden.bs.modal', function () {
         /* Событие после закрытия модального окна добавления аккаунта */
         $('#in-login').val('');
         $('#in-password').val('');
     });
 
-    $('#in-search').on('keyup', function() {
+    $('#in-search').on('keyup', function () {
         /* Событие отжатия клавиши (Ввода текста в поле поиска) */
         let tr = $('tbody tr');
         if ($(this).val() == '') {
@@ -712,7 +724,7 @@ $(function() {
         }
     });
 
-    $('#in-enter_master_password').on('keydown', function(e) {
+    $('#in-enter_master_password').on('keydown', function (e) {
         /* Событие нажатия клавиши (Ввод текста в поле ключа/мастер пароля) */
         if (e.keyCode == 13) {
             // Если нажата клавиша "Enter", проходим авторизацию
@@ -722,15 +734,15 @@ $(function() {
 
     $('#modal-btn-password')
         /* Долгое нажатие кнопки "Пароль" клавишей мыши или сенсором телефона в модальном окне просмотра аккаунта */
-        .on('touchend mouseup', (function() {
+        .on('touchend mouseup', (function () {
             /* Событие отжатия клавиши или сенсора */
             // Очищаем таймер
             clearTimeout(press_timer);
         }))
-        .on('touchstart mousedown', (function() {
+        .on('touchstart mousedown', (function () {
             /* Событие нажатия клавиши или сенсора */
             // Устанавливаем таймер
-            press_timer = window.setTimeout(function() {
+            press_timer = window.setTimeout(function () {
                 // Запрещаем копирование пароля в буфер обмена так как показываем пароль на экране
                 is_allow_copy = false;
                 show_or_copy_login_or_password(_password);
@@ -739,14 +751,14 @@ $(function() {
 
     $('#modal-btn-login')
         /* Долгое нажатие кнопки "Пароль" клавишей мыши или сенсором телефона в модальном окне просмотра аккаунта */
-        .on('touchend mouseup', (function() {
+        .on('touchend mouseup', (function () {
             /* Событие отжатия клавиши или сенсора */
             // Очищаем таймер
             clearTimeout(press_timer);
-        })).on('touchstart mousedown', (function() {
+        })).on('touchstart mousedown', (function () {
             /* Событие нажатия клавиши или сенсора */
             // Устанавливаем таймер
-            press_timer = window.setTimeout(function() {
+            press_timer = window.setTimeout(function () {
                 // Запрещаем копирование логина в буфер обмена так как показываем логин на экране
                 is_allow_copy = false;
                 show_or_copy_login_or_password(_login);

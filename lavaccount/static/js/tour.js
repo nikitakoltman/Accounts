@@ -52,7 +52,7 @@ $(function() {
 
         tour.init();
         tour.start();
-    }
+    };
 
     window.account_modal_tour = function() {
         /* Тур на модальное окно просмотра аккаунта */
@@ -74,5 +74,5 @@ $(function() {
 
         tour.init();
         tour.start();
-    }
+    };
 });

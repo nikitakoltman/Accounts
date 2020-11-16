@@ -11,7 +11,8 @@ $(function() {
 
     $('form').on('submit', function() {
         let sum = $('#sum');
-        if (sum.val() == '') {
+        if (sum.val() == '' || sum.val() == '0' || sum.val() == '1' || sum.val()[0] == '0') {
+            sum.val('');
             sum.focus();
             return false;
         }

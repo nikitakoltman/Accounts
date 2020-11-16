@@ -21,7 +21,7 @@
         <input id="btn_master_import" type="file" value="Import" class="btn btn-primary"/>
         {% endif %}
     </div>
-    <input class="form-control" placeholder="Поиск" type="text" id="in-search">
+    <input class="form-control" placeholder="Поиск" type="text" id="in-search" maxlength="254">
     <table id="Accounts_table" class="tablesorter tablesorter-blue table-hover">
         <thead>
             <tr>
@@ -60,15 +60,15 @@
             </div>
             <div class="modal-body modal-body-show-account">
                 <label for="modal-site">Сайт</label>
-                <input class="form-control" type="text" id="modal-site">
+                <input class="form-control" type="text" id="modal-site" maxlength="254">
                 <label for="modal-description">Описание</label>
-                <input class="form-control" type="text" id="modal-description">
+                <input class="form-control" type="text" id="modal-description" maxlength="254">
                 <label for="modal-new_login">Логин</label>
-                <input class="form-control" type="text" id="modal-new_login" placeholder="Введите новый логин">
+                <input class="form-control" type="text" id="modal-new_login" placeholder="Введите новый логин" maxlength="254">
                 <label for="modal-new_password">Пароль</label>
-                <input class="form-control" type="password" id="modal-new_password" placeholder="Введите новый пароль">
-                <input id="modal-login">
-                <input id="modal-password">
+                <input class="form-control" type="password" id="modal-new_password" placeholder="Введите новый пароль" maxlength="254">
+                <input id="modal-login" maxlength="254">
+                <input id="modal-password" maxlength="254">
             </div>
             <div align="center" class="modal-footer modal-footer-show-account">
                 <div align="center" id="js-tour_show_account_modal_footer_buttons">
@@ -88,13 +88,13 @@
             </div>
             <div class="modal-body modal-body-create-account">
                 <label for="in-site">Сайт</label>
-                <input class="form-control" type="text" id="in-site">
+                <input class="form-control" type="text" id="in-site" maxlength="254">
                 <label for="in-description">Описание</label>
-                <input class="form-control" type="text" id="in-description">
+                <input class="form-control" type="text" id="in-description" maxlength="254">
                 <label for="in-login">Логин</label>
-                <input class="form-control" type="text" id="in-login">
+                <input class="form-control" type="text" id="in-login" maxlength="254">
                 <label for="in-password">Пароль</label>
-                <input class="form-control" type="password" id="in-password">
+                <input class="form-control" type="password" id="in-password" maxlength="254">
                 <button class="btn btn-primary bubbly-button btn-round btn-send" id="btn-send_account">Добавить</button>
             </div>
         </div>
@@ -109,11 +109,11 @@
             </div>
             <div class="modal-body modal-body-master-password">
                 <label for="in-old_password">Старый пароль</label>
-                <input class="form-control" type="password" id="in-old_password">
+                <input class="form-control" type="password" id="in-old_password" maxlength="254">
                 <label for="in-new_password">Новый пароль</label>
-                <input class="form-control" type="password" id="in-new_password">
+                <input class="form-control" type="password" id="in-new_password" maxlength="254">
                 <label for="in-repeat_new_password">Повторите новый пароль</label>
-                <input class="form-control" type="password" id="in-repeat_new_password">
+                <input class="form-control" type="password" id="in-repeat_new_password" maxlength="254">
                 <button class="btn btn-primary bubbly-button btn-round btn-send" id="btn-send_master_password">Изменить</button>
                 <div id="password_info">
                     <h5>Пароль должен соответствовать критериям:</h5>
@@ -137,7 +137,7 @@
             </div>
             <div class="modal-body modal-body-enter-password">
                 <label for="in-enter_master_password">Введите мастер пароль</label>
-                <input class="form-control" type="password" id="in-enter_master_password" inputmode="text" autofocus>
+                <input class="form-control" type="password" id="in-enter_master_password" inputmode="text" maxlength="254" autofocus>
                 <button class="btn btn-primary btn-round btn-send" id="btn-enter_master_password">Войти</button>
             </div>
         </div>

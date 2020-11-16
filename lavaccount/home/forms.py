@@ -13,7 +13,7 @@ class RegisterForm(forms.Form):
     """ Форма регистрации """
     username = UsernameField(
         label='Имя пользователя',
-        widget=forms.TextInput(attrs={'autofocus': True})
+        widget=forms.TextInput(attrs={'autofocus': True, 'max_length': '254'})
     )
     email = forms.EmailField(
         label='Адрес электронной почты',
@@ -23,17 +23,26 @@ class RegisterForm(forms.Form):
     password1 = forms.CharField(
         label='Пароль',
         strip=False,
+        max_length=254,
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
     )
     password2 = forms.CharField(
         label='Повторите пароль',
         strip=False,
+        max_length=254,
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
     )
 
 
 class LavAuthenticationForm(AuthenticationForm):
     """ Форма расширяющая форму авторизации """
+    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True, 'max_length': '254'}))
+    password = forms.CharField(
+        label='Пароль',
+        strip=False,
+        max_length=254,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'}),
+    )
     system = forms.CharField(widget=forms.HiddenInput())
     browser = forms.CharField(widget=forms.HiddenInput())
 
@@ -80,6 +89,7 @@ class MasterPasswordResetForm(forms.Form):
     password = forms.CharField(
         label='Пароль',
         strip=False,
+        max_length=254,
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'autofocus': True})
     )
 

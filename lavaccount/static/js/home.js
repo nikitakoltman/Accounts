@@ -161,6 +161,8 @@ $(function () {
                     $("table").trigger("sorton", [[[1, 0]]]);
                     // Закрываем модальное окно создания аккаунта
                     $('#CreateAccountModal').modal('hide');
+                    // Обновляем счетчик аккаунтов
+                    $('#js-account-counter').text(parseInt($('#js-account-counter').text()) + 1);
                     // Чистим поля
                     $('#in-site').val('');
                     $('#in-description').val('');
@@ -205,6 +207,8 @@ $(function () {
                 if (result['status'] == 'success') {
                     // Скрываем запись из таблицы
                     $('tr[data-id="' + account_id + '"]').hide();
+                    // Обновляем счетчик аккаунтов
+                    $('#js-account-counter').text(parseInt($('#js-account-counter').text()) - 1);
                     // Закрываем модальное окно удаления аккаунта
                     $('#AccountModal').modal('hide');
                 } else {

@@ -5,7 +5,7 @@
 
 Клонируйте данный репозиторий и перейдите в каталог "LavAccount".
 ```
-git clone https://github.com/nikitakoltman/LavAccount
+git clone https://github.com/ottomayerpy/LavAccount
 cd LavAccount
 ```
 Создайте и активируйте виртуальное окружение python.

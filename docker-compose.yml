@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  app:
+    build: ./lavaccount/
+    command: python3 ./manage.py runserver 0.0.0.0:12888
+    ports:
+      - '12888:12888'
+    restart: always

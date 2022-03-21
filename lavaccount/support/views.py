@@ -1,5 +1,4 @@
-from api.models import SiteSetting
-from api.service import base_view
+from core.models import SiteSetting
 from django.contrib.sites.models import Site
 from django.shortcuts import render
 from lavaccount.settings import (SITE_PROTOCOL, STATIC_VERSION, SUPPORT_EMAIL,
@@ -7,7 +6,6 @@ from lavaccount.settings import (SITE_PROTOCOL, STATIC_VERSION, SUPPORT_EMAIL,
                                  YANDEX_MONEY_WALLET_NUMBER)
 
 
-@base_view
 def support(request):
     context = {
         'title': 'Помощь и поддержка',
@@ -17,7 +15,6 @@ def support(request):
     return render(request, 'support/support.html', context)
 
 
-@base_view
 def donation(request):
     context = {
         'title': 'Пожертвования',
@@ -29,7 +26,6 @@ def donation(request):
     return render(request, 'support/donation.html', context)
 
 
-@base_view
 def protection(request):
     context = {
         'title': 'Защита данных',
@@ -39,7 +35,6 @@ def protection(request):
     return render(request, 'support/protection.html', context)
 
 
-@base_view
 def privacy(request):
     current_site = Site.objects.get_current()
     context = {
@@ -54,7 +49,6 @@ def privacy(request):
     return render(request, 'support/privacy.html', context)
 
 
-@base_view
 def terms(request):
     context = {
         'title': 'Пользовательское соглашение',

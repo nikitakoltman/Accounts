@@ -1,14 +1,16 @@
+from core import lav_email
 from django import forms
-from django.contrib.auth.forms import UsernameField, AuthenticationForm, PasswordResetForm
-from api.service import send_email
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import (AuthenticationForm, PasswordResetForm,
+                                       UsernameField)
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-
 UserModel = get_user_model()
+
+
 class RegisterForm(forms.Form):
     """ Форма регистрации """
     username = UsernameField(
@@ -36,7 +38,8 @@ class RegisterForm(forms.Form):
 
 class LavAuthenticationForm(AuthenticationForm):
     """ Форма расширяющая форму авторизации """
-    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True, 'max_length': '254'}))
+    username = UsernameField(widget=forms.TextInput(
+        attrs={'autofocus': True, 'max_length': '254'}))
     password = forms.CharField(
         label='Пароль',
         strip=False,
@@ -49,6 +52,7 @@ class LavAuthenticationForm(AuthenticationForm):
 
 class LavPasswordResetForm(PasswordResetForm):
     """ Форма расширяющая форму восстановления пароля """
+
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
@@ -76,7 +80,7 @@ class LavPasswordResetForm(PasswordResetForm):
                     'protocol': 'https' if use_https else 'http',
                     **(extra_email_context or {}),
                 }
-                send_email(
+                lav_email.send_email(
                     email=user_email,
                     subject=f'Сброс пароля на {site_name}',
                     template=html_email_template_name,
@@ -90,7 +94,8 @@ class MasterPasswordResetForm(forms.Form):
         label='Пароль',
         strip=False,
         max_length=254,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'autofocus': True})
+        widget=forms.PasswordInput(
+            attrs={'autocomplete': 'new-password', 'autofocus': True})
     )
 
 
@@ -99,5 +104,6 @@ class EmailChangeForm(forms.Form):
     email = forms.EmailField(
         label='Адрес электронной почты',
         max_length=254,
-        widget=forms.EmailInput(attrs={'autocomplete': 'email', 'autofocus': True})
+        widget=forms.EmailInput(
+            attrs={'autocomplete': 'email', 'autofocus': True})
     )

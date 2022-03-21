@@ -1,8 +1,9 @@
 import locale
 
-from api import service
-from api.models import (Account, Donation, LoginHistory, MasterPassword,
-                        SiteSetting)
+from core import (accounts, lav_email, lav_logger, login_history,
+                  master_password, service, site_settings, yandex_donations)
+from core.models import (Account, Donation, LoginHistory, MasterPassword,
+                         SiteSetting)
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetView
@@ -23,7 +24,6 @@ from .forms import (EmailChangeForm, LavAuthenticationForm,
 locale.setlocale(locale.LC_ALL, "")
 
 
-@service.base_view
 def check_email_template(request):
     """ Текстирование шаблона для почты """
     if not request.user.is_staff:
@@ -35,7 +35,7 @@ def check_email_template(request):
         'domain': 'lavaccount.ru',
         'uid': 'MQ%5B0-9A-Za-z_%5',
         'token': '-z%5D%7B1,13%7D-%5B0-9A-Za-z%5D%',
-        'email': service.hiding_email(request.user.email)
+        'email': lav_email.hiding_email(request.user.email)
     }
 
     # Шаблоны
@@ -49,7 +49,6 @@ def check_email_template(request):
     return render(request, templates[0], context)
 
 
-@service.base_view
 def index(request):
     """ Главная страница """
     context = {
@@ -71,7 +70,6 @@ def index(request):
     return render(request, 'home.html', context)
 
 
-@service.base_view
 def logs(request):
     """ Страница с отображением последних логов """
     if not request.user.is_staff:
@@ -79,14 +77,13 @@ def logs(request):
 
     context = {
         'title': 'Логи',
-        'logs': service.get_logs(),
+        'logs': lav_logger.get_logs(),
         'site_in_service': SiteSetting.objects.get(name='site_in_service').value,
         'static_version': STATIC_VERSION
     }
     return render(request, 'logs.html', context)
 
 
-@service.base_view
 def noscript(request):
     """ Страница отображаемая если пользователь отключит javascript """
     context = {
@@ -97,18 +94,16 @@ def noscript(request):
     return render(request, 'noscript.html', context)
 
 
-@csrf_exempt
-@service.base_view
+@csrf_exempt  # TODO Че этот декоратор тут делает???
 def donation_notification(request):
     """ Уведомление о получении пожертвования """
     if request.method == 'POST':
-        if service.create_donation(request.POST.dict()):
+        if yandex_donations.create_donation(request.POST.dict()):
             return HttpResponse(status=200)
         return HttpResponse(status=500)
     return HttpResponseForbidden(render(request, '403.html'))
 
 
-@service.base_view
 def lk(request):
     """ Личный кабинет пользователя """
     context = {
@@ -122,7 +117,6 @@ def lk(request):
     return render(request, 'lk.html', context)
 
 
-@service.base_view
 def email_change(request):
     """ Изменить адрес электронной почты """
     context = {
@@ -136,18 +130,18 @@ def email_change(request):
         email = request.POST.get('email')
         user = User.objects.get(id=request.user.id)
         current_site = Site.objects.get_current()
-        service.confirm_email(
+        lav_email.confirm_email(
             user=user,
             email=email,
             subject='Привязка email к аккаунту',
             template='email/email_change_email.html'
         )
-        service.send_email(
+        lav_email.send_email(
             email=user.email,
             subject='Привязка email к аккаунту',
             template='email/email_change_notification_to_old_email.html',
             context={
-                'email': service.hiding_email(email),
+                'email': lav_email.hiding_email(email),
                 'username': user.username,
                 'domain': current_site.domain
             }
@@ -159,7 +153,6 @@ def email_change(request):
     return render(request, 'email/email_change_form.html', context)
 
 
-@service.base_view
 def email_change_done(request):
     """ Страница которая говорит о том что письмо с
     инструкциями по изменению почтового адреса отправлено """
@@ -171,7 +164,6 @@ def email_change_done(request):
     return render(request, 'email/email_change_done.html', context)
 
 
-@service.base_view
 def email_change_complete(request):
     """ Страница которая говорит о том что
     изменение адреса почты завершено """
@@ -183,7 +175,6 @@ def email_change_complete(request):
     return render(request, 'email/email_change_complete.html', context)
 
 
-@service.base_view
 def confirm_email_done(request):
     """ Страница которая говорит о том что
     отправленно письмо подтверждения почты после регистрации """
@@ -195,7 +186,6 @@ def confirm_email_done(request):
     return render(request, 'email/confirm_email_done.html', context)
 
 
-@service.base_view
 def confirm_email_complete(request):
     """ Страница которая говорит о том что
     пользователь успешно подтвердили почту после регистрации """
@@ -214,13 +204,12 @@ def confirm_email_complete(request):
     return render(request, 'email/confirm_email_complete.html', context)
 
 
-@service.base_view
 def confirm_email(request):
     """ Отправка письма о подтверждении
     почты после регистрации """
     if not request.user.is_authenticated:
         return redirect(reverse("home_url"))
-    service.confirm_email(
+    lav_email.confirm_email(
         user=request.user,
         email=request.user.email,
         subject='Добро пожаловать в LavAccount',
@@ -229,18 +218,16 @@ def confirm_email(request):
     return redirect(reverse("confirm_email_done_url"))
 
 
-@service.base_view
 def activate_email(request, uidb64, token):
     """ Активация почты """
     if not request.user.is_authenticated:
         return redirect(reverse("lav_login"))
 
-    if service.activate_email(uidb64, token):
+    if lav_email.activate_email(uidb64, token):
         request.session['valid'] = True
     return redirect(reverse("confirm_email_complete_url"))
 
 
-@service.base_view
 def master_password_reset(request):
     """ Сброс мастер пароля """
     if not request.user.is_authenticated:
@@ -263,7 +250,7 @@ def master_password_reset(request):
     if request.method == 'POST':
         password = request.POST.get('password')
 
-        if service.master_password_reset(request.user, password):
+        if master_password.master_password_reset(request.user, password):
             return redirect(reverse("home_url"))
 
         context.update({
@@ -272,27 +259,24 @@ def master_password_reset(request):
     return render(request, 'registration/master_password_reset.html', context)
 
 
-@service.base_view
 def get_ip_info_system_switch(request):
     """ Закрыть сайт на техническое обслуживание """
     if request.is_ajax() and request.user.is_staff:
         system_name = request.POST.get('system_name', None)
-        answer = service.get_ip_info_system_switch(system_name)
+        answer = site_settings.get_ip_info_system_switch(system_name)
         return service.json_response(answer)
     return HttpResponseForbidden(render(request, '403.html'))
 
 
-@service.base_view
 def site_in_service_switch(request):
     """ Закрыть сайт на техническое обслуживание """
     if request.is_ajax() and request.user.is_staff:
         checked = request.POST.get('checked', None)
-        answer = service.site_in_service_switch(checked)
+        answer = site_settings.site_in_service_switch(checked)
         return service.json_response(answer)
     return HttpResponseForbidden(render(request, '403.html'))
 
 
-@service.base_view
 def create_account(request):
     """ Создает аккаунт """
     if not request.is_ajax():
@@ -303,7 +287,7 @@ def create_account(request):
     _login = request.POST.get('login', None)
     password = request.POST.get('password', None)
 
-    answer = service.create_account(
+    answer = accounts.create_account(
         site=site,
         description=description,
         login=_login,
@@ -313,18 +297,16 @@ def create_account(request):
     return service.json_response(answer)
 
 
-@service.base_view
 def delete_account(request):
     """ Удаляет аккаунт """
     if not request.is_ajax():
         return HttpResponseForbidden(render(request, '403.html'))
 
     account_id = request.POST.get('account_id', None)
-    answer = service.delete_account(account_id)
+    answer = accounts.delete_account(account_id)
     return service.json_response(answer)
 
 
-@service.base_view
 def change_info_account(request):
     """ Изменяет информацию об аккаунте """
     if not request.is_ajax():
@@ -336,7 +318,7 @@ def change_info_account(request):
     new_password = request.POST.get('new_password', None)
     account_id = request.POST.get('account_id', None)
 
-    answer = service.change_info_account(
+    answer = accounts.change_info_account(
         site=site,
         description=description,
         new_login=new_login,
@@ -346,7 +328,6 @@ def change_info_account(request):
     return service.json_response(answer)
 
 
-@service.base_view
 def change_or_create_master_password(request):
     """ Изменяет мастер пароль """
     if not request.is_ajax():
@@ -358,7 +339,7 @@ def change_or_create_master_password(request):
     passwords = request.POST.get('passwords', None)
     new_master_password = request.POST.get('new_master_password', None)
 
-    answer = service.change_or_create_master_password(
+    answer = master_password.change_or_create_master_password(
         sites=sites,
         descriptions=descriptions,
         logins=logins,
@@ -369,7 +350,6 @@ def change_or_create_master_password(request):
     return service.json_response(answer)
 
 
-@service.base_view
 def check_username(request):
     """ Проверяет существование имени в БД """
     if not request.is_ajax():
@@ -380,17 +360,15 @@ def check_username(request):
     return service.json_response(answer)
 
 
-@service.base_view
 def get_master_password(request):
     """ Возвращает мастер пароль """
     if not request.is_ajax():
         return HttpResponseForbidden(render(request, '403.html'))
 
-    answer = service.get_master_password(user=request.user)
+    answer = master_password.get_master_password(user=request.user)
     return service.json_response(answer)
 
 
-@service.base_view
 def lav_login(request):
     """ Авторизация пользователей """
     if request.user.is_authenticated:
@@ -414,7 +392,8 @@ def lav_login(request):
 
         if user is not None:
             login(request, user)
-            nlh_thread = service.NewLoginHistory(user, request.META, system, browser)
+            nlh_thread = login_history.NewLoginHistory(
+                user, request.META, system, browser)
             nlh_thread.start()
             nlh_thread.join(1.0)
             return redirect(reverse("home_url"))
@@ -437,7 +416,6 @@ class RegisterView(TemplateView):
         return lav_register(request)
 
 
-@service.base_view
 def lav_register(request):
     """ Регистрация """
     if request.user.is_authenticated:
@@ -466,7 +444,7 @@ def lav_register(request):
                     password=password1
                 )
 
-                service.confirm_email(
+                lav_email.confirm_email(
                     user=user,
                     email=email,
                     subject='Добро пожаловать в LavAccount',

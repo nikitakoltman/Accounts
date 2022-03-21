@@ -1,37 +1,10 @@
-
-import functools
-import hashlib
-import json
-import os
-import re
-import threading
-import traceback
-import urllib.request
-import zipfile
-from datetime import datetime
-
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 
-from django.db import transaction
-from django.http import HttpResponseServerError, JsonResponse
-from django.shortcuts import render
-
-from lavaccount.settings import (BASE_DIR, DEBUG,
-                                 DONATION_NOTIFICATION_SECRET_KEY,
-                                 IPINFO_IO_TOKEN, SITE_PROTOCOL,
-                                 STATIC_VERSION, SUPPORT_EMAIL)
-from loguru import logger as log
-
-from .models import (Account, Donation, LoginHistory, MasterPassword,
-                     SiteSetting)
-
-
+from .models import Account
 
 
 def create_account(site: str, description: str,
-                    login: str, password: str, user: User) -> dict:
+                   login: str, password: str, user: User) -> dict:
     """ Создает новый аккаунт """
     if Account.objects.count() >= 200:
         return {
@@ -70,7 +43,7 @@ def delete_account(account_id: int) -> dict:
 
 
 def change_info_account(site: str, description: str, new_login: str,
-                        new_password: str,account_id: int) -> dict:
+                        new_password: str, account_id: int) -> dict:
     """ Изменяет информацию аккаунта """
     try:
         account = Account.objects.get(id=account_id)

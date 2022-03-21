@@ -100,6 +100,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'axes.middleware.AxesMiddleware',
+    'core.middleware.BaseViewMiddleware',
 ]
 
 AUTHENTICATION_BACKENDS = [

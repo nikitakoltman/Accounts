@@ -1,31 +1,10 @@
-
-import functools
-import hashlib
 import json
 import os
-import re
-import threading
-import traceback
-import urllib.request
 import zipfile
 from datetime import datetime
 
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
-
-from django.db import transaction
-from django.http import HttpResponseServerError, JsonResponse
-from django.shortcuts import render
-
-from lavaccount.settings import (BASE_DIR, DEBUG,
-                                 DONATION_NOTIFICATION_SECRET_KEY,
-                                 IPINFO_IO_TOKEN, SITE_PROTOCOL,
-                                 STATIC_VERSION, SUPPORT_EMAIL)
-from loguru import logger as log
-
-from .models import (Account, Donation, LoginHistory, MasterPassword,
-                     SiteSetting)
+from lavaccount.settings import BASE_DIR
 
 
 def get_logs() -> list:
@@ -78,7 +57,7 @@ def write_error_to_log_file(error_type: str, user: User, traceback_format_exc: s
                 BASE_DIR +
                 '/logs/log_json__' +
                 datetime.now().strftime('%d-%m-%Y_%H-%M-%S') +
-                '__.zip', 'w') as arzip:
+                    '__.zip', 'w') as arzip:
                 arzip.write(BASE_DIR + '/logs/log.json')
                 log_file = open(BASE_DIR + '/logs/log.json', 'w+')
                 log_file.write(json.dumps(json.loads('{}'), indent=4))

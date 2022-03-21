@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Account, MasterPassword, Profile, LoginHistory, SiteSetting, Donation
+from .models import (Account, Donation, LoginHistory, MasterPassword, Profile,
+                     SiteSetting)
 
 
 class AccountAdmin(admin.ModelAdmin):

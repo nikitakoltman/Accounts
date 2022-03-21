@@ -24,6 +24,7 @@ INSTALLED_APPS = [
 
     'home.apps.HomeConfig',
     'api.apps.ApiConfig',
+    'core.apps.ApiConfig',
     'support.apps.SupportConfig'
 ]
 

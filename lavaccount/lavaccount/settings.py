@@ -23,7 +23,6 @@ INSTALLED_APPS = [
     'axes',
 
     'home.apps.HomeConfig',
-    'api.apps.ApiConfig',
     'core.apps.ApiConfig',
     'support.apps.SupportConfig'
 ]
